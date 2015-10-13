@@ -201,19 +201,19 @@ def simulationResultsImg(request, ciclovia_id, results_id):
     #variable data
     queryFromDB = results.simulationresults_set.all()
     if request.GET.get('data', '') == 'total_arrivals':
-	for i in queryFromDB:
-	    data.append(i.total_arrivals)
-	    print("Estoy en la iteracion " + str(i) + "de total arrivals")
-	    print(i.total_arrivals)
-	    d.changeTitle('Numero total de arribos')
-    elif request.GET.get('data','') == 'average_number_system':
-	for i in queryFromDB:
-	    data.append(i.average_number_system)
-	    print("Estoy en la iteracion " + str(i) + "de num promedio")
-	    print(i.average_number_system)
-   	    d.changeTitle('Numero promedio de personas')
+        for i in queryFromDB:
+            data.append(i.total_arrivals)
+            print("Estoy en la iteracion " + str(i) + "de total arrivals")
+            print(i.total_arrivals)
+            d.changeTitle('Numero total de arribos')
+    elif request.GET.get('data', '') == 'average_number_system':
+        for i in queryFromDB:
+            data.append(i.average_number_system)
+            print("Estoy en la iteracion " + str(i) + "de num promedio")
+            print(i.average_number_system)
+            d.changeTitle('Numero promedio de personas')
     else:
-	data = [0,0,0,0]
+        data = [0, 0, 0, 0]
 
     d.chart.data = [data]
     d.chart.valueAxis.valueMin = 2000
