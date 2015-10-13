@@ -1,0 +1,61 @@
+{% extends "ciclovia/base.html" %}
+{% block content %}
+
+<div class="container theme-showcase" role="main">
+
+<div class="page-header">
+        <h1>Resultados Simulacion</h1>
+      </div>
+
+<div class="row">
+        <div class="col-xs-7">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title">Resumen</h3>
+            </div>
+            <div class="panel-body">
+	  
+
+	<table class="table table-striped">
+            <thead>
+              <tr>
+                <th align="center">Trayecto</th>
+		<th align="center">Flujo total </th>		
+		<th align="center">Numero promedio sistema</th>	
+		<th align="center">Detalle flujo</th>	
+              </tr>
+            </thead>
+            <tbody>	
+	     {%for track in run.simulationresultspertrack_set.all%}
+		<tr>
+		    <td align="center">{{track.track}}</td>
+		    <td align="center">{{track.total_flow}}</td>
+		    <td align="center">{{track.average_number_track}}</td>		   
+		    <td align="center"><a href="{% url 'CicloviaProgram:detailTrackValidationSingleRun' ciclovia.id run.id track.id %}">Ver flujo</a></td>
+		</tr>	 
+	    {% endfor %}
+	    
+            </tbody>
+          </table>
+	    
+	     
+	    
+	           
+             
+            </div>
+          </div>
+	</div>
+	
+	
+            
+            </tbody>
+          </table>
+        </div>
+      </div>
+{% endblock content %} 
+
+
+
+
+
+

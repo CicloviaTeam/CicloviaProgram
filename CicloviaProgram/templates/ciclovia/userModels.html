@@ -1,0 +1,59 @@
+{% extends "ciclovia/base.html" %}
+{% block content %}
+	<div class="container theme-showcase" role="main">
+		<div class="page-header">
+			<h1>Ciclovias registradas</h1>
+		</div>
+		<div class="col-md-6">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th align="center">Usuario</th>
+						<th align="center">Nombre</th>
+						<th align="center">Lugar</th>
+						<th align="center">Hora inicio</th>
+						<th align="center">Hora fin</th>
+						<th align="center">Num trayectos</th>
+						<th align="center"></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% if ciclovia_list %}
+						<ul>
+							{% for ciclovia in ciclovia_list %}
+								<tr>
+									<td align="center">{{ciclovia.user}}</td>
+									<td align="center"><a href="{%    url 'CicloviaProgram:detail' ciclovia.id %}">{{ ciclovia.name}}</a></td>
+									<td align="center">{{ciclovia.place}}</td>	 
+									<td align="center">{{ciclovia.start_hour}}</td>	 	
+									<td align="center">{{ciclovia.end_hour}}</td>	 
+									<td align="center">{{ciclovia.num_tracks}}</td>
+									<td align="center"><a class="close"
+														  href="{% url 'CicloviaProgram:borrarCiclovia' ciclovia.id %}"
+														  title="Eliminar ciclovia">&times;</a></td>
+								</tr>	 
+							{% endfor %}
+						</ul>
+				</tbody>
+			</table>
+					{% else %}
+				</tbody>
+			</table>
+						<p class="alert alert-info">No se ha creado ninguna Ciclovia.</p>
+					{% endif %}             
+
+		</div>
+		<div class="col-md-2"></div>
+		<div class="col-md-4">
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">Estructurar Ciclovia</h3>
+				</div>
+				<div class="panel-body">
+					En esta seccion se puede cargar la informacion necesaria para estructura una nueva Ciclovia (cargando un XML).   
+					<p><a href="{% url 'CicloviaProgram:upload' %}"" class="btn btn-primary">Cargar &raquo;</a></p>  
+				</div>
+			</div>
+		</div>	
+	</div>
+{% endblock content %}       

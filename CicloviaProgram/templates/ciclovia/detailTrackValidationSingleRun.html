@@ -1,0 +1,55 @@
+{% extends "ciclovia/base.html" %}
+{% block content %}
+
+<div class="container theme-showcase" role="main">
+
+<div class="page-header">
+        <h1>Resultados Simulacion por trayecto</h1>
+      </div>
+
+<div class="row">
+        <div class="col-xs-7">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title">Resumen</h3>
+            </div>
+            <div class="panel-body">
+	<table class="table table-striped">
+            <thead>
+              <tr>
+                <th align="center">Intervalo de tiempo </th>
+                <th align="center">Flujo</th>			
+              </tr>
+            </thead>
+            <tbody>
+	
+	     {%for results in track.simulationresultsflowpertrack_set.all%}	     
+		<tr>		    
+		    <td align="center">{{results.hour}}</td>
+		    <td align="center">{{results.flow_hour}}</td>		   
+		</tr>	
+	    {% endfor %}
+	    
+            </tbody>
+     </table>
+	 
+	 	
+       
+             
+            </div>
+          </div>
+	</div>
+	
+	
+            
+            </tbody>
+          </table>
+        </div>
+      </div>
+{% endblock content %}  
+
+
+
+
+
+

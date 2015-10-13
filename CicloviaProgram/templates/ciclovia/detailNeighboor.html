@@ -1,0 +1,93 @@
+{% extends "ciclovia/base.html" %}
+{% block content %}
+
+
+<div class="container theme-showcase" role="main">
+
+<div class="row">
+        <div class="col-xs-4">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title">Detalle Ciclovia - Trayecto</h3>
+            </div>
+            <div class="panel-body">
+   <table class="table table-striped">
+            <thead>
+              <tr>
+                <th align="center">Informacion</th>
+                <th align="center">Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+      <tr>
+       <td align="center">Nombre</td>
+       <td align="center">{{ciclovia.name}}</td>
+      </tr> 
+      <tr>
+        <td align="center">Lugar</td>
+        <td align="center">{{ciclovia.place}}</td>
+      </tr> 
+      <tr>
+       <td align="center">Horario</td>
+       <td align="center">{{ciclovia.start_hour}} :00 - {{ciclovia.end_hour}} :00</td>
+      </tr> 
+      <tr>
+       <td align="center">Num trayectos</td>
+       <td align="center">{{ciclovia.num_tracks}}</td>
+      </tr>  
+      <tr>
+       <td align="center">Id trayecto</td>
+       <td align="center">{{track.id_track}}</td>
+      </tr>   
+      <tr>
+       <td align="center">Distancia trayecto</td>
+       <td align="center">{{track.distance}}</td>
+      </tr>  
+      <tr>
+       <td align="center">Probabilidad trayecto</td>
+       <td align="center">{{track.probability}}</td>
+      </tr>  
+      <tr>
+       <td align="center">Proporcion arribos</td>
+       <td align="center">{{track.arrival_proportion}}</td>
+      </tr>    
+            </tbody>
+          </table>
+       
+             
+            </div>
+          </div>
+   </div>
+   
+   <div class="col-xs-4">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title">Detalle Vecinos</h3>
+            </div>
+            <div class="panel-body">
+             <table class="table table-striped">
+            <thead>
+              <tr>
+                <th align="center">Vecino #</th>
+                <th align="center">Probabilidad</th>     
+         </tr>
+            </thead>
+            <tbody>        
+       <ul>
+       {%for neighboor in track.neighboorinfo_set.all%}
+      <tr>
+          <td align="center">{{neighboor.neighboorId}}</td>
+          <td align="center">{{neighboor.probability}}</td>          
+      </tr>  
+        {% endfor %}
+       </ul>
+            
+            </tbody>
+          </table>
+        </div>
+      </div>
+  </div>
+</div>
+             
+            </div>
+{% endblock content %}         

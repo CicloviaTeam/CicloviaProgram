@@ -1,0 +1,66 @@
+{% extends "ciclovia/base.html" %}
+{% block content %}
+<body>
+<div id="wrapper">
+	{% load staticfiles %}
+	<!-- start header -->
+	<!-- end header -->
+	<section id="featured">
+
+		<!-- Slider -->
+		<div id="main-slider" class="flexslider">
+			<ul class="slides">
+				<li>
+					<img src="{% static "img/slides/1.jpg" %}" alt="" />
+					<div class="flex-caption">
+						<h3>Bienvenido</h3>
+						<p>Mediante este software, usted podrá modelar la ciclovía, estimar el numero de participantes y revisar los principales indicadores</p>
+					</div>
+				</li>
+				<li>
+					<img src="{% static "img/slides/2.jpg" %}" alt="" />
+					<div class="flex-caption">
+						<h3>Estructurar Ciclovia</h3>
+						<p>El software permite construir el modelo de una ciclovía. Esta estructura se puede modificar cuando sea necesario.</p>
+					</div>
+				</li>
+				<li>
+					<img src="{% static "img/slides/3.jpg" %}" alt="" />
+					<div class="flex-caption">
+						<h3>Revisar Indicadores</h3>
+						<p>Con el número de participantes ya calculado, se pueden realizar estimaciones de los principales indicacodres para luego comparar con datos históricos.</p>
+					</div>
+				</li>
+			</ul>
+		</div>
+		<!-- end slider -->
+
+	</section>
+	<section class="callaction">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-1">
+				</div>
+				<div class="col-md-8">
+					<div><h1><span><span class="blue_text">¡Bienvenido!</span></span></h1><span class="clear spacer_responsive_hide_mobile " style="height:13px;display:block;"></span><p>Mediante este software es posible modelar una ciclovía, estimar el numero de participantes y revisar los principales indicadores. Se pueden realizar estimaciones de la cantidad de participantes, una vez teniendo el modelo de la ciclovia, solo es necesario ingresar la informació de la tasa de llegada y el comportamiento de los participantes para obtener el resultado final.</p>
+
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</section>
+	<footer>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-4">
+					<div class="widget">
+
+						<span>&copy;Copyright 2015 Proyecto Ciclovía Simulator </span>
+					</div>
+				</div>
+			</div>
+	</footer>
+</div>
+<a href="#" class="scrollup"><i class="fa fa-angle-up active"></i></a>
+{% endblock content %}

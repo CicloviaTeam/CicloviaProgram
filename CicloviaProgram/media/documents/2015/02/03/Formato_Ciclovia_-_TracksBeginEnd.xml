@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ciclovia>
+	<name>Ejemplo</name>
+	<place>Bogota</place>
+	<type>model</type>
+	<startHour>7</startHour>
+	<endHour>14</endHour>
+	<numTracks> 3 </numTracks>
+	<track> 
+		<id>1</id>
+		<distance>10</distance>
+		<probability>0.3</probability>
+		<probabilityBegin>0</probabilityBegin>
+		<probabilityEnd>0</probabilityEnd>
+		<neighboor>
+			<id>2</id>
+			<probability>0.7</probability>
+			<direction>end</direction>
+		</neighboor>	
+	</track>
+	<track> 
+		<id>2</id>
+		<distance>30</distance>
+		<probability>0.2</probability>
+		<probabilityBegin>0.2</probabilityBegin>
+		<probabilityEnd>0.2</probabilityEnd>
+		<neighboor> 
+			<id>1</id>
+			<probability>0.8</probability>
+			<direction>begin</direction>
+		</neighboor>	
+		<neighboor> 
+			<id>3</id>
+			<probability>0.8</probability>
+			<direction>end</direction>
+		</neighboor>	
+	</track>
+	<track> 
+		<id>3</id>
+		<distance>15</distance>
+		<probability>0.1</probability>
+		<probabilityBegin>0.1</probabilityBegin>
+		<probabilityEnd>0.1</probabilityEnd>
+		<neighboor>
+			<id>2</id>
+			<probability>0.9</probability>
+			<direction>begin</direction>
+		</neighboor>	
+	</track>
+</ciclovia>
+
+

@@ -1,0 +1,118 @@
+{% extends "ciclovia/base.html" %}
+{% block content %}
+
+<div class="container theme-showcase" role="main">
+
+<div class="page-header">
+        <h1>Resultados Simulacion</h1>
+      </div>
+
+<div class="row">
+        <div class="col-xs-7">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <h3 class="panel-title">Resumen</h3>
+            </div>
+            <div class="panel-body">
+	  <table class="table table-striped">
+            <thead>
+              <tr>
+                <th align="center">Fecha</th>
+                <th align="center">Num corridas</th>
+		<th align="center">Promedio Arribos totales</th>
+		<th align="center">Desviacion estandar Arribos totales</th>		
+		<th align="center">Promedio Numero promedio sistema</th>
+		<th align="center">Desviacion estandar Numero promedio sistema</th>
+              </tr>
+            </thead>
+            <tbody>	
+		<tr>
+		    <td align="center">{{results.date}}</td>
+		    <td align="center">{{results.num_runs}}</td>
+		    <td align="center">{{results.avg_total_arrivals}}</td>
+		    <td align="center">{{results.stdev_total_arrivals}}</td>		    
+		    <td align="center">{{results.average_number_system}}</td>
+		    <td align="center">{{results.stdev_number_system}}</td>
+		</tr>	 
+	    
+	    
+            </tbody>
+     </table>
+
+    <table class="table table-striped">
+            <thead>
+              <tr>
+                <th align="center">Trayecto</th>		
+		<th align="center">Promedio Numero promedio trayecto</th>
+		<th align="center">Desviacion estandar Numero promedio trayecto</th>
+		<th align="center">Promedio Flujo trayecto</th>
+		<th align="center">Desviacion estandar Flujo trayecto</th>
+		<th align="center">Detalle flujo</th>
+              </tr>
+            </thead>
+            <tbody>	
+	     {%for track in results.simulationresultscompiledpertrack_set.all%}
+		<tr>
+		    <td align="center">{{track.track}}</td>
+		    <td align="center">{{track.average_number_track}}</td>
+		    <td align="center">{{track.stdev_number_track}}</td>
+		    <td align="center">{{track.average_total_flow}}</td>
+		    <td align="center">{{track.stdev_total_flow}}</td>
+		    <td align="center"><a href="{% url 'CicloviaProgram:detailTrackValidation' ciclovia.id track.id %}">Ver flujo</a></td>	
+		</tr>	 
+	    {% endfor %}
+	    
+            </tbody>
+     </table>
+
+	    
+	    
+	<table class="table table-striped">
+            <thead>
+              <tr>
+                <th align="center">Fecha</th>
+                <th align="center">Tiempo simulacion</th>
+		<th align="center">Arribos totales</th>
+		<th align="center">Tiempo promedio sistema</th>
+		<th align="center">Desviacion estandar tiempo</th>
+		<th align="center">Numero promedio sistema</th>	
+		<th align="center">Detalle simulacion</th>	
+              </tr>
+            </thead>
+            <tbody>	
+	     {%for run in results.simulationresults_set.all%}
+		<tr>
+		    <td align="center">{{run.date}}</td>
+		    <td align="center">{{run.sim_time}}</td>
+		    <td align="center">{{run.total_arrivals}}</td>
+		    <td align="center">{{run.average_time}}</td>	
+		    <td align="center">{{run.standard_deviation_time}}</td>
+		    <td align="center">{{run.average_number_system}}</td>
+		    <td align="center"><a href="{% url 'CicloviaProgram:detailValidationSingleRun' ciclovia.id run.id %}">Ver simulacion</a></td>
+		</tr>	 
+	    {% endfor %}
+	    
+            </tbody>
+          </table>
+	    
+	     
+	    
+	           
+             
+            </div>
+          </div>
+	</div>
+	
+	
+            
+            </tbody>
+          </table>
+        </div>
+      </div>
+{% endblock content %}
+
+
+
+
+
+

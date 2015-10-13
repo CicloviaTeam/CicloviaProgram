@@ -1,0 +1,53 @@
+{% extends "ciclovia/base.html" %}
+
+{% block title %}Pagina de {{ request.user.get_username }}{% endblock title %}
+
+{% block content %}
+	<div class="container">
+		<h1>Opciones de usuario</h1>
+		<h2>Actualizar datos:</h2>
+		{% if mensaje %}
+			<p class="alert alert-info">{{ mensaje }}</p>
+		{% endif %}
+		<form action="{% url 'CicloviaProgram:user'%}" method="POST">
+			{% csrf_token %}
+			{% for error in form.non_field_errors %}
+				<div class="alert alert-danger fade in">
+					<a class="close" data-dismiss="alert">&times;</a>
+					<strong>Error!</strong> {{ error }}
+				</div>
+			{% endfor %}
+			<div class="form-group">
+				{% for error in form.first_name.errors %}
+					<p class="text-danger"><strong>Error! </strong>{{error}}</p>
+				{% endfor %}
+				<label class="control-label" for="{{ form.first_name.id_for_label }}" >Nombres:</label>
+				<input class="form-control" type="text" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.html_name }}" value="{{ user.first_name}}"/>
+			</div>
+			<div class="form-group">
+				{% for error in form.last_name.errors %}
+					<p class="text-danger"><strong>Error! </strong>{{error}}</p>
+				{% endfor %}
+				<label class="control-label" for="{{ form.last_name.id_for_label }}" >Apellidos:</label>
+				<input class="form-control" type="text" id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.html_name }}" value="{{ user.last_name }}"/>
+			</div>
+			<div class="form-group">
+				{% for error in form.email.errors %}
+					<p class="text-danger"><strong>Error! </strong>{{error}}</p>
+				{% endfor %}
+				<label class="control-label" for="{{ form.email.id_for_label }}" >e-mail:</label>
+				<input class="form-control" type="email" id="{{ form.email.id_for_label }}" name="{{ form.email.html_name }}" value="{{ user.email }}"/>
+			</div>
+			<div class="form-group">
+				<input class="btn btn-primary" type="submit" name="opcion" value="Actualizar datos">
+			</div>
+			<h2>Mas opciones:</h2>
+			<div class="form-group">
+				<input class="btn btn-primary" type="submit" name="opcion" value="Cerrar sesion">
+			</div>
+			<div class="form-group">
+				<input class="btn btn-primary" type="submit" name="opcion" value="Borrar usuario">
+			</div>
+		</form>
+	</div>
+{% endblock content %}

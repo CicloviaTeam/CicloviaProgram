@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ciclovia>
+	<name>Ejemplo</name>
+	<place>Bogota</place>
+	<type>experiment</type>
+	<action>add</action>
+	<newTrack> 
+		<id> 4 </id>
+		<distance> 20 </distance>
+		<probability> 0.3 </probability>
+		<neighboor>
+			<id>3</id>
+			<trackToNeighboorProbability>0.3</trackToNeighboorProbability>
+			<neighboorToTrackProbability>0.3</neighboorToTrackProbability>
+		</neighboor>	
+	</newTrack>
+</ciclovia>
+
+

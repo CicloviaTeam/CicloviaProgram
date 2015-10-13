@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ciclovia>
+	<name> Ejemplo </name>
+	<place> Bogota </place>
+	<type>experiment</type>
+	<action> remove </action>
+	<trackToRemove> 
+		<id> 4 </id>
+		<type>extremity</type>			
+	</trackToRemove>
+</ciclovia>
+
+
+
+
+

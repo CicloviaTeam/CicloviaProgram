@@ -1,0 +1,118 @@
+{% extends "ciclovia/base.html" %}
+{% block content %}
+	<div class="container theme-showcase" role="main">
+		<div class="page-header">
+			<h1>Informacion detallada</h1>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Detalle Ciclovia</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th align="center">Informacion</th>
+									<th align="center">Valor</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td align="center">Nombre</td>
+									<td align="center">{{ciclovia.name}}</td>
+								</tr>	
+								<tr>
+									<td align="center">Lugar</td>
+									<td align="center">{{ciclovia.place}}</td>
+								</tr>	
+								<tr>
+									<td align="center">Horario</td>
+									<td align="center">{{ciclovia.start_hour}} :00 - {{ciclovia.end_hour}} :00</td>
+								</tr>	
+								<tr>
+									<td align="center">Num trayectos</td>
+									<td align="center">{{ciclovia.num_tracks}}</td>
+								</tr>      
+							</tbody>
+						</table>					 
+					</div>
+				</div>
+			</div>			
+			<div class="col-md-5">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Detalle Trayectos</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th align="center">#</th>
+									<th align="center">Distancia</th>
+									<th align="center">Probabilidad inicio</th>
+									<th align="center">Probabilidad fin</th>
+									<th align="center">Vecinos</th>
+								</tr>
+							</thead>
+							<tbody>		   
+								<ul>
+									{%for track in ciclovia.track_set.all%}
+										<tr>
+											<td align="center">{{track.id_track}}</td>
+											<td align="center">{{track.distance}}</td>
+											<td align="center">{{track.probabilityBegin}}</td>
+											<td align="center">{{track.probabilityEnd}}</td>
+											<td align="center"><a href="{% url 'CicloviaProgram:detailNeighboor' ciclovia.id track.id %}">Ver vecinos</a></td>			
+										</tr>	 
+									{% endfor %}
+								</ul>								
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="page-header">
+			<h1>Acciones</h1>
+		</div>
+		<div class="row">			
+			<div class="col-md-4">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Realizar experimentos</h3>
+					</div>
+					<div class="panel-body">
+						En esta seccion se pueden agregar/eliminar trayectos (cargando un XML), una vez se tiene el modelo de la Ciclovia.
+					</div>
+				</div>
+			</div>
+			{%ifequal ciclovia.reference_arrival_rate 0 %}	
+				<div class="col-md-4">
+					<div class="panel panel-primary">
+						<div class="panel-heading">						 
+							<h3 class="panel-title">Ingresar info de arribos</h3>
+						</div>
+						<div class="panel-body">
+							En esta seccion se puede ingresar la informacion que se va a utilizar para los arribos de la Ciclovia (necesarios para la simulacion).
+							<p><a href="{% url 'CicloviaProgram:uploadArrivalInfo' ciclovia.id %}"" class="btn btn-primary">Cargar &raquo;</a></p>  
+						</div>
+					</div>
+				</div>			
+			{% else %}	
+				<div class="col-md-4">
+					<div class="panel panel-primary">
+						<div class="panel-heading">					 
+							<h3 class="panel-title">Ver info de arribos</h3>
+						</div>
+						<div class="panel-body">
+							En esta seccion se puede ver la informacion ingresada de los arribos de la Ciclovia.
+							<p><a href="{% url 'CicloviaProgram:detailArrival' ciclovia.id %}"" class="btn btn-primary">Ver arribos &raquo;</a></p>  
+						</div>
+					</div>
+				</div>
+			{% endifequal %}
+		</div>
+	</div>
+{% endblock content %}       
