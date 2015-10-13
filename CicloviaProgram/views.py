@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import *
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from myCicloviaProject import settings as settings
 
+
 def index(request):
     return render(request, 'ciclovia/index.html')
 
@@ -172,7 +173,7 @@ def detailTrackValidation(request, ciclovia_id, track_id):
     print("La llave es " + track_id)
     track = get_object_or_404(SimulationResultsCompiledPerTrack, pk=track_id)
 
-    #return render(request, 'ciclovia/detailTrackValidation.html', {'ciclovia': ciclovia, 'track': track})
+    # return render(request, 'ciclovia/detailTrackValidation.html', {'ciclovia': ciclovia, 'track': track})
     return render(request, 'ciclovia/detailTrackValidation.html',
                   {'ciclovia': ciclovia, 'track': track})
 
