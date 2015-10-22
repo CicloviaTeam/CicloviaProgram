@@ -20,3 +20,4 @@ def DeleteU(pUsername):
 ##Check if user is logged in.
 def notAutheticated(User):
     return not User.is_authenticated()
+

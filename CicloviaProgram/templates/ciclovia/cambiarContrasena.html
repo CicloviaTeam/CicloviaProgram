@@ -1,0 +1,43 @@
+{% extends "ciclovia/base.html" %}
+
+{% block title %}Pagina de {{ request.user.get_username }}{% endblock title %}
+
+{% block content %}
+
+    <div class="container">
+        <form action="{% url 'CicloviaProgram:cambiarContrasena' %}" method="POST">
+            {% csrf_token %}
+            {% for error in form.non_field_errors %}
+				<div class="alert alert-danger fade in">
+					<a class="close" data-dismiss="alert">&times;</a>
+					<strong>Error!</strong> {{ error }}
+				</div>
+			{% endfor %}
+            <div class="form-group">
+				{% for error in form.old_password.errors %}
+					<p class="text-danger"><strong>Error! </strong>{{error}}</p>
+				{% endfor %}
+				<label class="control-label" for="{{ form.old_password.id_for_label }}" >Contraseña actual:</label>
+				<input class="form-control" type="password" id="{{ form.old_password.id_for_label }}" name="{{ form.old_password.html_name }}" />
+			</div>
+            <div class="form-group">
+				{% for error in form.new_password1.errors %}
+					<p class="text-danger"><strong>Error! </strong>{{error}}</p>
+				{% endfor %}
+				<label class="control-label" for="{{ form.new_password1.id_for_label }}" >Contraseña nueva:</label>
+				<input class="form-control" type="password" id="{{ form.new_password1.id_for_label }}" name="{{ form.new_password1.html_name }}" />
+			</div>
+            <div class="form-group">
+				{% for error in form.new_password2.errors %}
+					<p class="text-danger"><strong>Error! </strong>{{error}}</p>
+				{% endfor %}
+				<label class="control-label" for="{{ form.new_password2.id_for_label }}" >Repita la contraseña:</label>
+				<input class="form-control" type="password" id="{{ form.new_password2.id_for_label }}" name="{{ form.new_password2.html_name }}" />
+			</div>
+            <div class="form-group">
+				<input class="btn btn-primary" type="submit" name="opcion" value="Cambiar contraseña">
+			</div>
+        </form>
+    </div>
+
+{% endblock content %}

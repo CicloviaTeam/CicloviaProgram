@@ -105,3 +105,6 @@ STATIC_URL = '/static/'
 #ruta donde guardaremos los archivos de media
 #Revisar como poner relativa
 MEDIA_ROOT = os.path.join(BASE_DIR, 'CicloviaProgram/media/')
+
+# Dreccion para iniciar sesion.
+LOGIN_URL = 'CicloviaProgram:login'

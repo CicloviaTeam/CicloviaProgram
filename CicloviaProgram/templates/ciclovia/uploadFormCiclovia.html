@@ -1,0 +1,63 @@
+{% extends "ciclovia/base.html" %}
+
+{% load staticfiles %}
+
+{% block title %}
+
+	Formulario para estructurar ciclovia
+
+{% endblock title %}
+
+{% block content %}
+
+	<div class="container">
+		<div class="jumbotron" style="margin-top:30px;">
+			<h1>Estructurar ciclovia</h1>
+		</div>
+		<div id="container"></div>
+	</div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+	<script src="http://code.jquery.com/jquery-1.11.2.min.js"></script>
+	<script src="https://fb.me/react-0.13.3.min.js"></script>
+	<script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
+	<script type="text/jsx" src="{% static 'js/maro.js' %}"></script>
+	<script src="{% static 'js/js.cookie.js' %}"></script>
+	<script>
+		function mySendPost(global){
+			var csrftoken = Cookies.get('csrftoken');
+			function csrfSafeMethod(method) {
+				return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+			}
+			$.ajaxSetup({
+				beforeSend: function(xhr, settings) {
+					if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+						xhr.setRequestHeader("X-CSRFToken", csrftoken);
+					}
+				}
+			});
+			$.ajax({
+				url:"{% url 'CicloviaProgram:uploadFormCiclovia' %}",
+				type: "POST",
+				data: JSON.stringify(global),
+				contentType: 'application/json; charset=utf-8',
+				success:function(response){
+					resp = jQuery(response);
+					$("title").replaceWith(resp.filter("title")[0].innerHTML);
+					$("body").html(response);
+				},
+				error:function (xhr, textStatus, thrownError){
+					<!--var jqueryResp = jQuery(xhr.responseText);-->
+					<!--var htmlEle = $("html");-->
+					$("html").html(xhr.responseText);
+					<!--$("div").replaceWith(jqueryResp);-->
+					<!--alert(textStatus + " " + thrownError);-->
+				}
+			});
+		}
+	</script>
+{% endblock scripts %}
+

@@ -22,21 +22,36 @@
 					<p class="text-danger"><strong>Error! </strong>{{error}}</p>
 				{% endfor %}
 				<label class="control-label" for="{{ form.first_name.id_for_label }}" >Nombres:</label>
-				<input class="form-control" type="text" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.html_name }}" value="{{ user.first_name}}"/>
+				{% if form.first_name.value %}
+					<input class="form-control" type="text" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.html_name }}" value="{{ form.first_name.value }}" />
+				{% else %}
+					<input class="form-control" type="text" id="{{ form.first_name.id_for_label }}" name="{{ form.first_name.html_name }}" />
+				{% endif %}
 			</div>
 			<div class="form-group">
 				{% for error in form.last_name.errors %}
 					<p class="text-danger"><strong>Error! </strong>{{error}}</p>
 				{% endfor %}
 				<label class="control-label" for="{{ form.last_name.id_for_label }}" >Apellidos:</label>
-				<input class="form-control" type="text" id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.html_name }}" value="{{ user.last_name }}"/>
+				{% if form.last_name.value %}
+					<input class="form-control" type="text" id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.html_name }}" value="{{ form.last_name.value }}" />
+				{% else %}
+					<input class="form-control" type="text" id="{{ form.last_name.id_for_label }}" name="{{ form.last_name.html_name }}" />
+				{% endif %}
 			</div>
 			<div class="form-group">
 				{% for error in form.email.errors %}
 					<p class="text-danger"><strong>Error! </strong>{{error}}</p>
 				{% endfor %}
 				<label class="control-label" for="{{ form.email.id_for_label }}" >e-mail:</label>
-				<input class="form-control" type="email" id="{{ form.email.id_for_label }}" name="{{ form.email.html_name }}" value="{{ user.email }}"/>
+				{% if form.email.value %}
+					<input class="form-control" type="text" id="{{ form.email.id_for_label }}" name="{{ form.email.html_name }}" value="{{ form.email.value }}" />
+				{% else %}
+					<input class="form-control" type="text" id="{{ form.email.id_for_label }}" name="{{ form.email.html_name }}" />
+				{% endif %}
+			</div>
+			<div class="form-group">
+				<a href="{% url 'CicloviaProgram:cambiarContrasena' %}">Cambiar contraseña</a>
 			</div>
 			<div class="form-group">
 				<input class="btn btn-primary" type="submit" name="opcion" value="Actualizar datos">
@@ -44,8 +59,6 @@
 			<h2>Mas opciones:</h2>
 			<div class="form-group">
 				<input class="btn btn-primary" type="submit" name="opcion" value="Cerrar sesion">
-			</div>
-			<div class="form-group">
 				<input class="btn btn-primary" type="submit" name="opcion" value="Borrar usuario">
 			</div>
 		</form>
