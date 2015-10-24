@@ -1,3 +1,4 @@
+# coding=utf-8
 from xml.etree import ElementTree
 from xml.dom import minidom
 

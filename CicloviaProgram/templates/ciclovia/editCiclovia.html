@@ -1,0 +1,166 @@
+{% extends "ciclovia/base.html" %}
+
+{% block content %}
+	<div class="container theme-showcase" role="main">
+		<div class="page-header">
+			<h1>Editar información detallada</h1>
+		</div>
+		<div class="row">
+		    <div class="col-md-4">
+                {% for error in form.non_field_errors %}
+                    <div class="alert alert-danger fade in">
+                        <a class="close" data-dismiss="alert">&times;</a>
+                        <strong>Error!</strong> {{ error }}
+                    </div>
+                {% endfor %}
+                {% for error in form.name.errors %}
+                    <p class="text-danger"><strong>Nombre! </strong>{{error}}</p>
+                {% endfor %}
+                {% for error in form.place.errors %}
+                    <p class="text-danger"><strong>Lugar! </strong>{{error}}</p>
+                {% endfor %}
+                {% for error in form.start_hour.errors %}
+                    <p class="text-danger"><strong>Hora de inicio! </strong>{{error}}</p>
+                {% endfor %}
+                {% for error in form.end_hour.errors %}
+                    <p class="text-danger"><strong>Hora de finalización! </strong>{{error}}</p>
+                {% endfor %}
+            </div>
+		    {% if formset.total_error_count != 0 %}
+                <div class="col-md-8">
+                    {% for error in formset.non_form_errors %}
+                        <div class="alert alert-danger fade in">
+                            <a class="close" data-dismiss="alert">&times;</a>
+                            <strong>Error!</strong> {{ error }}
+                        </div>
+                    {% endfor %}
+                    {% for formsetform in formset %}
+                        {% for error in formsetform.non_field_errors %}
+                            <div class="alert alert-danger fade in">
+                                <a class="close" data-dismiss="alert">&times;</a>
+                                <strong>Ruta {{ formsetform.id_track.value }}!</strong> {{ error }}
+                            </div>
+                        {% endfor %}
+                        {% for error in formsetform.id_track.errors %}
+                            <p class="text-danger"><strong>Ruta {{ formsetform.id_track.value }}, id! </strong>{{error}}</p>
+                        {% endfor %}
+                        {% for error in formsetform.distance.errors %}
+                            <p class="text-danger"><strong>Ruta {{ formsetform.id_track.value }}, distancia! </strong>{{error}}</p>
+                        {% endfor %}
+                        {% for error in formsetform.probabilityBegin.errors %}
+                            <p class="text-danger"><strong>Ruta {{ formsetform.id_track.value }}, probabilidad inicio! </strong>{{error}}</p>
+                        {% endfor %}
+                        {% for error in formsetform.probabilityEnd.errors %}
+                            <p class="text-danger"><strong>Ruta {{ formsetform.id_track.value }}, probabilidad fin! </strong>{{error}}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <form action="{% url 'CicloviaProgram:editCiclovia' ciclovia.id %}" method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Editar detalles de ciclovía</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th align="center">Información</th>
+                                        <th align="center">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td align="center">Nombre</td>
+                                        <td align="center"><input class="form-control" type="text" name="{{ form.name.html_name }}" value="{{ form.name.value }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center">Lugar</td>
+                                        <td align="center"><input class="form-control" type="text" name="{{ form.place.html_name }}" value="{{ form.place.value }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center">Hora de inicio</td>
+                                        <td align="center"><input class="form-control" type="number" name="{{ form.start_hour.html_name }}" value="{{ form.start_hour.value }}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center">Hora de finalización</td>
+                                        <td align="center"><input class="form-control" type="number" name="{{ form.end_hour.html_name }}" value="{{ form.end_hour.value }}"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Editar detalles de trayectos</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th align="center">#</th>
+                                        <th align="center">Distancia</th>
+                                        <th align="center">Probabilidad inicio</th>
+                                        <th align="center">Probabilidad fin</th>
+                                        <th align="center">Eliminar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="trackdata">
+                                    {{ formset.management_form }}
+                                    {% for formsetform in formset %}
+                                        <tr>
+                                            {% if formsetform.id_track.value %}
+                                                <td align="center"><input class="form-control" type="number" name="{{ formsetform.id_track.html_name }}" value="{{ formsetform.id_track.value }}" readonly></td>
+                                            {% else %}
+                                                <td align="center"><input class="form-control" type="number" name="{{ formsetform.id_track.html_name }}" value="{{ formsetform.id_track.value }}"></td>
+                                            {% endif %}
+                                            <td align="center"><input class="form-control" type="text" name="{{ formsetform.distance.html_name }}" value="{{ formsetform.distance.value }}"></td>
+                                            <td align="center"><input class="form-control" type="text" name="{{ formsetform.probabilityBegin.html_name }}" value="{{ formsetform.probabilityBegin.value }}"></td>
+                                            <td align="center"><input class="form-control" type="text" name="{{ formsetform.probabilityEnd.html_name }}" value="{{ formsetform.probabilityEnd.value }}"></td>
+                                            <td align="center"><input type="checkbox" name="{{ formsetform.DELETE.html_name }}"></td>
+                                            <input type="hidden" name="{{ formsetform.id.html_name }}" value="{{ formsetform.id.value }}">
+                                            <input type="hidden" name="{{ formsetform.ciclovia.html_name }}" value="{{ formsetform.ciclovia.value }}">
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            <button class="btn btn-primary" type="button" onclick="inserttrack()">Añadir trayecto</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <input class="btn btn-primary" type="submit" value="Modificar">
+            </div>
+        </form>
+	</div>
+{% endblock content %}
+
+{% block scripts %}
+
+    <script>
+        var form_count = {{formset.total_form_count}};
+        function inserttrack(){
+            var row =   "<tr>"+
+                        "    <td align='center'><input class='form-control' type='number' name='{{ formset.empty_form.id_track.html_name }}' ></td>"+
+                        "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.distance.html_name }}' ></td>"+
+                        "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityBegin.html_name }}' ></td>"+
+                        "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityEnd.html_name }}' ></td>"+
+                        "    <td align='center'><input type='checkbox' name='{{ formset.empty_form.DELETE.html_name }}'></td>"+
+                        "    <input type='hidden' name='{{ formset.empty_form.id.html_name }}' >"+
+                        "    <input type='hidden' name='{{ formset.empty_form.ciclovia.html_name }}' value='{{ formset.empty_form.ciclovia.value }}'>"+
+                        "</tr>";
+            var row2 = row.replace(/__prefix__/g,form_count);
+            $(row2).appendTo("#trackdata");
+            form_count++;
+            $("#id_track_set-TOTAL_FORMS").val(form_count);
+        }
+    </script>
+
+{% endblock scripts %}

@@ -1,16 +1,20 @@
+# coding=utf-8
 from django.conf.urls import patterns, url
 from django.contrib.auth import views as auth_views
 from CicloviaProgram import views
 
 urlpatterns = patterns('',
-                    # Paginas principales.
+                    # Páginas principales.
     url(r'^$', views.index, name='index'),
     # ex: /ciclovias/
     url(r'^models/$', views.userModels, name='userModels'),
     # ex: /ciclovias/5/
     url(r'^(?P<ciclovia_id>\d+)/$', views.detail, name='detail'),
+    url(r'^editCiclovia/(?P<ciclovia_id>\d+)/$', views.editCiclovia, name='editCiclovia'),
     url(r'^(?P<ciclovia_id>\d+)/(?P<track_id>\d+)/$',
-        views.detailNeighboor, name='detailNeighboor'),   
+        views.detailNeighboor, name='detailNeighboor'),
+    url(r'^editNeighboor/(?P<ciclovia_id>\d+)/(?P<track_id>\d+)/$',
+        views.editNeighboor, name='editNeighboor'),
     url(r'^upload/$', views.upload, name='upload'),
     url(r'^uploadFormCiclovia$', views.uploadFormCiclovia, name='uploadFormCiclovia'),
     url(r'^borrarCiclovia/(?P<ciclovia_id>\d+)/$', views.borrarCiclovia, name='borrarCiclovia'),
@@ -21,9 +25,16 @@ urlpatterns = patterns('',
     url(r'^adminSimulation/$', views.adminSimulation, name='adminSimulation'),
     url(r'^(?P<ciclovia_id>\d+)/simulationResults/$',
         views.simulationResults, name='simulationResults'),
-                    # Paginas de validacion
+    url(r'^simulationResultsOld/(?P<ciclovia_id>\d+)/$',
+        views.simulationResultsOld, name='simulationResultsOld'),
+    url(r'^charts/pie/$',views.piechart, name='pieChart'),
+    url(r'^charts/verticalBarChart/$',views.verticalBarChart, name='vBarChart'),
+    url(r'^charts/graph/$',views.graphImg, name='graph'),
+                    # Páginas de validación
     url(r'^(?P<ciclovia_id>\d+)/simulationResultsValidation/$',
         views.simulationResultsValidation, name='simulationResultsValidation'),
+    url(r'^(?P<ciclovia_id>\d+)/simulationResultsValidationOld/$',
+        views.simulationResultsValidationOld, name='simulationResultsValidationOld'),
     url(r'^(?P<ciclovia_id>\d+)/simulationResultsValidationPerTrack'+
         '/(?P<track_id>\d+)/$', views.detailTrackValidation,
         name='detailTrackValidation'),  
@@ -36,7 +47,7 @@ urlpatterns = patterns('',
         name='detailTrackValidationSingleRun'),  
     url(r'^(?P<ciclovia_id>\d+)/simulationResultsImg/(?P<results_id>\d+)/$',
         views.simulationResultsImg, name='simulationResultsImg'),
-                    # Paginas de usuario.
+                    # Páginas de usuario.
     url(r'^login$', auth_views.login,
         {'template_name':'ciclovia/login.html'}, name='login'),
     url(r'^newUser$', views.newUser, name='newUser'),

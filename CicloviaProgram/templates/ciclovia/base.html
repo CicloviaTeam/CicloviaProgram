@@ -31,8 +31,8 @@
 					<div class="collapse navbar-collapse" id="navbarCollapse">
 						<ul class="nav navbar-nav">
 							<li><a href="http://epiandes.uniandes.edu.co/?portfolio=taste-lab" target="_blank">Proyecto</a></li>
-							<li><a href ="{% url 'CicloviaProgram:userModels' %}" >Ver Ciclovias</a></li>
-							<li><a href ="{% url 'CicloviaProgram:adminSimulation' %}" >Ver Parametros Simulacion</a></li>
+							<li><a href ="{% url 'CicloviaProgram:userModels' %}" >Ver Ciclovías</a></li>
+							<li><a href ="{% url 'CicloviaProgram:adminSimulation' %}" >Ver Parametros Simulación</a></li>
 						{% if user.is_authenticated %}
 							<li class="active"><a href="{% url 'CicloviaProgram:user' %}">Bienvenido, {{ user.get_username }}</a></li>
 						</ul>

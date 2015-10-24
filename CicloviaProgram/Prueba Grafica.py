@@ -1,3 +1,4 @@
+# coding=utf-8
 from __future__ import division
 import numpy as np
 import random
@@ -11,7 +12,7 @@ def ejemploGrafica():
     plot(x,y,'r')
     xlabel('x')
     ylabel('y')
-    title(u'Título')
+    title(u'Tï¿½tulo')
     show()
     
 def ejemploGrafica2():

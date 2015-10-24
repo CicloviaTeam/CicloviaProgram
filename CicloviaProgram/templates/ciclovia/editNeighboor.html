@@ -1,0 +1,209 @@
+{% extends "ciclovia/base.html" %}
+
+{% block content %}
+
+    <div class="container theme-showcase" role="main">
+        <div class="page-header">
+			<h1>Información detallada del trayecto</h1>
+		</div>
+		<div class="row">
+		    {% if formset.total_error_count != 0 %}
+                <div class="col-md-offset-4 col-md-8">
+                    {% for error in formset.non_form_errors %}
+                        <div class="alert alert-danger fade in">
+                            <a class="close" data-dismiss="alert">&times;</a>
+                            <strong>Error!</strong> {{ error }}
+                        </div>
+                    {% endfor %}
+                    {% for formsetform in formset %}
+                        {% for error in formsetform.non_field_errors %}
+                            <div class="alert alert-danger fade in">
+                                <a class="close" data-dismiss="alert">&times;</a>
+                                <strong>Vecino {{ formsetform.neighboorId.value }}!</strong> {{ error }}
+                            </div>
+                        {% endfor %}
+                        {% for error in formsetform.neighboorId.errors %}
+                            <p class="text-danger"><strong>Vecino {{ formsetform.neighboorId.value }}, id! </strong>{{error}}</p>
+                        {% endfor %}
+                        {% for error in formsetform.probability.errors %}
+                            <p class="text-danger"><strong>Vecino {{ formsetform.neighboorId.value }}, probabilidad! </strong>{{error}}</p>
+                        {% endfor %}
+                        {% for error in formsetform.direction.errors %}
+                            <p class="text-danger"><strong>Vecino {{ formsetform.neighboorId.value }}, desde! </strong>{{error}}</p>
+                        {% endfor %}
+                        {% for error in formsetform.fromDirection.errors %}
+                            <p class="text-danger"><strong>Vecino {{ formsetform.neighboorId.value }}, hacia! </strong>{{error}}</p>
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+						<h3 class="panel-title">Detalles de la ciclovía</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th align="center">Información</th>
+									<th align="center">Valor</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td align="center">Nombre</td>
+									<td align="center">{{ciclovia.name}}</td>
+								</tr>
+								<tr>
+									<td align="center">Lugar</td>
+									<td align="center">{{ciclovia.place}}</td>
+								</tr>
+								<tr>
+									<td align="center">Horario</td>
+									<td align="center">{{ciclovia.start_hour}} :00 - {{ciclovia.end_hour}} :00</td>
+								</tr>
+								<tr>
+									<td align="center">Número de trayectos</td>
+									<td align="center">{{ciclovia.num_tracks}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Detalles del trayecto</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th align="center">Información</th>
+                                    <th align="center">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="center">Id del trayecto</td>
+                                    <td align="center">{{track.id_track}}</td>
+                                </tr>
+                                <tr>
+                                    <td align="center">Distancia del trayecto</td>
+                                    <td align="center">{{track.distance}}</td>
+                                </tr>
+                                <tr>
+                                    <td align="center">Probabilidad del trayecto</td>
+                                    <td align="center">{{track.probability}}</td>
+                                </tr>
+                                <tr>
+                                    <td align="center">Proporción de arribos</td>
+                                    <td align="center">{{track.arrival_proportion}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <form action="{% url 'CicloviaProgram:editNeighboor' ciclovia.id track.id %}" method="POST">
+                    {% csrf_token %}
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Detalles de los vecinos</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th align="center">Vecino #</th>
+                                        <th align="center">Probabilidad</th>
+                                        <th align="center">Desde</th>
+                                        <th align="center">Hacia</th>
+                                        <th align="center">Eliminar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="neighboordata">
+                                        {{ formset.management_form }}
+                                        {% for formsetform in formset %}
+                                            <tr>
+                                                <td align="center"><input class="form-control" type="number" name="{{ formsetform.neighboorId.html_name }}" value="{{ formsetform.neighboorId.value }}"></td>
+                                                <td align="center"><input class="form-control" type="text" name="{{ formsetform.probability.html_name }}" value="{{ formsetform.probability.value }}"></td>
+                                                <td align="center">
+                                                    <select class="form-control" name="{{ formsetform.direction.html_name }}">
+                                                        {% ifequal formsetform.direction.value 'end' %}
+                                                            <option value="begin">Comienzo</option>
+                                                            <option value="end" selected>Fin</option>
+                                                        {% else %}
+                                                            <option value="begin" selected>Comienzo</option>
+                                                            <option value="end">Fin</option>
+                                                        {% endifequal %}
+                                                    </select>
+                                                </td>
+                                                <td align="center">
+                                                    <select class="form-control" name="{{ formsetform.fromDirection.html_name }}">
+                                                        {% ifequal formsetform.fromDirection.value 'end' %}
+                                                            <option value="begin">Comienzo</option>
+                                                            <option value="end" selected>Fin</option>
+                                                        {% else %}
+                                                            <option value="begin" selected>Comienzo</option>
+                                                            <option value="end">Fin</option>
+                                                        {% endifequal %}
+                                                    </select>
+                                                </td>
+                                                <td align="center"><input type="checkbox" name="{{ formsetform.DELETE.html_name }}"></td>
+                                                <input type="hidden" name="{{ formsetform.id.html_name }}" value="{{ formsetform.id.value }}">
+                                                <input type="hidden" name="{{ formsetform.track.html_name }}" value="{{ formsetform.track.value }}">
+                                            </tr>
+                                        {% endfor %}
+                                </tbody>
+                            </table>
+                            <button class="btn btn-primary" type="button" onclick="insertneighboor()">Agregar vecino</button>
+                        </div>
+                    </div>
+                    <input class="btn btn-primary" type="submit" value="Modificar">
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
+
+{% block scripts %}
+
+    <script>
+        /*
+        {{ formset.empty_form }}
+        */
+        var form_count = {{formset.total_form_count}};
+        var emptyf = "{{ formset.empty_form|escapejs }}";
+        var test = $(emptyf);
+        function insertneighboor(){
+            var row =   "<tr>"+
+                        "    <td align='center'><input class='form-control' type='number' name='{{ formset.empty_form.neighboorId.html_name }}'></td>"+
+                        "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probability.html_name }}'></td>"+
+                        "    <td align='center'>"+
+                        "        <select class='form-control' name='{{ formset.empty_form.direction.html_name }}'>"+
+                        "               <option value='begin'>Comienzo</option>"+
+                        "                <option value='end'>Fin</option>"+
+                        "        </select>"+
+                        "    </td>"+
+                        "    <td align='center'>"+
+                        "        <select class='form-control' name='{{ formset.empty_form.fromDirection.html_name }}'>"+
+                        "                <option value='begin'>Comienzo</option>"+
+                        "                <option value='end'>Fin</option>"+
+                        "        </select>"+
+                        "    </td>"+
+                        "    <td align='center'><input type='checkbox' name='{{ formset.empty_form.DELETE.html_name }}'></td>"+
+                        "    <input type='hidden' name='{{ formset.empty_form.id.html_name }}' >"+
+                        "    <input type='hidden' name='{{ formset.empty_form.track.html_name }}' value='{{ formset.empty_form.track.value }}'>"+
+                        "</tr>";
+
+            var row2 = row.replace(/__prefix__/g,form_count);
+            $(row2).appendTo("#neighboordata");
+            form_count++;
+            $("#id_neighboorinfo_set-TOTAL_FORMS").val(form_count);
+        }
+    </script>
+
+{% endblock scripts %}
