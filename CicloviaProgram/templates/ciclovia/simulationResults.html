@@ -1,111 +1,135 @@
 {% extends "ciclovia/base.html" %}
 {% block content %}
 
-<div class="container theme-showcase" role="main">
+    <div class="container theme-showcase" role="main">
 
-<div class="page-header">
-        <h1>Resultados Simulacion</h1>
-      </div>
-      
-    
-
-<div class="row">
-        <div class="col-xs-7">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Resumen</h3>
-            </div>
-            <div class="panel-body">
-	  <table class="table table-striped">
-            <thead>
-              <tr>
-                <th align="center">Fecha</th>
-                <th align="center">Num corridas</th>
-		<th align="center">Promedio Arribos totales</th>
-		<th align="center">Desviacion estandar Arribos totales</th>		
-		<th align="center">Promedio Numero promedio sistema</th>
-		<th align="center">Desviacion estandar Numero promedio sistema</th>
-              </tr>
-            </thead>
-            <tbody>	
-		<tr>
-		    <td align="center">{{results.date}}</td>
-		    <td align="center">{{results.num_runs}}</td>
-		    <td align="center">{{results.avg_total_arrivals}}</td>
-		    <td align="center">{{results.stdev_total_arrivals}}</td>		    
-		    <td align="center">{{results.average_number_system}}</td>
-		    <td align="center">{{results.stdev_number_system}}</td>
-		</tr>	 
-	    
-	    
-            </tbody>
-     </table>
-
-    <table class="table table-striped">
-            <thead>
-              <tr>
-                <th align="center">Trayecto</th>		
-		<th align="center">Promedio Numero promedio trayecto</th>
-		<th align="center">Desviacion estandar Numero promedio trayecto</th>
-              </tr>
-            </thead>
-            <tbody>	
-	     {%for track in results.simulationresultscompiledpertrack_set.all%}
-		<tr>
-		    <td align="center">{{track.track}}</td>
-		    <td align="center">{{track.average_number_track}}</td>
-		    <td align="center">{{track.stdev_number_track}}</td>	
-		</tr>	 
-	    {% endfor %}
-	    
-            </tbody>
-     </table>
-
-	    
-	    
-	<table class="table table-striped">
-            <thead>
-              <tr>
-                <th align="center">Fecha</th>
-                <th align="center">Tiempo simulacion</th>
-		<th align="center">Arribos totales</th>
-		<th align="center">Tiempo promedio sistema</th>
-		<th align="center">Desviacion estandar tiempo</th>
-		<th align="center">Numero promedio sistema</th>		
-              </tr>
-            </thead>
-            <tbody>	
-	     {%for run in results.simulationresults_set.all%}
-		<tr>
-		    <td align="center">{{run.date}}</td>
-		    <td align="center">{{run.sim_time}}</td>
-		    <td align="center">{{run.total_arrivals}}</td>
-		    <td align="center">{{run.average_time}}</td>	
-		    <td align="center">{{run.standard_deviation_time}}</td>
-		    <td align="center">{{run.average_number_system}}</td>
-		</tr>	 
-	    {% endfor %}
-	    
-            </tbody>
-          </table>
-       
-             
-            </div>
-          </div>
-	</div>
-	
-	
-	  <img src="{% url 'CicloviaProgram:simulationResultsImg' ciclovia.id results.id  %}?data=total_arrivals">
-          <img src="{% url 'CicloviaProgram:simulationResultsImg' ciclovia.id results.id %}?data=average_number_system">
-	
-            
-            </tbody>
-          </table>
+        <div class="page-header">
+            <h1>Resultados Simulación</h1>
         </div>
-      </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Resumen</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th align="center">Fecha</th>
+									<th align="center">Número de corridas</th>
+									<th align="center">Promedio de arribos totales</th>
+									<th align="center">Desviación estándar de arribos totales</th>
+									<th align="center">Promedio del número promedio en el sistema</th>
+									<th align="center">Desviación estándar del número promedio en el sistema</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="center">{{results.date}}</td>
+                                    <td align="center">{{results.num_runs}}</td>
+                                    <td align="center">{{results.avg_total_arrivals}}</td>
+                                    <td align="center">{{results.stdev_total_arrivals}}</td>
+                                    <td align="center">{{results.average_number_system}}</td>
+                                    <td align="center">{{results.stdev_number_system}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th align="center">Trayecto</th>
+									<th align="center">Promedio del número promedio en el trayecto</th>
+									<th align="center">Desviación estándar del número promedio en el trayecto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for track in results.simulationresultscompiledpertrack_set.all%}
+                                    <tr>
+                                        <td align="center">{{track.track}}</td>
+                                        <td align="center">{{track.average_number_track}}</td>
+                                        <td align="center">{{track.stdev_number_track}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th align="center">Fecha</th>
+									<th align="center">Tiempo de simulación</th>
+									<th align="center">Arribos totales</th>
+									<th align="center">Tiempo promedio en el sistema</th>
+									<th align="center">Desviación estándar del tiempo poroemdio en el sistema</th>
+									<th align="center">Número promedio en el sistema</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for run in results.simulationresults_set.all%}
+                                    <tr>
+                                        <td align="center">{{run.date}}</td>
+                                        <td align="center">{{run.sim_time}}</td>
+                                        <td align="center">{{run.total_arrivals}}</td>
+                                        <td align="center">{{run.average_time}}</td>
+                                        <td align="center">{{run.standard_deviation_time}}</td>
+                                        <td align="center">{{run.average_number_system}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h4>Número promedio de personas por trayecto</h4>
+                <p>Seleccione el tipo de gráfico</p>
+                <select class="form-control" onchange="changeavgnumbertrack()" id="avgnumbertrackselect">
+                    <option disabled selected>Tipo</option>
+                    <option value="PIE">Gráfico de torta</option>
+                    <option value="BAR">Gráfico de barras</option>
+                </select>
+                <div id="avgnumbertrackdiv"></div>
+                <h4>Número promedio de arribos por trayecto</h4>
+                <p>Seleccione el tipo de gráfico</p>
+                <select class="form-control" onchange="changearrivalstrack()" id="arrivalstrackselect">
+                    <option disabled selected>Tipo</option>
+                    <option value="PIE">Gráfico de torta</option>
+                    <option value="BAR">Gráfico de barras</option>
+                </select>
+                <div id="arrivalstrackdiv"></div>
+                {% comment %}
+                <img class="img-responsive" src="{% url 'CicloviaProgram:pieChart' %}?data=gender&results_id={{results.id}}">
+                <img class="img-responsive" src="{% url 'CicloviaProgram:vBarChart' %}?data=gender&results_id={{results.id}}">
+                {% endcomment %}
+            </div>
+        </div>
+    </div>
+
 {% endblock content %}
 
+{% block scripts %}
 
+    <script>
+        function changeavgnumbertrack() {
+            var opt = $("#avgnumbertrackselect").val();
+            if (opt == "PIE") {
+                $("#avgnumbertrackdiv").html("<img alt='pieChart' class='img-responsive' src='{% url 'CicloviaProgram:pieChart' %}?data=avgnumbertrack&results_id={{results.id}}'>");
+            } else if (opt == "BAR") {
+                $("#avgnumbertrackdiv").html("<img alt='barChart' class='img-responsive' src='{% url 'CicloviaProgram:vBarChart' %}?data=avgnumbertrack&results_id={{results.id}}'>");
+            }
+        }
+        function changearrivalstrack() {
+            var opt = $("#arrivalstrackselect").val();
+            if (opt == "PIE") {
+                $("#arrivalstrackdiv").html("<img alt='pieChart' class='img-responsive' src='{% url 'CicloviaProgram:pieChart' %}?data=arrivalstrack&results_id={{results.id}}'>");
+            } else if (opt == "BAR") {
+                $("#arrivalstrackdiv").html("<img alt='barChart' class='img-responsive' src='{% url 'CicloviaProgram:vBarChart' %}?data=arrivalstrack&results_id={{results.id}}'>");
+            }
+        }
+    </script>
+
+{% endblock scripts %}
 
 
 

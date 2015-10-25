@@ -1,3 +1,4 @@
+# coding=utf-8
 from django.contrib import admin
 from CicloviaProgram.models import Ciclovia
 from CicloviaProgram.models import Track

@@ -1,55 +1,67 @@
 {% extends "ciclovia/base.html" %}
+
 {% block content %}
 
-<div class="container theme-showcase" role="main">
-
-<div class="page-header">
-        <h1>Resultados Simulacion por trayecto</h1>
-      </div>
-
-<div class="row">
-        <div class="col-xs-7">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Resumen</h3>
-            </div>
-            <div class="panel-body">
-	<table class="table table-striped">
-            <thead>
-              <tr>
-                <th align="center">Intervalo de tiempo </th>
-                <th align="center">Promedio Flujo</th>	
-		<th align="center">Desviacion estandar Flujo</th>	
-              </tr>
-            </thead>
-            <tbody>
-	
-	     {%for results in track.simulationresultscompiledflowtrack_set.all%}	     
-		<tr>		    
-		    <td align="center">{{results.hour}}</td>
-		    <td align="center">{{results.avg_flow_hour}}</td>
-		    <td align="center">{{results.stdev_flow_hour}}</td>		    
-		</tr>	
-	    {% endfor %}
-	    
-            </tbody>
-     </table>
-	 
-	 	
-       
-             
-            </div>
-          </div>
-	</div>
-	
-	
-            
-            </tbody>
-          </table>
+    <div class="container theme-showcase" role="main">
+        <div class="page-header">
+            <h1>Resultados Simulación por trayecto</h1>
         </div>
-      </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Resumen</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th align="center">Intervalo de tiempo </th>
+                                    <th align="center">Promedio flujo</th>
+                                    <th align="center">Desviación estándar del flujo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for results in track.simulationresultscompiledflowtrack_set.all%}
+                                    <tr>
+                                        <td align="center">{{results.hour}}</td>
+                                        <td align="center">{{results.avg_flow_hour}}</td>
+                                        <td align="center">{{results.stdev_flow_hour}}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h4>Promedio del flujo por trayecto</h4>
+                <p>Seleccione el tipo de gráfico</p>
+                <select class="form-control" onchange="changeflowtrack()" id="avgflowtrackselect">
+                    <option disabled selected>Tipo</option>
+                    <option value="PIE">Gráfico de torta</option>
+                    <option value="BAR">Gráfico de barras</option>
+                </select>
+                <div id="avgflowtrackdiv"></div>
+            </div>
+        </div>
+    </div>
 {% endblock content %}  
 
+{% block scripts %}
+
+    <script>
+        function changeflowtrack() {
+            var opt = $("#avgflowtrackselect").val();
+            if (opt == "PIE") {
+                $("#avgflowtrackdiv").html("<img alt='pieChart' class='img-responsive' src='{% url 'CicloviaProgram:pieChart' %}?data=avgflowtrackcompiled&srcpt_id={{track.id}}'>");
+            } else if (opt == "BAR") {
+                $("#avgflowtrackdiv").html("<img alt='barChart' class='img-responsive' src='{% url 'CicloviaProgram:vBarChart' %}?data=avgflowtrackcompiled&srcpt_id={{track.id}}'>");
+            }
+        }
+    </script>
+
+{% endblock scripts %}
 
 
 

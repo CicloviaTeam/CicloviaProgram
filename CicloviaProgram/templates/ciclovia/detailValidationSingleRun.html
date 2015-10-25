@@ -1,60 +1,85 @@
 {% extends "ciclovia/base.html" %}
+
 {% block content %}
 
-<div class="container theme-showcase" role="main">
-
-<div class="page-header">
-        <h1>Resultados Simulacion</h1>
-      </div>
-
-<div class="row">
-        <div class="col-xs-7">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Resumen</h3>
-            </div>
-            <div class="panel-body">
-	  
-
-	<table class="table table-striped">
-            <thead>
-              <tr>
-                <th align="center">Trayecto</th>
-		<th align="center">Flujo total </th>		
-		<th align="center">Numero promedio sistema</th>	
-		<th align="center">Detalle flujo</th>	
-              </tr>
-            </thead>
-            <tbody>	
-	     {%for track in run.simulationresultspertrack_set.all%}
-		<tr>
-		    <td align="center">{{track.track}}</td>
-		    <td align="center">{{track.total_flow}}</td>
-		    <td align="center">{{track.average_number_track}}</td>		   
-		    <td align="center"><a href="{% url 'CicloviaProgram:detailTrackValidationSingleRun' ciclovia.id run.id track.id %}">Ver flujo</a></td>
-		</tr>	 
-	    {% endfor %}
-	    
-            </tbody>
-          </table>
-	    
-	     
-	    
-	           
-             
-            </div>
-          </div>
-	</div>
-	
-	
-            
-            </tbody>
-          </table>
+    <div class="container theme-showcase" role="main">
+        <div class="page-header">
+            <h1>Resultados Simulación</h1>
         </div>
-      </div>
+        <div class="row">
+            <div class="col-md-7">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Resumen</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th align="center">Trayecto</th>
+                                    <th align="center">Flujo total </th>
+                                    <th align="center">Número promedio en el sistema</th>
+                                    <th align="center">Detalle del flujo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for track in run.simulationresultspertrack_set.all%}
+                                    <tr>
+                                        <td align="center">{{track.track}}</td>
+                                        <td align="center">{{track.total_flow}}</td>
+                                        <td align="center">{{track.average_number_track}}</td>
+                                        <td align="center"><a href="{% url 'CicloviaProgram:detailTrackValidationSingleRun' ciclovia.id run.id track.id %}">Ver flujo</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <h4>Flujo total</h4>
+                <p>Seleccione el tipo de gráfico</p>
+                <select class="form-control" onchange="changefluxtrack()" id="fluxtrackselect">
+                    <option disabled selected>Tipo</option>
+                    <option value="PIE">Gráfico de torta</option>
+                    <option value="BAR">Gráfico de barras</option>
+                </select>
+                <div id="fluxtrackdiv"></div>
+                <h4>Número promedio en el sistema</h4>
+                <p>Seleccione el tipo de gráfico</p>
+                <select class="form-control" onchange="changeavgnumbertrack()" id="avgnumbertrackselect">
+                    <option disabled selected>Tipo</option>
+                    <option value="PIE">Gráfico de torta</option>
+                    <option value="BAR">Gráfico de barras</option>
+                </select>
+                <div id="avgnumbertrackdiv"></div>
+            </div>
+        </div>
+    </div>
 {% endblock content %} 
 
+{% block scripts %}
 
+    <script>
+        function changefluxtrack() {
+            var opt = $("#fluxtrackselect").val();
+            if (opt == "PIE") {
+                $("#fluxtrackdiv").html("<img alt='pieChart' class='img-responsive' src='{% url 'CicloviaProgram:pieChart' %}?data=totalfluxtrackonerun&results_id={{run.id}}'>");
+            } else if (opt == "BAR") {
+                $("#fluxtrackdiv").html("<img alt='barChart' class='img-responsive' src='{% url 'CicloviaProgram:vBarChart' %}?data=totalfluxtrackonerun&results_id={{run.id}}'>");
+            }
+        }
+        function changeavgnumbertrack() {
+            var opt = $("#avgnumbertrackselect").val();
+            if (opt == "PIE") {
+                $("#avgnumbertrackdiv").html("<img alt='pieChart' class='img-responsive' src='{% url 'CicloviaProgram:pieChart' %}?data=avgnumbertrackonerun&results_id={{run.id}}'>");
+            } else if (opt == "BAR") {
+                $("#avgnumbertrackdiv").html("<img alt='barChart' class='img-responsive' src='{% url 'CicloviaProgram:vBarChart' %}?data=avgnumbertrackonerun&results_id={{run.id}}'>");
+            }
+        }
+    </script>
+
+{% endblock scripts %}
 
 
 

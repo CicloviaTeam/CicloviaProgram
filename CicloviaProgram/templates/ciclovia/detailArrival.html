@@ -51,7 +51,71 @@
 						</table>					 
 					</div>
 				</div>
-			</div>			
+			</div>
+			<div class="col-md-7">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Detalle Trayectos</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th align="center">#</th>
+									<th align="center">Distancia</th>
+									<th align="center">Probabilidad inicio</th>
+									<th align="center">Probabilidad fin</th>
+									<th align="center">Proporcion Arribos</th>
+									<th align="center">Vecinos</th>
+								</tr>
+							</thead>
+							<tbody>
+								<ul>
+									{%for track in ciclovia.track_set.all%}
+										<tr>
+											<td align="center">{{track.id_track}}</td>
+											<td align="center">{{track.distance}}</td>
+											<td align="center">{{track.probabilityBegin}}</td>
+											<td align="center">{{track.probabilityEnd}}</td>
+											<td align="center">{{track.arrival_proportion}}</td>
+											<td align="center"><a href="{% url 'CicloviaProgram:detailNeighboor' ciclovia.id track.id %}">Ver vecinos</a></td>
+										</tr>
+									{% endfor %}
+								</ul>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-3">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Distribucion Tiempo en el Sistema</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th align="center">Tiempo</th>
+									<th align="center">Porcentaje</th>
+									</tr>
+							</thead>
+							<tbody>
+								<ul>
+									{%for timeInSystem in ciclovia.timeinsystemdistribution_set.all%}
+										<tr>
+											<td align="center">{{timeInSystem.time}}</td>
+											<td align="center">{{timeInSystem.percentage}}</td>
+										</tr>
+									{% endfor %}
+								</ul>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
 			<div class="col-md-3">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
@@ -61,113 +125,51 @@
 						<table class="table table-striped">
 							<thead>
 								<tr>
-									<th align="center">Hora</th>                
-									<th align="center">Proporcion Arribos</th>		
+									<th align="center">Hora</th>
+									<th align="center">Proporcion Arribos</th>
 								</tr>
 							</thead>
-							<tbody>		   
+							<tbody>
 								<ul>
 									{%for arrivalPerHour in ciclovia.arrivalsproportionperhour_set.all%}
 										<tr>
 											<td align="center">{{arrivalPerHour.hour}}</td>
-											<td align="center">{{arrivalPerHour.proportion}}</td>		   
-										</tr>	 
+											<td align="center">{{arrivalPerHour.proportion}}</td>
+										</tr>
 									{% endfor %}
-								</ul>	
+								</ul>
 							</tbody>
 						</table>
 					</div>
 				</div>
 			</div>
-		</div>
-		<div class="col-md-3">
-			<div class="panel panel-primary">
-				<div class="panel-heading">
-					<h3 class="panel-title">Distribucion Tiempo en el Sistema</h3>
-				</div>
-				<div class="panel-body">
-					<table class="table table-striped">
-						<thead>
-							<tr>             
-								<th align="center">Tiempo</th>                
-								<th align="center">Porcentaje</th>		
+			<div class="col-md-3">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Detalle Participantes</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th align="center">Tipo</th>
+									<th align="center">Velocidad</th>
+									<th align="center">Porcentaje</th>
 								</tr>
-						</thead>
-						<tbody>		   
-							<ul>
-								{%for timeInSystem in ciclovia.timeinsystemdistribution_set.all%}
-									<tr>
-										<td align="center">{{timeInSystem.time}}</td>
-										<td align="center">{{timeInSystem.percentage}}</td>		   
-									</tr>	 
-								{% endfor %}
-							</ul>						
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>			
-		<div class="col-md-6">
-			<div class="panel panel-primary">
-				<div class="panel-heading">
-					<h3 class="panel-title">Detalle Trayectos</h3>
-				</div>
-				<div class="panel-body">
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th align="center">#</th>
-								<th align="center">Distancia</th>
-								<th align="center">Probabilidad inicio</th>
-								<th align="center">Probabilidad fin</th>
-								<th align="center">Proporcion Arribos</th>
-								<th align="center">Vecinos</th>
-							</tr>
-						</thead>
-						<tbody>		   
-							<ul>
-								{%for track in ciclovia.track_set.all%}
-									<tr>
-										<td align="center">{{track.id_track}}</td>
-										<td align="center">{{track.distance}}</td>
-										<td align="center">{{track.probabilityBegin}}</td>
-										<td align="center">{{track.probabilityEnd}}</td>
-										<td align="center">{{track.arrival_proportion}}</td>
-										<td align="center"><a href="{% url 'CicloviaProgram:detailNeighboor' ciclovia.id track.id %}">Ver vecinos</a></td>			
-									</tr>	 
-								{% endfor %}
-							</ul>						
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>			
-		<div class="col-md-3">
-			<div class="panel panel-primary">
-				<div class="panel-heading">
-					<h3 class="panel-title">Detalle Participantes</h3>
-				</div>
-				<div class="panel-body">
-					<table class="table table-striped">
-						<thead>
-							<tr>
-								<th align="center">Tipo</th>
-								<th align="center">Velocidad</th>
-								<th align="center">Porcentaje</th>
-							</tr>
-						</thead>
-						<tbody>		   
-							<ul>
-								{%for participant in ciclovia.participanttype_set.all%}
-									<tr>
-										<td align="center">{{participant.activity}}</td>
-										<td align="center">{{participant.velocity}}</td>
-										<td align="center">{{participant.percentage}}</td>		    			
-									</tr>	 
-								{% endfor %}
-							</ul>						
-						</tbody>
-					</table>			
+							</thead>
+							<tbody>
+								<ul>
+									{%for participant in ciclovia.participanttype_set.all%}
+										<tr>
+											<td align="center">{{participant.activity}}</td>
+											<td align="center">{{participant.velocity}}</td>
+											<td align="center">{{participant.percentage}}</td>
+										</tr>
+									{% endfor %}
+								</ul>
+							</tbody>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -177,38 +179,7 @@
 			<h1>Acciones</h1>
 		</div>
 		<div class="row">			
-			<div class="col-md-4">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Realizar experimentos</h3>
-					</div>
-					<div class="panel-body">
-						En esta seccion se pueden agregar/eliminar trayectos (cargando un XML), una vez se tiene el modelo de la Ciclovia.
-					</div>
-				</div>
-			</div>			
-			<div class="col-md-4">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Simular</h3>
-					</div>
-					<div class="panel-body">
-						En esta seccion se ejecuta la simulacion
-						<p><a href="{% url 'CicloviaProgram:simulationResults' ciclovia.id %}"" class="btn btn-primary">Ejecutar &raquo;</a></p>  	   
-					</div>
-				</div>
-			</div>			
-			<div class="col-md-4">
-				<div class="panel panel-primary">
-					<div class="panel-heading">
-						<h3 class="panel-title">Validar</h3>
-					</div>
-					<div class="panel-body">
-						En esta seccion se valida la simulacion
-						<p><a href="{% url 'CicloviaProgram:simulationResultsValidation' ciclovia.id %}"" class="btn btn-primary">Validar &raquo;</a></p>  	   
-					</div>
-				</div>
-			</div>
-		</div>		
+
+		</div>
 	</div>
 {% endblock content %}          

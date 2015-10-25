@@ -1,5 +1,7 @@
+# coding=utf-8
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.translation import ugettext_lazy as _
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #This section contains the objects associated with the information of the structure of the Ciclovia
@@ -111,7 +113,7 @@ class SimulationParameters(models.Model):
     arrivals_probability_distribution = models.CharField(max_length=30)
                
     def __unicode__(self):  
-        return str(self.replications)+ "," + self.arrivals_probability_distribution
+        return str(self.replications)+ "," + str(self.arrivals_probability_distribution)
         
 #This object represents the statistics for a serie of runs        
 class SimulationResultsCompiled(models.Model):
@@ -127,7 +129,7 @@ class SimulationResultsCompiled(models.Model):
     is_validation = models.BooleanField(default=False)
     
     def __unicode__(self):  
-        return str(self.num_runs)+ "," + str(self.avg_total_arrivals) + "," + str(self.stdev_total_arrivals)
+        return 'Fecha: ' + self.date.strftime('%Y-%m-%d %H:%M %Z') + ', Replicas: ' + str(self.num_runs)
     
 #This obhect represents the results of a single run
 class SimulationResults(models.Model):
@@ -158,7 +160,8 @@ class SimulationResultsCompiledPerTrack(models.Model):
     hw_total_flow  = models.IntegerField(default=0)    
     
     def __unicode__(self):  
-        return str(self.simulation_compiled)+ "," + str(self.track)+ "," + str(self.average_number_track)+ "," + str(self.stdev_number_track) + "," + str(self.average_total_flow)+ "," + str(self.stdev_total_flow)
+        return str(self.simulation_compiled)+ "," + str(self.track)+ "," + str(self.average_number_track)+ "," \
+        + str(self.stdev_number_track) + "," + str(self.average_total_flow)+ "," + str(self.stdev_total_flow)
        
 #This object represents the information associated with the flow that occurs in a single track     
 class SimulationResultsPerTrack(models.Model):

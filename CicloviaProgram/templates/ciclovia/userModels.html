@@ -14,7 +14,6 @@
 						<th align="center">Hora inicio</th>
 						<th align="center">Hora fin</th>
 						<th align="center">Num trayectos</th>
-						<th align="center"></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -28,11 +27,6 @@
 									<td align="center">{{ciclovia.start_hour}}</td>	 	
 									<td align="center">{{ciclovia.end_hour}}</td>	 
 									<td align="center">{{ciclovia.num_tracks}}</td>
-									<td align="center"><a class="close"
-														  href="{% url 'CicloviaProgram:borrarCiclovia' ciclovia.id %}"
-														  title="Eliminar ciclovia"
-														  onclick="return confirm('¿Seguro que desea borrar la ciclovía?')"
-											>&times;</a></td>
 								</tr>	 
 							{% endfor %}
 						</ul>

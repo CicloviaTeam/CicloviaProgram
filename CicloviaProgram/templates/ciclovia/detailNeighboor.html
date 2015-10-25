@@ -1,93 +1,132 @@
 {% extends "ciclovia/base.html" %}
+
 {% block content %}
 
-
-<div class="container theme-showcase" role="main">
-
-<div class="row">
-        <div class="col-xs-4">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Detalle Ciclovia - Trayecto</h3>
+    <div class="container theme-showcase" role="main">
+        <div class="page-header">
+			<h1>Información detallada del trayecto</h1>
+		</div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+						<h3 class="panel-title">Detalles de la ciclovía</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th align="center">Información</th>
+									<th align="center">Valor</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td align="center">Nombre</td>
+									<td align="center">{{ciclovia.name}}</td>
+								</tr>
+								<tr>
+									<td align="center">Lugar</td>
+									<td align="center">{{ciclovia.place}}</td>
+								</tr>
+								<tr>
+									<td align="center">Horario</td>
+									<td align="center">{{ciclovia.start_hour}} :00 - {{ciclovia.end_hour}} :00</td>
+								</tr>
+								<tr>
+									<td align="center">Número de trayectos</td>
+									<td align="center">{{ciclovia.num_tracks}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Detalles del trayecto</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th align="center">Información</th>
+                                    <th align="center">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="center">Id del trayecto</td>
+                                    <td align="center">{{track.id_track}}</td>
+                                </tr>
+                                <tr>
+                                    <td align="center">Distancia del trayecto</td>
+                                    <td align="center">{{track.distance}}</td>
+                                </tr>
+                                <tr>
+                                    <td align="center">Probabilidad del trayecto</td>
+                                    <td align="center">{{track.probability}}</td>
+                                </tr>
+                                <tr>
+                                    <td align="center">Proporción de arribos</td>
+                                    <td align="center">{{track.arrival_proportion}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="panel-body">
-   <table class="table table-striped">
-            <thead>
-              <tr>
-                <th align="center">Informacion</th>
-                <th align="center">Valor</th>
-              </tr>
-            </thead>
-            <tbody>
-      <tr>
-       <td align="center">Nombre</td>
-       <td align="center">{{ciclovia.name}}</td>
-      </tr> 
-      <tr>
-        <td align="center">Lugar</td>
-        <td align="center">{{ciclovia.place}}</td>
-      </tr> 
-      <tr>
-       <td align="center">Horario</td>
-       <td align="center">{{ciclovia.start_hour}} :00 - {{ciclovia.end_hour}} :00</td>
-      </tr> 
-      <tr>
-       <td align="center">Num trayectos</td>
-       <td align="center">{{ciclovia.num_tracks}}</td>
-      </tr>  
-      <tr>
-       <td align="center">Id trayecto</td>
-       <td align="center">{{track.id_track}}</td>
-      </tr>   
-      <tr>
-       <td align="center">Distancia trayecto</td>
-       <td align="center">{{track.distance}}</td>
-      </tr>  
-      <tr>
-       <td align="center">Probabilidad trayecto</td>
-       <td align="center">{{track.probability}}</td>
-      </tr>  
-      <tr>
-       <td align="center">Proporcion arribos</td>
-       <td align="center">{{track.arrival_proportion}}</td>
-      </tr>    
-            </tbody>
-          </table>
-       
-             
+            <div class="col-md-4">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Detalles de los vecinos</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th align="center">Vecino #</th>
+                                    <th align="center">Probabilidad</th>
+                                    <th align="center">Desde</th>
+                                    <th align="center">Hacia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {%for neighboor in track.neighboorinfo_set.all%}
+                                    <tr>
+                                        <td align="center">{{neighboor.neighboorId}}</td>
+                                        <td align="center">{{neighboor.probability}}</td>
+                                        {% ifequal neighboor.direction 'end' %}
+                                            <td align="center">Fin</td>
+                                        {% else %}
+                                            <td align="center">Comienzo</td>
+                                        {% endifequal %}
+                                        {% ifequal neighboor.fromDirection 'end' %}
+                                            <td align="center">Fin</td>
+                                        {% else %}
+                                            <td align="center">Comienzo</td>
+                                        {% endifequal %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-          </div>
-   </div>
-   
-   <div class="col-xs-4">
-          <div class="panel panel-primary">
-            <div class="panel-heading">
-              <h3 class="panel-title">Detalle Vecinos</h3>
-            </div>
-            <div class="panel-body">
-             <table class="table table-striped">
-            <thead>
-              <tr>
-                <th align="center">Vecino #</th>
-                <th align="center">Probabilidad</th>     
-         </tr>
-            </thead>
-            <tbody>        
-       <ul>
-       {%for neighboor in track.neighboorinfo_set.all%}
-      <tr>
-          <td align="center">{{neighboor.neighboorId}}</td>
-          <td align="center">{{neighboor.probability}}</td>          
-      </tr>  
-        {% endfor %}
-       </ul>
-            
-            </tbody>
-          </table>
         </div>
-      </div>
-  </div>
-</div>
-             
-            </div>
+        <div class="page-header">
+			<h1>Acciones</h1>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Editar vecino</h3>
+					</div>
+					<div class="panel-body">
+						En esta seccion se pueden editar la información de los vecinos.
+						<p><a class="btn btn-primary" href="{% url 'CicloviaProgram:editNeighboor' ciclovia.id track.id %}">Editar vecino &raquo;</a></p>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+
 {% endblock content %}         
