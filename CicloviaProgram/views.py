@@ -24,7 +24,7 @@ import grafo
 from reportlab.graphics.charts.piecharts import Pie, Pie3d
 
 
-#El índice de la página.
+
 def index(request):
 	return render(request, 'ciclovia/index.html')
 
