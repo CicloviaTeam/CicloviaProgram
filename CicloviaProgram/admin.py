@@ -35,7 +35,7 @@ class SimulationParametersAdmin(admin.ModelAdmin):
      list_display = ('replications',  'arrivals_probability_distribution')
 
 class TimeInSystemDistributionAdmin(admin.ModelAdmin):
-     list_display = ('time',  'percentage')
+     list_display = ('time',  'percentage', 'ciclovia',)
 
 class ArrivalsProportionPerHourAdmin(admin.ModelAdmin):
      list_display = ('hour',  'proportion')

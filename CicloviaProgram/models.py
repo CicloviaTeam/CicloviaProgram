@@ -24,7 +24,7 @@ class Ciclovia(models.Model):
     arrivals_loaded = models.BooleanField(default=False)
         
     def __unicode__(self):  
-        return self.place 
+        return self.name
 
 #This object represents a Track
 class Track(models.Model):

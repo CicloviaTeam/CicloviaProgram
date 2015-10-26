@@ -1,0 +1,334 @@
+{% extends "ciclovia/base.html" %}
+
+{% block content %}
+    <div class="container theme-showcase" role="main">
+		<div class="page-header">
+			<h1>Información detallada</h1>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Detalle ciclovía</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th align="center">Información</th>
+									<th align="center">Valor</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td align="center">Nombre</td>
+									<td align="center">{{ciclovia.name}}</td>
+								</tr>
+								<tr>
+									<td align="center">Lugar</td>
+									<td align="center">{{ciclovia.place}}</td>
+								</tr>
+								<tr>
+									<td align="center">Horario</td>
+									<td align="center">{{ciclovia.start_hour}} - {{ciclovia.end_hour}} </td>
+								</tr>
+								<tr>
+									<td align="center">Número de trayectos</td>
+									<td align="center">{{ciclovia.num_tracks}}</td>
+								</tr>
+								<tr>
+									<td align="center">Trayecto de referencia</td>
+									<td align="center">{{ciclovia.reference_track}}</td>
+								</tr>
+								<tr>
+									<td align="center">Hora de referencia</td>
+									<td align="center">{{ciclovia.reference_hour}}</td>
+								</tr>
+								<tr>
+									<td align="center">Tasa de arribos de referencia</td>
+									<td align="center">{{ciclovia.reference_arrival_rate}}</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-7">
+				<div class="panel panel-primary">
+					<div class="panel-heading">
+						<h3 class="panel-title">Detalles de los trayectos</h3>
+					</div>
+					<div class="panel-body">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th align="center">#</th>
+									<th align="center">Distancia</th>
+									<th align="center">Probabilidad inicio</th>
+									<th align="center">Probabilidad fin</th>
+									<th align="center">Proporción de arribos</th>
+									<th align="center">Vecinos</th>
+								</tr>
+							</thead>
+							<tbody>
+								{%for track in ciclovia.track_set.all%}
+									<tr>
+										<td align="center">{{track.id_track}}</td>
+										<td align="center">{{track.distance}}</td>
+										<td align="center">{{track.probabilityBegin}}</td>
+										<td align="center">{{track.probabilityEnd}}</td>
+										<td align="center">{{track.arrival_proportion}}</td>
+										<td align="center"><a href="{% url 'CicloviaProgram:detailNeighboor' ciclovia.id track.id %}">Ver vecinos</a></td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<form action="{% url 'CicloviaProgram:editArrivalInfo' ciclovia.id %}" method="POST">
+			{% csrf_token %}
+			<div class="row">
+				<div class="col-md-3">
+					{% if timesystemformset.total_error_count != 0 %}
+						{% for error in timesystemformset.non_form_errors %}
+							<div class="alert alert-danger fade in">
+								<a class="close" data-dismiss="alert">&times;</a>
+								<strong>Error!</strong> {{ error }}
+							</div>
+						{% endfor %}
+						{% for formsetform in timesystemformset %}
+							{% for error in formsetform.non_field_errors %}
+								<div class="alert alert-danger fade in">
+									<a class="close" data-dismiss="alert">&times;</a>
+									<strong>Fila {{ forloop.parentloop.counter }}!</strong> {{ error }}
+								</div>
+							{% endfor %}
+							{% for error in formsetform.time.errors %}
+								<p class="text-danger"><strong>Fila {{ forloop.parentloop.counter }}, tiempo! </strong>{{error}}</p>
+							{% endfor %}
+							{% for error in formsetform.percentage.errors %}
+								<p class="text-danger"><strong>Fila {{ forloop.parentloop.counter }}, porcentaje! </strong>{{error}}</p>
+							{% endfor %}
+						{% endfor %}
+					{% endif %}
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">Distribución del tiempo en el sistema</h3>
+						</div>
+						<div class="panel-body">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th align="center">Tiempo</th>
+										<th align="center">Porcentaje</th>
+										<th align="center">Borrar</th>
+										</tr>
+								</thead>
+								<tbody id="timesystemtable">
+									{{ timesystemformset.management_form }}
+									{% for timesystemform in timesystemformset %}
+										<tr>
+											<td align="center"><input class="form-control" type="text" name="{{ timesystemform.time.html_name }}" value="{{ timesystemform.time.value }}"></td>
+											<td align="center"><input class="form-control" type="text" name="{{ timesystemform.percentage.html_name }}" value="{{ timesystemform.percentage.value }}"></td>
+											<td align="center">
+												<input type="checkbox" name="{{ timesystemform.DELETE.html_name }}">
+												<input type="hidden" name="{{ timesystemform.id.html_name }}" value="{{ timesystemform.id.value }}">
+												<input type="hidden" name="{{ timesystemform.ciclovia.html_name }}" value="{{ timesystemform.ciclovia.value }}">
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+							<button class="btn btn-primary" type="button" onclick="inserttimesystem()">Añadir tiempo</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					{% if arrivalsproportionformset.total_error_count != 0 %}
+						{% for error in arrivalsproportionformset.non_form_errors %}
+							<div class="alert alert-danger fade in">
+								<a class="close" data-dismiss="alert">&times;</a>
+								<strong>Error!</strong> {{ error }}
+							</div>
+						{% endfor %}
+						{% for formsetform in arrivalsproportionformset %}
+							{% for error in formsetform.non_field_errors %}
+								<div class="alert alert-danger fade in">
+									<a class="close" data-dismiss="alert">&times;</a>
+									<strong>Fila {{ forloop.parentloop.counter }}!</strong> {{ error }}
+								</div>
+							{% endfor %}
+							{% for error in formsetform.hour.errors %}
+								<p class="text-danger"><strong>Fila {{ forloop.parentloop.counter }}, hora! </strong>{{error}}</p>
+							{% endfor %}
+							{% for error in formsetform.proportion.errors %}
+								<p class="text-danger"><strong>Fila {{ forloop.parentloop.counter }}, proporción! </strong>{{error}}</p>
+							{% endfor %}
+						{% endfor %}
+					{% endif %}
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">Proporción de arribos por hora</h3>
+						</div>
+						<div class="panel-body">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th align="center">Hora</th>
+										<th align="center">Proporción de arribos</th>
+										<th align="center">Borrar</th>
+									</tr>
+								</thead>
+								<tbody id="arrivalproportiontable">
+									{{ arrivalsproportionformset.management_form }}
+									{% for arrivalsproportionform in arrivalsproportionformset %}
+										<tr>
+											<td align="center"><input class="form-control" type="text" name="{{ arrivalsproportionform.hour.html_name }}" value="{{ arrivalsproportionform.hour.value }}"></td>
+											<td align="center"><input class="form-control" type="text" name="{{ arrivalsproportionform.proportion.html_name }}" value="{{ arrivalsproportionform.proportion.value }}"></td>
+											<td align="center">
+												<input type="checkbox" name="{{ arrivalsproportionform.DELETE.html_name }}">
+												<input type="hidden" name="{{ arrivalsproportionform.id.html_name }}" value="{{ arrivalsproportionform.id.value }}">
+												<input type="hidden" name="{{ arrivalsproportionform.ciclovia.html_name }}" value="{{ arrivalsproportionform.ciclovia.value }}">
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+							<button class="btn btn-primary" type="button" onclick="insertarrivalproportion()">Añadir proporción</button>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-5">
+					{% if participantformset.total_error_count != 0 %}
+						{% for error in participantformset.non_form_errors %}
+							<div class="alert alert-danger fade in">
+								<a class="close" data-dismiss="alert">&times;</a>
+								<strong>Error!</strong> {{ error }}
+							</div>
+						{% endfor %}
+						{% for formsetform in participantformset %}
+							{% for error in formsetform.non_field_errors %}
+								<div class="alert alert-danger fade in">
+									<a class="close" data-dismiss="alert">&times;</a>
+									<strong>Fila {{ forloop.parentloop.counter }}!</strong> {{ error }}
+								</div>
+							{% endfor %}
+							{% for error in formsetform.activity.errors %}
+								<p class="text-danger"><strong>Fila {{ forloop.parentloop.counter }}, tipo! </strong>{{error}}</p>
+							{% endfor %}
+							{% for error in formsetform.velocity.errors %}
+								<p class="text-danger"><strong>Fila {{ forloop.parentloop.counter }}, velocidad! </strong>{{error}}</p>
+							{% endfor %}
+							{% for error in formsetform.percentage.errors %}
+								<p class="text-danger"><strong>Fila {{ forloop.parentloop.counter }}, porcentaje! </strong>{{error}}</p>
+							{% endfor %}
+						{% endfor %}
+					{% endif %}
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">Detalles de los participantes</h3>
+						</div>
+						<div class="panel-body">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th align="center">Tipo</th>
+										<th align="center">Velocidad</th>
+										<th align="center">Porcentaje</th>
+										<th align="center">Borrar</th>
+									</tr>
+								</thead>
+								<tbody id="participanttable">
+									{{ participantformset.management_form }}
+									{% for participantform in participantformset %}
+										<tr>
+											<td align="center"><input class="form-control" type="text" name="{{ participantform.activity.html_name }}" value="{{ participantform.activity.value }}"></td>
+											<td align="center"><input class="form-control" type="text" name="{{ participantform.velocity.html_name }}" value="{{ participantform.velocity.value }}"></td>
+											<td align="center"><input class="form-control" type="text" name="{{ participantform.percentage.html_name }}" value="{{ participantform.percentage.value }}"></td>
+											<td align="center">
+												<input type="checkbox" name="{{ participantform.DELETE.html_name }}">
+												<input type="hidden" name="{{ participantform.id.html_name }}" value="{{ participantform.id.value }}">
+												<input type="hidden" name="{{ participantform.ciclovia.html_name }}" value="{{ participantform.ciclovia.value }}">
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+							<button class="btn btn-primary" type="button" onclick="insertparticipant()">Añadir participante</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<input class="btn btn-primary" type="submit" value="Modificar">
+			</div>
+		</form>
+	</div>
+{% endblock content %}
+
+{% block scripts %}
+
+    <script>
+    	/*
+    	{{ timesystemformset.empty_form.as_p }}
+    	*/
+        var timesystem_form_count = {{ timesystemformset.total_form_count }};
+        function inserttimesystem(){
+			var row =   "<tr>"+
+						"	<td align='center'><input class='form-control' type='text' name='{{ timesystemformset.empty_form.time.html_name }}'></td>"+
+						"	<td align='center'><input class='form-control' type='text' name='{{ timesystemformset.empty_form.percentage.html_name }}'></td>"+
+						"	<td align='center'>"+
+						"		<input type='checkbox' name='{{ timesystemformset.empty_form.DELETE.html_name }}'>"+
+						"		<input type='hidden' name='{{ timesystemformset.empty_form.id.html_name }}'>"+
+						"		<input type='hidden' name='{{ timesystemformset.empty_form.ciclovia.html_name }}' value='{{ timesystemformset.empty_form.ciclovia.value }}'>"+
+						"	</td>"+
+						"</tr>";
+            var row2 = row.replace(/__prefix__/g,timesystem_form_count);
+            $(row2).appendTo("#timesystemtable");
+            timesystem_form_count++;
+            $("#{{ timesystemformset.management_form.TOTAL_FORMS.id_for_label }}").val(timesystem_form_count);
+        }
+        /*
+    	{{ arrivalsproportionformset.empty_form.as_p }}
+    	*/
+        var arrivalproportion_form_count = {{ arrivalsproportionformset.total_form_count }};
+        function insertarrivalproportion(){
+			var row =	"<tr>"+
+						"	<td align='center'><input class='form-control' type='text' name='{{ arrivalsproportionformset.empty_form.hour.html_name }}'></td>"+
+						"	<td align='center'><input class='form-control' type='text' name='{{ arrivalsproportionformset.empty_form.proportion.html_name }}'></td>"+
+						"	<td align='center'>"+
+						"		<input type='checkbox' name='{{ arrivalsproportionformset.empty_form.DELETE.html_name }}'>"+
+						"		<input type='hidden' name='{{ arrivalsproportionformset.empty_form.id.html_name }}'>"+
+						"		<input type='hidden' name='{{ arrivalsproportionformset.empty_form.ciclovia.html_name }}' value='{{ arrivalsproportionformset.empty_form.ciclovia.value }}'>"+
+						"	</td>"+
+						"</tr>";
+            var row2 = row.replace(/__prefix__/g,arrivalproportion_form_count);
+            $(row2).appendTo("#arrivalproportiontable");
+            arrivalproportion_form_count++;
+            $("#{{ arrivalsproportionformset.management_form.TOTAL_FORMS.id_for_label }}").val(arrivalproportion_form_count);
+        }
+        /*
+    	{{ participantformset.empty_form.as_p }}
+    	*/
+        var participant_form_count = {{ participantformset.total_form_count }};
+        function insertparticipant(){
+			var row =	"<tr>"+
+						"	<td align='center'><input class='form-control' type='text' name='{{ participantformset.empty_form.activity.html_name }}'></td>"+
+						"	<td align='center'><input class='form-control' type='text' name='{{ participantformset.empty_form.velocity.html_name }}'></td>"+
+						"	<td align='center'><input class='form-control' type='text' name='{{ participantformset.empty_form.percentage.html_name }}'></td>"+
+						"	<td align='center'>"+
+						"		<input type='checkbox' name='{{ participantformset.empty_form.DELETE.html_name }}'>"+
+						"		<input type='hidden' name='{{ participantformset.empty_form.id.html_name }}'>"+
+						"		<input type='hidden' name='{{ participantformset.empty_form.ciclovia.html_name }}' value='{{ participantformset.empty_form.ciclovia.value }}'>"+
+						"	</td>"+
+						"</tr>";
+            var row2 = row.replace(/__prefix__/g,participant_form_count);
+            $(row2).appendTo("#participanttable");
+            participant_form_count++;
+            $("#{{ participantformset.management_form.TOTAL_FORMS.id_for_label }}").val(participant_form_count);
+        }
+    </script>
+
+{% endblock scripts %}

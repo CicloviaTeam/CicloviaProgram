@@ -1,48 +1,47 @@
 {% extends "ciclovia/base.html" %}
+
 {% block content %}
+
 	<div class="container theme-showcase" role="main">
 		<div class="page-header">
-			<h1>Parametros de la simulacion</h1>
+			<h1>Parámetros de la simulación</h1>
 		</div>
 		<div class="row">
 			<div class="col-md-5">
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<th align="center">Num replicas</th>
-							<th align="center">Distribucion tiempo entre arribos</th>
+							<th align="center">Número de réplicas</th>
+							<th align="center">Distribución tiempo entre arribos</th>
 						</tr>
 					</thead>
 					<tbody>
-						{% if simulation_list %}
-							<ul>
-								{% for sim in simulation_list %}
-									<tr>
-										<td align="center">{{sim.replications}}</td>	 
-										<td align="center">{{sim.arrivals_probability_distribution}}</td>					
-									</tr>	 
-								{% endfor %}
-							</ul>
+						{% for sim in simulation_list %}
+							<tr>
+								<td align="center">{{sim.replications}}</td>
+								<td align="center">{{sim.arrivals_probability_distribution}}</td>
+							</tr>
+						{% empty %}
+							<tr><td colspan="2"><p class="alert alert-info">No se han definido parámetros.</p></td></tr>
+						{% endfor %}
 					</tbody>
 				</table>
-						{% else %}
-						</tbody>
-				</table>
-							<div class="alert alert-info">No se han definido parametros.</div>
-						{% endif %}				
 			</div>
-			<div class="col-md-3"></div>
-			<div class="col-md-4">
+			{% comment %}
+			<!-- No se ha incluido el manejo de los parámetros de simulación en ninguna vista -->
+			<div class="col-md-offset-3 col-md-4">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
-						<h3 class="panel-title">Establecer parametros Simulacion</h3>
+						<h3 class="panel-title">Establecer parámetros Simulacion</h3>
 					</div>
 					<div class="panel-body">
-						En esta seccion se pueden cargar los parametros con los que va a correr la simulacion.   
-						<p><a href="{% url 'CicloviaProgram:upload' %}"" class="btn btn-primary">Cargar &raquo;</a></p>  
+						En esta sección se pueden cargar los parámetros con los que va a correr la simulación.
+						<p><a href="{% url 'CicloviaProgram:' %}" class="btn btn-primary">Cargar &raquo;</a></p>
 					</div>
 				</div>
-			</div>	
+			</div>
+			{% endcomment %}
 		</div>
 	</div>
+
 {% endblock content %}             

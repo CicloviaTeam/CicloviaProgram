@@ -30,18 +30,32 @@
 								</tr>	
 								<tr>
 									<td align="center">Horario</td>
-									<td align="center">{{ciclovia.start_hour}} :00 - {{ciclovia.end_hour}} :00</td>
+									<td align="center">{{ciclovia.start_hour| floatformat:0}}:00 - {{ciclovia.end_hour | floatformat:0}}:00</td>
 								</tr>	
 								<tr>
 									<td align="center">Número de trayectos</td>
 									<td align="center">{{ciclovia.num_tracks}}</td>
-								</tr>      
+								</tr>
+								{% if ciclovia.arrivals_loaded %}
+									<tr>
+										<td align="center">Trayecto de referencia</td>
+										<td align="center">{{ciclovia.reference_track}}</td>
+									</tr>
+									<tr>
+										<td align="center">Hora de referencia</td>
+										<td align="center">{{ciclovia.reference_hour}}</td>
+									</tr>
+									<tr>
+										<td align="center">Tasa de arrivos de referencia</td>
+										<td align="center">{{ciclovia.reference_arrival_rate}}</td>
+									</tr>
+								{% endif %}
 							</tbody>
 						</table>					 
 					</div>
 				</div>
 			</div>			
-			<div class="col-md-6">
+			<div class="col-md-7">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h3 class="panel-title">Detalle Trayectos</h3>
@@ -51,24 +65,28 @@
 							<thead>
 								<tr>
 									<th align="center">#</th>
-									<th align="center">Distancia</th>
+									<th align="center">Longitud</th>
 									<th align="center">Probabilidad inicio</th>
 									<th align="center">Probabilidad fin</th>
+									{% if ciclovia.arrivals_loaded %}
+										<th align="center">Proporción de arrivos</th>
+									{% endif %}
 									<th align="center">Vecinos</th>
 								</tr>
 							</thead>
-							<tbody>		   
-								<ul>
-									{%for track in ciclovia.track_set.all%}
-										<tr>
-											<td align="center">{{track.id_track}}</td>
-											<td align="center">{{track.distance}}</td>
-											<td align="center">{{track.probabilityBegin}}</td>
-											<td align="center">{{track.probabilityEnd}}</td>
-											<td align="center"><a href="{% url 'CicloviaProgram:detailNeighboor' ciclovia.id track.id %}">Ver vecinos</a></td>			
-										</tr>	 
-									{% endfor %}
-								</ul>								
+							<tbody>
+								{% for track in ciclovia.track_set.all %}
+									<tr>
+										<td align="center">{{track.id_track}}</td>
+										<td align="center">{{track.distance}}</td>
+										<td align="center">{{track.probabilityBegin}}</td>
+										<td align="center">{{track.probabilityEnd}}</td>
+										{% if ciclovia.arrivals_loaded %}
+											<td align="center">{{track.arrival_proportion | floatformat:2}}</td>
+										{% endif %}
+										<td align="center"><a href="{% url 'CicloviaProgram:detailNeighboor' ciclovia.id track.id %}">Ver vecinos</a></td>
+									</tr>
+								{% endfor %}
 							</tbody>
 						</table>
 					</div>
@@ -92,7 +110,7 @@
 				<div class="col-md-4">
 					<div class="panel panel-primary">
 						<div class="panel-heading">
-							<h3 class="panel-title">Ingresar rmación de arribos</h3>
+							<h3 class="panel-title">Ingresar información de arribos</h3>
 						</div>
 						<div class="panel-body">
 							<p>En esta sección se puede ingresar la información que se va a utilizar para los arribos de la ciclovía (necesarios para la simulación).</p>
@@ -166,7 +184,7 @@
 										<input class="btn btn-primary" type="submit" value="Ver resultados &raquo;">
 									</div>
 								{% else %}
-									<b><p class="text-info">No hay simulaciones</p></b>
+									<p class="text-info"><b>No hay simulaciones</b></p>
 								{% endif %}
 							</form>
 						</div>
@@ -192,7 +210,7 @@
 										<input class="btn btn-primary" type="submit" value="Ver resultados &raquo;">
 									</div>
 								{% else %}
-									<b><p class="text-info">No hay validaciones</p></b>
+									<p class="text-info"><b>No hay validaciones</b></p>
 								{% endif %}
 							</form>
 						</div>
