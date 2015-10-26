@@ -1,4 +1,3 @@
-# coding=utf-8
 import xml.etree.ElementTree as ET
 import decimal
 import simpy
@@ -63,7 +62,7 @@ class CicloviaObj:
     #This gives a track, given its ID
     def getTrack(self, trackId):
         for track in self.tracks:
-            if track.idNum==trackId:
+            if(track.idNum==trackId):
                 return track
 
     #This assigns the arrival, according to the hour and the track density
@@ -101,34 +100,34 @@ class TrackObj:
     #This gives the probability of a neighboor track, given its ID
     def getProb(self, trackId):
         for index, neighboor in enumerate(self.tracksId):
-            if neighboor==trackId:
+            if(neighboor==trackId):
                 return self.tracksProb.pop(index)
         return -1
 
     #This recalculates the probability of the tracks, given the new neighboor ID
-    # def recalculateProb(self, newTrackId):
-    #     newTrackProb = self.getProb(newTrackId)
-    #     newProb = 1-newTrackProb
-    #     self.probability = self.probability*newProb
-    #     for index, neighboor in enumerate(self.tracksId):
-    #         if(neighboor!=trackId):
-    #             self.tracksProb[index] = self.tracksProb.pop(index)*newProb
+    def recalculateProb(self, newTrackId):
+        newTrackProb = self.getProb(newTrackId)
+        newProb = 1-newTrackProb
+        self.probability = self.probability*newProb
+        for index, neighboor in enumerate(self.tracksId):
+            if(neighboor!=trackId):
+                self.tracksProb[index] = self.tracksProb.pop(index)*newProb
 
     #This method gives a neighboor of a track, in a specific direction
     def giveNeighboorInDirection(self, direction):
         probabilities = []
         ids = []
-        if direction == "begin":
+        if(direction == "begin"):
             probabilities.append(self.probabilityBegin)
         else:
             probabilities.append(self.probabilityEnd)
 
         ids.append(self.idNum)
         for index, direct in enumerate(self.tracksDirection):
-            if direct[1] == direction:
+            if(direct[1] == direction):
                 probabilities.append(self.tracksProb[index])
                 ids.append(self.tracksId[index])
-        if len(ids)==1:
+        if(len(ids)==1):
             return [self.idNum, direction]
 
         probabilitiesArray = numpy.array(probabilities, dtype=numpy.dtype(numpy.float64))
@@ -140,11 +139,11 @@ class TrackObj:
 
 
 
-        if listProbabilities[0]==self.idNum:
+        if(listProbabilities[0]==self.idNum):
             return [listProbabilities[0],direction]
         enterTo = "begin"
         for index, neighboor  in enumerate(self.tracksId):
-                if listProbabilities[0] == neighboor:
+                if(listProbabilities[0] == neighboor):
                     direction = self.tracksDirection[index]
                     enterTo =direction[0]
         #OJO ACA
@@ -156,7 +155,7 @@ class TrackObj:
     #This method updates the number of participants in a track
     def updateNumberInTrack(self, time):
         size = len(self.numParticipantsInTrack)
-        if size == 0:
+        if(size == 0):
             initialNumber = [0, 0]
             self.numParticipantsInTrack.append(initialNumber)
             info = [self.numberInTrack,time]
@@ -274,7 +273,7 @@ def buildCiclovia(filename, pUser):
 
         #Only loads info in database if it is a model (no an experiment)
         #OJO: CAMBIAR A MODEL en lugar de MODELC
-        if typeCiclovia=="model":
+        if(typeCiclovia=="model"):
             #print("Como es un modelo, voy a guardar la info en la base de datos")
             cicloviaDB = Ciclovia(user=pUser, name=ciclovia.name, place=ciclovia.place, start_hour = ciclovia.startHour, end_hour = ciclovia.endHour, num_tracks = ciclovia.numTracks)
             cicloviaDB.save()
@@ -365,7 +364,7 @@ def buildCicloviaFromJson(json_data, pUser):
 
         #Only loads info in database if it is a model (no an experiment)
         #OJO: CAMBIAR A MODEL en lugar de MODELC
-        if typeCiclovia=="model":
+        if(typeCiclovia=="model"):
             #print("Como es un modelo, voy a guardar la info en la base de datos")
             cicloviaDB = Ciclovia(user=pUser, name=ciclovia.name, place=ciclovia.place, start_hour = ciclovia.startHour, end_hour = ciclovia.endHour, num_tracks = ciclovia.numTracks)
             cicloviaDB.save()
@@ -389,49 +388,49 @@ def buildCicloviaFromJson(json_data, pUser):
         print ("Ocurrio un error")
 
 #This definition adds new tracks to the model
-# def addTracks(dataFile, ciclovia):
-#
-#     tree = ET.parse(dataFile)
-#     root = tree.getroot()
-#
-#     #In this part, all the new tracks are built and they are added to the Ciclovia set.
-#     #Neighboors' probabilities are modified too.
-#     for newTrack in root.findall('newTrack'):
-#         trackId = int(newTrack.find('id').text)
-#         trackDistance = int(newTrack.find('distance').text)
-#         trackProbability =  decimal.Decimal(newTrack.find('probability').text)
-#         #Modified probabilities
-#         trackProbabilityBegin =  decimal.Decimal(newTrack.find('probabilityBegin').text)
-#         trackProbabilityEnd =  decimal.Decimal(newTrack.find('probabilityEnd').text)
-#         neighboorsIds = []
-#         neighboorsProbs = []
-#         sumProb = trackProbability
-#         for neighboor in newTrack.findall('neighboor'):
-#             neighboorId = int(neighboor.find('id').text)
-#             neighboorsIds.append(neighboorId)
-#             neighboorProb= decimal.Decimal(neighboor.find('trackToNeighboorProbability').text)
-#             neighboorToTrackProb= decimal.Decimal(neighboor.find('neighboorToTrackProbability').text)
-#             neighboorsProbs.append(neighboorProb)
-#             neighboorsDirec= neighboor.find('direction').text
-#             #Modified to give From and To
-#             neighboorsFromDirec= neighboor.find('from').text
-#             neighboorsFromToDirec = [neighboorsFromDirec, neighboorsDirec]
-#
-#             neighboorsDirection.append(neighboorsFromToDirec)
-#             for neighboorTrack in ciclovia.tracks:
-#                 found= False
-#                 if(neighboorTrack.idNum == neighboorId and found!=True):
-#                     neighboorTrack.tracksId.append(trackId);
-#                     neighboorTrack.tracksProb.append(neighboorToTrackProb);
-#                     found=True
-#                     #print("Se agrego la prob del nuevo trayecto al vecino")
-#             sumProb+= neighboorProb
-#         if sumProb != 1.0:
-#             print("Error la suma de probabilidades no es 1")
-#
-#         newTrack = TrackObj(trackId, trackDistance, trackProbability, trackProbabilityBegin, trackProbabilityEnd, neighboorsIds, neighboorsProbs, neighboorsDirection)
-#
-#         ciclovia.tracks.append(newTrack)
+def addTracks(dataFile, ciclovia):
+
+    tree = ET.parse(dataFile)
+    root = tree.getroot()
+
+    #In this part, all the new tracks are built and they are added to the Ciclovia set.
+    #Neighboors' probabilities are modified too.
+    for newTrack in root.findall('newTrack'):
+        trackId = int(newTrack.find('id').text)
+        trackDistance = int(newTrack.find('distance').text)
+        trackProbability =  decimal.Decimal(newTrack.find('probability').text)
+        #Modified probabilities
+        trackProbabilityBegin =  decimal.Decimal(newTrack.find('probabilityBegin').text)
+        trackProbabilityEnd =  decimal.Decimal(newTrack.find('probabilityEnd').text)
+        neighboorsIds = []
+        neighboorsProbs = []
+        sumProb = trackProbability
+        for neighboor in newTrack.findall('neighboor'):
+            neighboorId = int(neighboor.find('id').text)
+            neighboorsIds.append(neighboorId)
+            neighboorProb= decimal.Decimal(neighboor.find('trackToNeighboorProbability').text)
+            neighboorToTrackProb= decimal.Decimal(neighboor.find('neighboorToTrackProbability').text)
+            neighboorsProbs.append(neighboorProb)
+            neighboorsDirec= neighboor.find('direction').text
+            #Modified to give From and To
+            neighboorsFromDirec= neighboor.find('from').text
+            neighboorsFromToDirec = [neighboorsFromDirec, neighboorsDirec]
+
+            neighboorsDirection.append(neighboorsFromToDirec)
+            for neighboorTrack in ciclovia.tracks:
+                found= False
+                if(neighboorTrack.idNum == neighboorId and found!=True):
+                    neighboorTrack.tracksId.append(trackId);
+                    neighboorTrack.tracksProb.append(neighboorToTrackProb);
+                    found=True
+                    #print("Se agrego la prob del nuevo trayecto al vecino")
+            sumProb+= neighboorProb
+        if sumProb != 1.0:
+            print("Error la suma de probabilidades no es 1")
+
+        newTrack = TrackObj(trackId, trackDistance, trackProbability, trackProbabilityBegin, trackProbabilityEnd, neighboorsIds, neighboorsProbs, neighboorsDirection)
+
+        ciclovia.tracks.append(newTrack)
 
 #This definition removes tracks from the Ciclovia
 def removeTracks(dataFile, ciclovia):
@@ -444,12 +443,12 @@ def removeTracks(dataFile, ciclovia):
         trackId = int(removeTrack.find('id').text)
         for track in ciclovia.tracks:
             found= False
-            if track.idNum == trackId:
+            if(track.idNum == trackId):
                 ciclovia.tracks.remove(track)
                 #print("Se elimino el trayecto")
             else:
                 for index, elem in enumerate(track.tracksId):
-                    if elem==trackId:
+                    if(elem==trackId):
                         track.tracksId.pop(index)
                         track.tracksProb.pop(index)
                         #print ("Se elimino la prob en el trayecto vecino")
@@ -465,7 +464,7 @@ def assignArrivalInfo(ciclovia, ciclovia_id, filename):
 
     #This is the type of XML (model or experiment)
     nameCiclovia = root.find('name').text
-    if nameCiclovia!=cicloviaFromDB.name:
+    if(nameCiclovia!=cicloviaFromDB.name):
         print("Error, los nombres no coinciden")
 
     #In this part all the attributes of a Ciclovia are assigned
@@ -496,7 +495,7 @@ def assignArrivalInfo(ciclovia, ciclovia_id, filename):
         query_tracksFromDB = cicloviaFromDB.track_set.all()
         found = False
         for trackDB in query_tracksFromDB:
-            if found == False and trackDB.id_track == trackId:
+            if(found == False and trackDB.id_track == trackId):
                 trackDB.arrival_proportion = proportion
                 trackDB.save()
                 found=True
@@ -662,7 +661,7 @@ def loadCiclovia(cicloviaId):
     print(loadedCiclovia.printInfo())
 
     #If arrivals are already loaded, I have to load all the information to the Ciclovia
-    if ciclovia.arrivals_loaded:
+    if(ciclovia.arrivals_loaded==True):
         print("Tengo que cargar toda la info del a Ciclovia")
         loadedCiclovia.referenceTrack = ciclovia.reference_track
         loadedCiclovia.referenceHour = ciclovia.reference_hour
@@ -781,14 +780,14 @@ class SimulationDES:
         for event in partArriving.eventsList:
             eventType = partArriving
             yield self.env.timeout(decimal.Decimal(event[3]))
-            if event[0]==0:
+            if(event[0]==0):
                 event[1].numberInTrack -= decimal.Decimal(1)
                 event[1].updateNumberInTrack(self.env.now)
                 event[2].numberInTrack += decimal.Decimal(1)
                 event[2].updateNumberInTrack(self.env.now)
 
                 #print('%s moving in Ciclovia at %s' % (idNum, self.env.now))
-            if event[0]==-1:
+            if(event[0]==-1):
                 self.numberInCiclovia -= decimal.Decimal(1)
                 event[1].numberInTrack -= decimal.Decimal(1)
                 event[1].updateNumberInTrack(self.env.now)
@@ -874,21 +873,21 @@ class SimulationDES:
                 #print("Last arrival es " + str(lastArrival))
                 #Changed 60 to 30
                 #print("En la hora " + str(indexHour) + " en el trayecto " + str(track.idNum) + " la tasa de arribos es " + str(30/hour))
-                while lastArrival<((indexHour+1)*30):
+                while(lastArrival<((indexHour+1)*30)):
                     #print("Entro al while!")
                     #trackNum = track.idNum
                     #Modified here!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     #Add +1 to hour: time =...(/hour+1 ) double check
                     #Changed 60 to 30
-                    time = -math.log(1.0 - random.random())/float(hour)
+                    time = -math.log(1.0 - random.random())/float((hour))
                     #print("Tiempo expo: " + str(time))
                     arrivalTime = decimal.Decimal(time) + decimal.Decimal(lastArrival)
                     lastArrival = arrivalTime
                     #Changed 60 to 30
-                    if lastArrival>(indexHour+1)*30:
+                    if(lastArrival>(indexHour+1)*30):
                         noEnter+=1
                     #Changed 60 to 30
-                    if lastArrival<(indexHour+1)*30:
+                    if(lastArrival<(indexHour+1)*30):
                         i+=1
                         #print("last arrival es " + str(lastArrival))
                         #print("El valor de i es: " + str(i))
@@ -899,16 +898,16 @@ class SimulationDES:
                         #This assigns randomly if a participant enter by the end or by the begin of the track
                         assignEnterIn = random.random()
                         enterIn = "begin"
-                        if assignEnterIn>0.5:
+                        if(assignEnterIn>0.5):
                             enterIn = "end"
                         part = ParticipantObjSim(self.ciclovia, track, enterIn, i, typeOfParticipant, arrivalTime, timeParticipantSystem)
                         enterParticipants+=1
 
-                        if self.isValidation:
+                        if(self.isValidation == True):
                             print("Va a asignar ruta")
                             part.assignRoute()
                         #Imprimo la primera entidad que entra
-                        if i == 100:
+                        if(i == 100):
                             print("El trayecto por el que entra es: " + str(track.idNum))
                             #print("Entro a imprimir lista de eventos")
                             #print("Evento 1" +" tracks " + str(part.arrivalTrack.idNum))
@@ -936,12 +935,12 @@ class SimulationDES:
 
         for index, partArriving in enumerate(participantListSorted):
 
-            if self.isValidation:
+            if(self.isValidation==True):
                 part = self.participantValidation(partArriving, partArriving.track, partArriving.idNum, partArriving.participantType, partArriving.arrivalTime, partArriving.timeInSystem)
             else:
                 part = self.participant(partArriving, partArriving.track, partArriving.idNum, partArriving.participantType, partArriving.arrivalTime, partArriving.timeInSystem)
 
-            if index == 0:
+            if(index == 0):
                 yield self.env.timeout(partArriving.arrivalTime)
             else:
                 yield self.env.timeout(partArriving.arrivalTime - participantListSorted[index-1].arrivalTime)
@@ -961,7 +960,7 @@ class SimulationDES:
         print("Parametros")
         x = numpy.random.random_sample(size)
         for value in x:
-            if value > bins[len(bins)-1]:
+            if(value > bins[len(bins)-1]):
                 print("Es mayor: " + str(value))
 
         print(bins)
@@ -982,10 +981,10 @@ class SimulationDES:
         valuesLimits = []
         for index, value in enumerate(values):
             limits = 0
-            if index==0:
+            if(index==0):
                 #Limit = Ubicacion, Limite inferior, Limite superior, Ancho
                 limits = [-1,0,values[index],1]
-            elif index==len(values)-1:
+            elif(index==len(values)-1):
                 limits = [1,values[index-1], values[index],1]
             else:
                 limits = [0, values[index-1],values[index],1]
@@ -998,7 +997,7 @@ class SimulationDES:
 
         change = False
         finish = False
-        while not finish:
+        while(finish==False):
             counter = 0
             maxInterval = len(limitsAdj)
             change = False
@@ -1007,19 +1006,19 @@ class SimulationDES:
             for index, interval in enumerate(limitsAdj):
                 counter += 1
                 #print("Relative freq for index " + str(index) + "is " + str(relativeFrequenciesAdj[index]))
-                if change==False and index>0 and relativeFrequenciesAdj[index]<minFrequency:
+                if(change==False and index>0 and relativeFrequenciesAdj[index]<minFrequency):
                     #Aca se deben unir intervalos
                     #print("Entrooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
                     joinIntervalIndex = index-1
                     position = 1
                     #Aca debe ser un while
-                    if index<(len(limitsAdj)-1) and relativeFrequenciesAdj[index-1]>relativeFrequenciesAdj[index+1]:
+                    if(index<(len(limitsAdj)-1) and relativeFrequenciesAdj[index-1]>relativeFrequenciesAdj[index+1]):
                         joinIntervalIndex = index+1
                         position = -1
                     probabilitiesAdj[joinIntervalIndex] += probabilitiesAdj[joinIntervalIndex+position]
                     relativeFrequenciesAdj[joinIntervalIndex] = (probabilitiesAdj[joinIntervalIndex]+probabilitiesAdj[joinIntervalIndex+position])/total
                     limitsAdj[joinIntervalIndex][3] = limitsAdj[joinIntervalIndex][3]+ limitsAdj[index][3]
-                    if position==1:
+                    if(position==1):
                         limitsAdj[joinIntervalIndex][2] = limitsAdj[joinIntervalIndex+position][2]
                         valuesAdj[joinIntervalIndex] =  valuesAdj[joinIntervalIndex+position]
                     else:
@@ -1035,7 +1034,7 @@ class SimulationDES:
                     change = True
                     counter -= 1
 
-            if counter==maxInterval:
+            if(counter==maxInterval):
                 finish = True
 
 
@@ -1057,18 +1056,18 @@ class SimulationDES:
         randomsList = []
         for randomValue in randomsObtained:
             indexNew = randomValue
-            if limitsAdj[indexNew][0] == 0:
+            if(limitsAdj[indexNew][0] == 0):
                 y = random.randint(limitsAdj[indexNew][1],limitsAdj[indexNew][2])
                 randomsList.append(y)
-            elif limitsAdj[indexNew][0] == -1:
+            elif (limitsAdj[indexNew][0] == -1):
                 y = random.randint(limitsAdj[indexNew][1],limitsAdj[indexNew][2])
                 randomsList.append(y)
-            elif limitsAdj[indexNew][0] == 1:
+            elif(limitsAdj[indexNew][0] == 1):
                 initialValue = limitsAdj[indexNew][1]
                 rate = limitsAdj[indexNew][2] - limitsAdj[indexNew][1]
                 y = -math.log(1.0 - random.random())*rate
                 y += initialValue
-                while y>limitsAdj[indexNew][2]:
+                while(y>limitsAdj[indexNew][2]):
                     y = -math.log(1.0 - random.random())*rate
                     y += initialValue
                 randomsList.append(y)
@@ -1078,7 +1077,7 @@ class SimulationDES:
     #This definition accumulates the current number in system
     def numberInSystemStatistic(self):
         size = len(self.listNumberInSystem)
-        if size == 0:
+        if(size == 0):
             info = [self.numberInCiclovia, self.env.now]
             self.listNumberInSystem.append(info)
         else:
@@ -1133,12 +1132,12 @@ class SimulationDES:
                 listTimeNumberInTrack.append(float(value[1]))
             #Revisar
             print("Sim time " + str(simTime))
-            if len(listNumberInTrack)>0:
+            if(len(listNumberInTrack)>0):
                 listNumberInTrack.append(listNumberInTrack[len(listNumberInTrack)-1])
                 listTimeNumberInTrack.append(simTime - listTimeNumberInTrack[len(listTimeNumberInTrack)-1])
 
             avgNumberInTrack = 0
-            if len(listNumberInTrack)==0:
+            if(len(listNumberInTrack)==0):
                 resultsPerTrackDB = resultsDB.simulationresultspertrack_set.create(track = track.idNum, total_arrivals=0,  average_number_track=0)
                 resultsPerTrackDB.save()
 
@@ -1148,7 +1147,7 @@ class SimulationDES:
                 resultsPerTrackDB = resultsDB.simulationresultspertrack_set.create(track = track.idNum, total_arrivals=0,  total_flow=0, average_number_track=avgNumberInTrack)
                 resultsPerTrackDB.save()
 
-            if self.isValidation:
+            if(self.isValidation == True):
 
                 hourInterval = 1
                 totalFlow = 0
@@ -1198,18 +1197,18 @@ class ParticipantObjSim:
         self.eventsList.append(event)
         simTime = (self.ciclovia.endHour - self.ciclovia.startHour+1)*30
 
-        while self.timeLeftInSystem>0:
+        while(self.timeLeftInSystem>0):
             distance = self.track.distance
-            timeForTrack = 60*distance/ self.participantType.velocity
+            timeForTrack = 60*distance/(self.participantType.velocity)
             #Update flow if necessary
             #halfDistance = distance/2
             timeForHalfTrack = timeForTrack/2
             #If the entity has enough time to go until the half of the track, the flow statistic has to be updated
-            if timeForHalfTrack<self.timeLeftInSystem and (float(self.currentTimeForFlow)+float(timeForHalfTrack)<simTime):
+            if(timeForHalfTrack<self.timeLeftInSystem and (float(self.currentTimeForFlow)+float(timeForHalfTrack)<simTime)):
                 timeSimFlow = float(self.currentTimeForFlow) + float(timeForHalfTrack)
                 self.track.updateFlowInTrack(timeSimFlow)
 
-            if timeForTrack>self.timeLeftInSystem:
+            if(timeForTrack>self.timeLeftInSystem):
                 #leavingTime = self.currentTime + self.timeLeftInSystem
                 leavingTime = self.timeLeftInSystem
                 self.timeLeftInSystem = 0
@@ -1221,7 +1220,7 @@ class ParticipantObjSim:
                 #Info neighboor gives me an array with the nextTrack and with the direction
                 #If a participant enters by the begin of the track, he has to go out from the end of the track
                 outIn = "end"
-                if self.direction == "end":
+                if(self.direction == "end"):
                     outIn = "begin"
                 nextTrack = self.track.giveNeighboorInDirection(outIn)
                 nextTrackId = nextTrack[0]
@@ -1229,9 +1228,9 @@ class ParticipantObjSim:
                 nextTrack = self.ciclovia.getTrack(nextTrackId)
 
                 #Assign the opposite direction !
-                if self.direction == "begin" and nextTrackId == self.track.idNum:
+                if(self.direction == "begin" and nextTrackId == self.track.idNum):
                     self.direction = "end"
-                if self.direction == "end" and nextTrackId == self.track.idNum:
+                if(self.direction == "end" and nextTrackId == self.track.idNum):
                     self.direction = "begin"
 
                 #movingTime = self.currentTime + timeForTrack
@@ -1256,7 +1255,7 @@ def simulationExecution(cicloviaId, isValidation):
 
     start = timeit.default_timer()
     simulationRuns = 10
-    if isValidation:
+    if(isValidation==True):
         simulationRuns = 2
     seed = 9243881
 
@@ -1309,23 +1308,23 @@ def simulationExecution(cicloviaId, isValidation):
     for index, listPerTrack in enumerate(listInfoTracks):
         avg_number_track = round(numpy.mean(listPerTrack),3)
         std_number_track = 0
-        if len(listInfoTracks)>1:
+        if(len(listInfoTracks)>1):
             std_number_track = round(numpy.std(listPerTrack),3)
         avg_total_flow = 0
         std_total_flow = 0
-        if isValidation:
+        if(isValidation == True):
             avg_total_flow = round(numpy.mean(listFlowTracks[index]),3)
-            if len(listInfoTracks)>1:
+            if(len(listInfoTracks)>1):
                 std_total_flow = round(numpy.std(listFlowTracks[index]),3)
         resultsPerTrackCompiledDB = resultsCompiledDB.simulationresultscompiledpertrack_set.create(track = index+1, average_number_track = avg_number_track, stdev_number_track = std_number_track, average_total_flow=avg_total_flow, stdev_total_flow=std_total_flow)
         resultsPerTrackCompiledDB.save()
 
         #Aca se debe compilar el flujo por trayecto
-        if isValidation:
+        if(isValidation==True):
             for index2, hourInt in enumerate(listFlowPerHourTracks[index]):
                 avg_flow_hourInt = round(numpy.mean(hourInt),3)
                 std_flow_hourInt = 0
-                if len(listInfoTracks)>1:
+                if(len(listInfoTracks)>1):
                     std_flow_hourInt = round(numpy.std(hourInt),3)
                 resultsPerHourPerTrackCompiledDB = resultsPerTrackCompiledDB.simulationresultscompiledflowtrack_set.create(track_simulation = index+1, hour = index2+1, avg_flow_hour=avg_flow_hourInt,stdev_flow_hour = std_flow_hourInt, hw_flow_hour=0)
 
@@ -1336,7 +1335,7 @@ def simulationExecution(cicloviaId, isValidation):
     resultsCompiledDB.avg_total_arrivals = round(numpy.mean(listTotalArrivals),3)
     resultsCompiledDB.average_number_system = round(numpy.mean(listNumberSystem),3)
     resultsCompiledDB.num_runs = simulationRuns
-    if simulationRuns>1:
+    if(simulationRuns>1):
         resultsCompiledDB.stdev_total_arrivals = round(numpy.std(listTotalArrivals),3)
         resultsCompiledDB.stdev_number_system = round(numpy.std(listNumberSystem),3)
 
