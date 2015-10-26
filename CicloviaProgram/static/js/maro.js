@@ -34,16 +34,19 @@ var Ciclovia = React.createClass({
 			}else if ($(inputs[i]).attr("class") === "form-control imprimir rutaDistancia"){
 				ruta["distance"] = $(inputs[i]).val();
 			}else if ($(inputs[i]).attr("class") === "form-control imprimir rutaProbaInit"){
-				ruta["probabilityBegin"] = $(inputs[i]).val();
+				//ruta["probabilityBegin"] = $(inputs[i]).val();
+				ruta["probabilityBegin"] = 0.5
 			}else if ($(inputs[i]).attr("class") === "form-control imprimir rutaProbaFin"){
-				ruta["probabilityEnd"] = $(inputs[i]).val();
-				ruta["neighboor"] = [];
+				//ruta["probabilityEnd"] = $(inputs[i]).val();
+				ruta["probabilityEnd"] = 0.5
 			}
+			ruta["neighboor"] = [];
 
 			if ($(inputs[i]).attr("class") === "form-control imprimir vecinoId"){
 				vecino["id"] = $(inputs[i]).val();
 			}else if ($(inputs[i]).attr("class") === "form-control imprimir vecinoDistancia"){
-				vecino["probability"] = $(inputs[i]).val();
+				//vecino["probability"] = $(inputs[i]).val();
+				vecino["probability"] = 0.5
 			}else if ($(inputs[i]).attr("class") === "form-control imprimir vecinoDesde"){
 				vecino["direction"] = $(inputs[i]).val();
 			}else if ($(inputs[i]).attr("class") === "form-control imprimir vecinoHacia"){
@@ -122,7 +125,7 @@ var Ciclovia = React.createClass({
 			<div>
 				<br/>
 				<div className="input-group">
-					<span className="input-group-addon">N&uacute;mero de rutas:</span>
+					<span className="input-group-addon">N&uacute;mero de tramos:</span>
 					<input type="number" id="generar" className="form-control" placeholder="Cuantas" aria-describedby="basic-addon1"> </input>
 				</div>
 				<br/>
@@ -174,15 +177,13 @@ var Ruta = React.createClass({
 		var rutas = this.props.rutas.map(function (ruta) {
 			return (
 				<div>
-					<h3>RUTA {ruta.numero}</h3>
-					<input type="text" className="form-control imprimir rutaId" placeholder="ID ruta" aria-describedby="basic-addon1"> </input>
+					<h3>TRAMO {ruta.numero}</h3>
+					<input type="text" className="form-control imprimir rutaId" placeholder="ID tramo" aria-describedby="basic-addon1"> </input>
 					<input type="text" className="form-control imprimir rutaDistancia" placeholder="Distancia" aria-describedby="basic-addon1"> </input>
-					<input type="text" className="form-control imprimir rutaProbaInit" placeholder="probaInit" aria-describedby="basic-addon1"> </input>
-					<input type="text" className="form-control imprimir rutaProbaFin" placeholder="ProbaFin" aria-describedby="basic-addon1"> </input>
 
 					<Vecino vecino={ruta.vecinos}> </Vecino>	
 
-					<h3>FIN RUTA</h3>				
+					<h3>FIN TRAMO {ruta.numero} </h3>
 				</div>	
 			);
 		});
@@ -203,13 +204,13 @@ var Vecino = React.createClass({
 				<div className="row">
 					<div className="col-md-1"></div> 
 					<div className="col-md-11"> 
-						<input type="text" className="form-control imprimir vecinoId" placeholder="ID ruta" aria-describedby="basic-addon1"> </input>
+						<input type="text" className="form-control imprimir vecinoId" placeholder="ID tramo" aria-describedby="basic-addon1"> </input>
 						<input type="text" className="form-control imprimir vecinoDistancia" placeholder="Distancia" aria-describedby="basic-addon1"> </input>
 						<input type="text" className="form-control imprimir vecinoDesde" placeholder="desde" aria-describedby="basic-addon1"> </input>
 						<input type="text" className="form-control imprimir vecinoHacia" placeholder="hacia" aria-describedby="basic-addon1"> </input>
 					</div>
 					
-					<p>Fin VECINO</p>
+					<p>Fin vecino</p>
 				</div>	
 			);
 		});

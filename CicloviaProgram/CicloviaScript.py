@@ -11,6 +11,7 @@ from PrintXML import printOrganizedXML
 from django.utils import timezone
 import timeit
 import matplotlib.pyplot as plt
+import traceback
 
 
 from CicloviaProgram.models import Ciclovia, Track, NeighboorInfo, ArrivalsProportionPerHour, TimeInSystemDistribution, SimulationResults, SimulationResultsCompiled, SimulationResultsPerTrack, SimulationResultsCompiledFlowTrack
@@ -385,7 +386,9 @@ def buildCicloviaFromJson(json_data, pUser):
                     #print(neighboorDB)
         return ciclovia
     except:
+        traceback.print_exc()
         print ("Ocurrio un error")
+
 
 #This definition adds new tracks to the model
 def addTracks(dataFile, ciclovia):
