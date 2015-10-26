@@ -25,6 +25,17 @@
                 {% for error in form.end_hour.errors %}
                     <p class="text-danger"><strong>Hora de finalización! </strong>{{error}}</p>
                 {% endfor %}
+                {% if ciclovia.arrivals_loaded %}
+                    {% for error in form.reference_track.errors %}
+                        <p class="text-danger"><strong>Trayecto de referencia! </strong>{{error}}</p>
+                    {% endfor %}
+                    {% for error in form.reference_hour.errors %}
+                        <p class="text-danger"><strong>Hora de referencia! </strong>{{error}}</p>
+                    {% endfor %}
+                    {% for error in form.reference_arrival_rate.errors %}
+                        <p class="text-danger"><strong>Tasa de arribos de referencia! </strong>{{error}}</p>
+                    {% endfor %}
+                {% endif %}
             </div>
 		    {% if formset.total_error_count != 0 %}
                 <div class="col-md-8">
@@ -53,6 +64,11 @@
                         {% for error in formsetform.probabilityEnd.errors %}
                             <p class="text-danger"><strong>Ruta {{ formsetform.id_track.value }}, probabilidad fin! </strong>{{error}}</p>
                         {% endfor %}
+                        {% if ciclovia.arrivals_loaded %}
+                            {% for error in formsetform.arrival_proportion.errors %}
+                                <p class="text-danger"><strong>Ruta {{ formsetform.id_track.value }}, porporción de arrivos! </strong>{{error}}</p>
+                            {% endfor %}
+                        {% endif %}
                     {% endfor %}
                 </div>
             {% endif %}
@@ -90,6 +106,40 @@
                                         <td align="center">Hora de finalización</td>
                                         <td align="center"><input class="form-control" type="number" name="{{ form.end_hour.html_name }}" value="{{ form.end_hour.value }}"></td>
                                     </tr>
+                                    {% if ciclovia.arrivals_loaded %}
+                                        <tr>
+                                            <td align="center">Trayecto de referencia</td>
+                                            <td>
+                                                <select name="{{ form.reference_track.html_name }}" class="form-control">
+                                                    {% for track in ciclovia.track_set.all %}
+                                                        {% if track.id_track == form.reference_track.value %}
+                                                            <option value="{{ track.id_track }}" selected>{{ track.id_track }}</option>
+                                                        {% else %}
+                                                            <option value="{{ track.id_track }}">{{ track.id_track }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center">Hora de referencia</td>
+                                            <td>
+                                                <select name="{{ form.reference_hour.html_name }}" class="form-control">
+                                                    {% for hour in ciclovia.arrivalsproportionperhour_set.all %}
+                                                        {% if hour.hour == form.reference_hour.value %}
+                                                            <option value="{{ hour.hour | floatformat:0 }}" selected>{{ hour.hour | floatformat:0 }}</option>
+                                                        {% else %}
+                                                            <option value="{{ hour.hour | floatformat:0 }}">{{ hour.hour | floatformat:0 }}</option>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center">Tasa de arribos de referencia</td>
+                                            <td align="center"><input class="form-control" type="number" name="{{ form.reference_arrival_rate.html_name }}" value="{{ form.reference_arrival_rate.value }}"></td>
+                                        </tr>
+                                    {% endif %}
                                 </tbody>
                             </table>
                         </div>
@@ -108,6 +158,9 @@
                                         <th align="center">Distancia</th>
                                         <th align="center">Probabilidad inicio</th>
                                         <th align="center">Probabilidad fin</th>
+                                        {% if ciclovia.arrivals_loaded %}
+                                             <th align="center">Proporción de arribos</th>
+                                        {% endif %}
                                         <th align="center">Eliminar</th>
                                     </tr>
                                 </thead>
@@ -123,9 +176,14 @@
                                             <td align="center"><input class="form-control" type="text" name="{{ formsetform.distance.html_name }}" value="{{ formsetform.distance.value }}"></td>
                                             <td align="center"><input class="form-control" type="text" name="{{ formsetform.probabilityBegin.html_name }}" value="{{ formsetform.probabilityBegin.value }}"></td>
                                             <td align="center"><input class="form-control" type="text" name="{{ formsetform.probabilityEnd.html_name }}" value="{{ formsetform.probabilityEnd.value }}"></td>
-                                            <td align="center"><input type="checkbox" name="{{ formsetform.DELETE.html_name }}"></td>
-                                            <input type="hidden" name="{{ formsetform.id.html_name }}" value="{{ formsetform.id.value }}">
-                                            <input type="hidden" name="{{ formsetform.ciclovia.html_name }}" value="{{ formsetform.ciclovia.value }}">
+                                            {% if ciclovia.arrivals_loaded %}
+                                                <td align="center"><input class="form-control" type="text" name="{{ formsetform.arrival_proportion.html_name }}" value="{{ formsetform.arrival_proportion.value }}"></td>
+                                            {% endif %}
+                                            <td align="center">
+                                                <input type="checkbox" name="{{ formsetform.DELETE.html_name }}">
+                                                <input type="hidden" name="{{ formsetform.id.html_name }}" value="{{ formsetform.id.value }}">
+                                                <input type="hidden" name="{{ formsetform.ciclovia.html_name }}" value="{{ formsetform.ciclovia.value }}">
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -147,19 +205,32 @@
     <script>
         var form_count = {{formset.total_form_count}};
         function inserttrack(){
-            var row =   "<tr>"+
-                        "    <td align='center'><input class='form-control' type='number' name='{{ formset.empty_form.id_track.html_name }}' ></td>"+
-                        "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.distance.html_name }}' ></td>"+
-                        "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityBegin.html_name }}' ></td>"+
-                        "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityEnd.html_name }}' ></td>"+
-                        "    <td align='center'><input type='checkbox' name='{{ formset.empty_form.DELETE.html_name }}'></td>"+
-                        "    <input type='hidden' name='{{ formset.empty_form.id.html_name }}' >"+
-                        "    <input type='hidden' name='{{ formset.empty_form.ciclovia.html_name }}' value='{{ formset.empty_form.ciclovia.value }}'>"+
-                        "</tr>";
+            {% if not ciclovia.arrivals_loaded %}
+                var row =   "<tr>"+
+                            "    <td align='center'><input class='form-control' type='number' name='{{ formset.empty_form.id_track.html_name }}' ></td>"+
+                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.distance.html_name }}' ></td>"+
+                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityBegin.html_name }}' ></td>"+
+                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityEnd.html_name }}' ></td>"+
+                            "    <td align='center'><input type='checkbox' name='{{ formset.empty_form.DELETE.html_name }}'></td>"+
+                            "    <input type='hidden' name='{{ formset.empty_form.id.html_name }}' >"+
+                            "    <input type='hidden' name='{{ formset.empty_form.ciclovia.html_name }}' value='{{ formset.empty_form.ciclovia.value }}'>"+
+                            "</tr>";
+            {% else %}
+                var row =   "<tr>"+
+                            "    <td align='center'><input class='form-control' type='number' name='{{ formset.empty_form.id_track.html_name }}' ></td>"+
+                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.distance.html_name }}' ></td>"+
+                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityBegin.html_name }}' ></td>"+
+                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityEnd.html_name }}' ></td>"+
+                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.arrival_proportion.html_name }}' ></td>"+
+                            "    <td align='center'><input type='checkbox' name='{{ formset.empty_form.DELETE.html_name }}'></td>"+
+                            "    <input type='hidden' name='{{ formset.empty_form.id.html_name }}' >"+
+                            "    <input type='hidden' name='{{ formset.empty_form.ciclovia.html_name }}' value='{{ formset.empty_form.ciclovia.value }}'>"+
+                            "</tr>";
+            {% endif %}
             var row2 = row.replace(/__prefix__/g,form_count);
             $(row2).appendTo("#trackdata");
             form_count++;
-            $("#id_track_set-TOTAL_FORMS").val(form_count);
+            $("#{{ formset.management_form.TOTAL_FORMS.id_for_label }}").val(form_count);
         }
     </script>
 

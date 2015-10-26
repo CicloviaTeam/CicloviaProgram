@@ -22,9 +22,10 @@ from django.forms.models import inlineformset_factory
 import charts
 import grafo
 from reportlab.graphics.charts.piecharts import Pie, Pie3d
+import urllib
 
 
-
+#El índice de la página.
 def index(request):
 	return render(request, 'ciclovia/index.html')
 
@@ -88,8 +89,14 @@ def graphImg(request):
 @login_required(login_url='CicloviaProgram:login')
 def editCiclovia(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	CicloviaForm = modelform_factory(Ciclovia, fields=('name', 'place', 'start_hour', 'end_hour',))
-	TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance','probabilityBegin', 'probabilityEnd',), extra=0)
+	if ciclovia.arrivals_loaded:
+		CicloviaForm = modelform_factory(Ciclovia, fields=('name', 'place', 'start_hour', 'end_hour'\
+			,'reference_track','reference_hour','reference_arrival_rate',))
+		TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance'\
+			,'probabilityBegin', 'probabilityEnd','arrival_proportion'), extra=0)
+	else:
+		CicloviaForm = modelform_factory(Ciclovia, fields=('name', 'place', 'start_hour', 'end_hour',))
+		TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance','probabilityBegin', 'probabilityEnd',), extra=0)
 	if request.method=='POST':
 		form = CicloviaForm(request.POST, instance = ciclovia)
 		formset = TrackFormSet(request.POST, request.FILES, instance = ciclovia)
@@ -112,6 +119,43 @@ def detailArrival(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
 	return render(request, 'ciclovia/detailArrival.html',
 				  {'ciclovia': ciclovia})
+
+@login_required(login_url='CicloviaProgram:login')
+def editArrivalInfo(request,ciclovia_id):
+	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
+	TimeSystemFormsetClass = inlineformset_factory(Ciclovia,TimeInSystemDistribution,
+		fields=('time', 'percentage',), extra=0)
+	ArrivalProportionPerHourFormsetClass = inlineformset_factory(Ciclovia,ArrivalsProportionPerHour,
+		fields=('hour', 'proportion',), extra=0)
+	ParticipantFormsetClass = inlineformset_factory(Ciclovia,ParticipantType,
+		fields=('activity', 'velocity', 'percentage',), extra=0)
+	if request.method == 'POST':
+		timesystemformset = TimeSystemFormsetClass(request.POST, request.FILES, instance=ciclovia, prefix='timesystem')
+		arrivalproportionperhourformset = ArrivalProportionPerHourFormsetClass(request.POST, request.FILES,
+			instance=ciclovia, prefix='arrivalproportion')
+		participantformset = ParticipantFormsetClass(request.POST, request.FILES,
+			instance=ciclovia, prefix='participant')
+		if timesystemformset.is_valid() and arrivalproportionperhourformset.is_valid()\
+				and participantformset.is_valid():
+			timesystemformset.save()
+			arrivalproportionperhourformset.save()
+			participantformset.save()
+			return HttpResponseRedirect(reverse('CicloviaProgram:detail',args=[ciclovia_id]))
+		else:
+			return render(request,'ciclovia/editArrivalInfo.html',
+				{'timesystemformset':timesystemformset, 'ciclovia':ciclovia,
+				 'arrivalsproportionformset':arrivalproportionperhourformset,
+				 'participantformset':participantformset})
+	else:
+		timesystemformset = TimeSystemFormsetClass(instance=ciclovia, prefix='timesystem')
+		arrivalproportionperhourformset = ArrivalProportionPerHourFormsetClass(
+			instance=ciclovia, prefix='arrivalproportion')
+		participantformset = ParticipantFormsetClass(
+			instance=ciclovia, prefix='participant')
+		return render(request,'ciclovia/editArrivalInfo.html',
+				{'timesystemformset':timesystemformset, 'ciclovia':ciclovia,
+				 'arrivalsproportionformset':arrivalproportionperhourformset,
+				 'participantformset':participantformset})
 
 # @login_required(login_url='CicloviaProgram:login')
 # def detailNeighboor(request, ciclovia_id, track_id):
@@ -502,7 +546,7 @@ def newUser(request):
 #User page.
 def user(request):
 	if request.method == 'POST':
-		if request.POST['opcion']=='Cerrar sesion':
+		if request.POST['opcion']=='Cerrar sesión'.decode('utf-8'):
 			return auth_views.logout(request,next_page='CicloviaProgram:index')
 		elif request.POST['opcion']=='Borrar usuario':
 			DeleteU(request.user.username)

@@ -151,9 +151,11 @@
                                                         {% endifequal %}
                                                     </select>
                                                 </td>
-                                                <td align="center"><input type="checkbox" name="{{ formsetform.DELETE.html_name }}"></td>
-                                                <input type="hidden" name="{{ formsetform.id.html_name }}" value="{{ formsetform.id.value }}">
-                                                <input type="hidden" name="{{ formsetform.track.html_name }}" value="{{ formsetform.track.value }}">
+                                                <td align="center">
+                                                    <input type="checkbox" name="{{ formsetform.DELETE.html_name }}">
+                                                    <input type="hidden" name="{{ formsetform.id.html_name }}" value="{{ formsetform.id.value }}">
+                                                    <input type="hidden" name="{{ formsetform.track.html_name }}" value="{{ formsetform.track.value }}">
+                                                </td>
                                             </tr>
                                         {% endfor %}
                                 </tbody>
