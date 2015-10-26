@@ -1195,52 +1195,63 @@ class ParticipantObjSim:
         #Arrival
         event = [1, self.track, self.track, self.arrivalTime]
         self.eventsList.append(event)
-        simTime = (self.ciclovia.endHour - self.ciclovia.startHour+1)*30
+        sim_time = (self.ciclovia.endHour - self.ciclovia.startHour+1)*30
 
         while(self.timeLeftInSystem>0):
             distance = self.track.distance
-            timeForTrack = 60*distance/(self.participantType.velocity)
+            velocity = self.participantType.velocity
+            # Todo change the velocity according to track parameters
+            if self.track.number_of_semaphores > 0:
+                binomialProb = 1
+                velocity = velocity*binomialProb
+            if self.track.hasSlope > 0:
+                slopeCoef = 1
+                velocity = velocity*slopeCoef
+            if self.track.quality_of_track > 0:
+                qualityCoef = 1
+                velocity = velocity*qualityCoef
+            time_for_track = 60*distance/(velocity)
             #Update flow if necessary
             #halfDistance = distance/2
-            timeForHalfTrack = timeForTrack/2
+            time_for_half_track = time_for_track/2
             #If the entity has enough time to go until the half of the track, the flow statistic has to be updated
-            if(timeForHalfTrack<self.timeLeftInSystem and (float(self.currentTimeForFlow)+float(timeForHalfTrack)<simTime)):
-                timeSimFlow = float(self.currentTimeForFlow) + float(timeForHalfTrack)
-                self.track.updateFlowInTrack(timeSimFlow)
+            if time_for_half_track<self.timeLeftInSystem and (float(self.currentTimeForFlow)+float(time_for_half_track)<sim_time):
+                time_sim_flow = float(self.currentTimeForFlow) + float(time_for_half_track)
+                self.track.updateFlowInTrack(time_sim_flow)
 
-            if(timeForTrack>self.timeLeftInSystem):
+            if time_for_track>self.timeLeftInSystem:
                 #leavingTime = self.currentTime + self.timeLeftInSystem
-                leavingTime = self.timeLeftInSystem
+                leaving_time = self.timeLeftInSystem
                 self.timeLeftInSystem = 0
                 #Leaving system = -1
-                event = [-1, self.track, self.track, leavingTime]
+                event = [-1, self.track, self.track, leaving_time]
                 self.eventsList.append(event)
 
             else:
                 #Info neighboor gives me an array with the nextTrack and with the direction
                 #If a participant enters by the begin of the track, he has to go out from the end of the track
-                outIn = "end"
-                if(self.direction == "end"):
-                    outIn = "begin"
-                nextTrack = self.track.giveNeighboorInDirection(outIn)
-                nextTrackId = nextTrack[0]
-                self.direction = nextTrack[1]
-                nextTrack = self.ciclovia.getTrack(nextTrackId)
+                out_in = "end"
+                if self.direction == "end":
+                    out_in = "begin"
+                next_track = self.track.giveNeighboorInDirection(out_in)
+                next_track_id = next_track[0]
+                self.direction = next_track[1]
+                next_track = self.ciclovia.getTrack(next_track_id)
 
                 #Assign the opposite direction !
-                if(self.direction == "begin" and nextTrackId == self.track.idNum):
+                if self.direction == "begin" and next_track_id == self.track.idNum:
                     self.direction = "end"
-                if(self.direction == "end" and nextTrackId == self.track.idNum):
+                if self.direction == "end" and next_track_id == self.track.idNum:
                     self.direction = "begin"
 
                 #movingTime = self.currentTime + timeForTrack
-                movingTime = timeForTrack
-                self.currentTimeForFlow = float(self.currentTimeForFlow) + timeForTrack
-                self.currentTime = movingTime
-                self.timeLeftInSystem -= timeForTrack
+                moving_time = time_for_track
+                self.currentTimeForFlow = float(self.currentTimeForFlow) + time_for_track
+                self.currentTime = moving_time
+                self.timeLeftInSystem -= time_for_track
                 #Moving from ciclovia = 0
-                event = [0, self.track, nextTrack, movingTime]
-                self.track = nextTrack
+                event = [0, self.track, next_track, moving_time]
+                self.track = next_track
                 self.eventsList.append(event)
                 self.assignRoute()
 
