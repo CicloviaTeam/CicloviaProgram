@@ -1,5 +1,12 @@
 {% extends "ciclovia/base.html" %}
 
+{% comment %}
+	Para la codificación en PyCharm
+	<head>
+		<meta charset="UTF-8">
+	</head>
+{% endcomment %}
+
 {% block content %}
 	<div class="container theme-showcase" role="main">
 		<div class="page-header">
@@ -54,7 +61,7 @@
 										<td align="center">{{track.stdev_number_track}}</td>
 										<td align="center">{{track.average_total_flow}}</td>
 										<td align="center">{{track.stdev_total_flow}}</td>
-										<td align="center"><a href="{% url 'CicloviaProgram:detailTrackValidation' ciclovia.id track.id %}" target="_blank">Ver flujo</a></td>
+										<td align="center"><a href="{% url 'CicloviaProgram:detailTrackValidation' ciclovia.id track.id %}">Ver flujo</a></td>
 									</tr>
 								{% endfor %}
 							</tbody>
@@ -80,7 +87,7 @@
 										<td align="center">{{run.average_time}}</td>
 										<td align="center">{{run.standard_deviation_time}}</td>
 										<td align="center">{{run.average_number_system}}</td>
-										<td align="center"><a href="{% url 'CicloviaProgram:detailValidationSingleRun' ciclovia.id run.id %}" target="_blank">Ver corrida</a></td>
+										<td align="center"><a href="{% url 'CicloviaProgram:detailValidationSingleRun' ciclovia.id run.id %}">Ver corrida</a></td>
 									</tr>
 								{% endfor %}
 							</tbody>
