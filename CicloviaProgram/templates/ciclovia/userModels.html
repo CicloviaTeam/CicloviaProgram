@@ -1,4 +1,12 @@
 {% extends "ciclovia/base.html" %}
+
+{% comment %}
+	Para la codificación en PyCharm
+	<head>
+		<meta charset="UTF-8">
+	</head>
+{% endcomment %}
+
 {% block content %}
 	<div class="container theme-showcase" role="main">
 		<div class="page-header">
@@ -27,7 +35,7 @@
 								<td align="center">{{ciclovia.num_tracks}}</td>
 							</tr>
 						{% empty %}
-							<tr><td colspan="2"><p class="alert alert-info">No se ha creado ninguna ciclovía.</p></td></tr>
+							<tr><td colspan="6"><p class="alert alert-info">No se ha creado ninguna ciclovía.</p></td></tr>
 						{% endfor %}
 				</tbody>
 			</table>

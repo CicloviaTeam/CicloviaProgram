@@ -1,11 +1,31 @@
 {% extends "ciclovia/base.html" %}
 
+{% comment %}
+	Para la codificación en PyCharm
+	<head>
+		<meta charset="UTF-8">
+	</head>
+{% endcomment %}
+
 {% block content %}
 
     <div class="container theme-showcase" role="main">
-        <form action="" method="post" enctype="multipart/form-data">
+        <h1>Subir archivo</h1>
+        <form class="form-horizontal" action="" method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
+            <div class="form-group">
+                <label class="control-label col-md-2" for="{{ form.filename.id_for_label }}">Nombre del archivo:</label>
+                <div class="col-md-6">
+                    <input class="form-control" id="{{ form.filename.id_for_label }}" maxlength="{{ form.filename.field.max_length }}" name="{{ form.filename.html_name }}" type="text" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2" for="{{ form.docfile.id_for_label }}">Selecciona un archivo:</label>
+                <div class="col-md-6">
+                    <input id="{{ form.docfile.id_for_label }}" name="{{ form.docfile.html_name }}" type="file" />
+                </div>
+            </div>
+
             <input type="submit" class="btn btn-primary" value="Submit">
         </form>
     </div>

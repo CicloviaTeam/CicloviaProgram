@@ -640,7 +640,7 @@ def loadCiclovia(cicloviaId):
     #query_cicloviaFromDB = Ciclovia.objects.filter(place=placeC)
     #for ciclovia in query_cicloviaFromDB:
     ciclovia = Ciclovia.objects.get(id=cicloviaId)
-    name = str(ciclovia.name)
+    name = str(ciclovia.name.encode('utf-8'))
     place = str(ciclovia.place)
     startHour = ciclovia.start_hour
     endHour = ciclovia.end_hour

@@ -35,13 +35,13 @@ class SimulationParametersAdmin(admin.ModelAdmin):
      list_display = ('replications',  'arrivals_probability_distribution')
 
 class TimeInSystemDistributionAdmin(admin.ModelAdmin):
-     list_display = ('time',  'percentage', 'ciclovia',)
+     list_display = ('time',  'percentage', 'ciclovia')
 
 class ArrivalsProportionPerHourAdmin(admin.ModelAdmin):
      list_display = ('hour',  'proportion')
      
 class SimulationResultsCompiledAdmin(admin.ModelAdmin):
-     list_display = ('date',  'num_runs', 'avg_total_arrivals', 'stdev_total_arrivals', 'average_number_system', 'stdev_number_system')
+     list_display = ('date',  'num_runs', 'avg_total_arrivals', 'stdev_total_arrivals', 'average_number_system', 'stdev_number_system', 'is_validation','ciclovia')
 
 class SimulationResultsAdmin(admin.ModelAdmin):
      list_display = ('date',  'sim_time', 'total_arrivals', 'average_time', 'standard_deviation_time', 'average_number_system')
