@@ -59,7 +59,7 @@ def userModels(request):
 @login_required(login_url='CicloviaProgram:login')
 def detail(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	resultset = ciclovia.simulationresultscompiled_set.filter(is_validation=False).order_by('-date')
 	resultset2 = ciclovia.simulationresultscompiled_set.filter(is_validation=True).order_by('-date')
@@ -92,7 +92,7 @@ def graphImg(request):
 @login_required(login_url='CicloviaProgram:login')
 def editCiclovia(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	if ciclovia.arrivals_loaded:
 		CicloviaForm = modelform_factory(Ciclovia, fields=('name', 'place', 'start_hour', 'end_hour'\
@@ -122,7 +122,7 @@ def editCiclovia(request, ciclovia_id):
 @login_required(login_url='CicloviaProgram:login')
 def detailArrival(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	return render(request, 'ciclovia/detailArrival.html',
 				  {'ciclovia': ciclovia})
@@ -130,7 +130,7 @@ def detailArrival(request, ciclovia_id):
 @login_required(login_url='CicloviaProgram:login')
 def editArrivalInfo(request,ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	TimeSystemFormsetClass = inlineformset_factory(Ciclovia,TimeInSystemDistribution,
 		fields=('time', 'percentage',), extra=0)
@@ -173,7 +173,7 @@ def editArrivalInfo(request,ciclovia_id):
 @login_required(login_url='CicloviaProgram:login')
 def detailNeighboor(request, ciclovia_id, track_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	track = get_object_or_404(Track, pk=track_id)
 	return render(request, 'ciclovia/detailNeighboor.html',
@@ -182,7 +182,7 @@ def detailNeighboor(request, ciclovia_id, track_id):
 @login_required(login_url='CicloviaProgram:login')
 def editNeighboor(request, ciclovia_id, track_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	track = get_object_or_404(Track, pk=track_id)
 	TrackForm = inlineformset_factory(Track,NeighboorInfo,
@@ -232,7 +232,7 @@ def uploadFormCiclovia(request):
 @login_required(login_url='CicloviaProgram:login')
 def deleteCiclovia(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	ciclovia.delete()
 	return HttpResponseRedirect(reverse('CicloviaProgram:userModels'))
@@ -240,7 +240,7 @@ def deleteCiclovia(request, ciclovia_id):
 @login_required(login_url='CicloviaProgram:login')
 def uploadArrivalInfo(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	if request.method == 'POST':
 		form = UploadForm(request.POST, request.FILES)
@@ -271,7 +271,7 @@ def uploadArrivalInfo(request, ciclovia_id):
 @login_required(login_url='CicloviaProgram:login')
 def simulationResults(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	results_id = CicloviaScript.simulationExecution(ciclovia_id,False)
 	return HttpResponseRedirect(reverse('CicloviaProgram:simulationResultsOld',
@@ -280,7 +280,7 @@ def simulationResults(request, ciclovia_id):
 @login_required(login_url='CicloviaProgram:login')
 def simulationResultsOld(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	results = get_object_or_404(SimulationResultsCompiled, pk=request.GET['results_id'])
 	return render(request, 'ciclovia/simulationResults.html',
@@ -440,7 +440,7 @@ def verticalBarChart(request):
 @login_required(login_url='CicloviaProgram:login')
 def simulationResultsValidation(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	results_id = CicloviaScript.simulationExecution(ciclovia_id,True)
 	return HttpResponseRedirect(reverse('CicloviaProgram:simulationResultsValidationOld',
@@ -449,7 +449,7 @@ def simulationResultsValidation(request, ciclovia_id):
 @login_required(login_url='CicloviaProgram:login')
 def simulationResultsValidationOld(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	results = get_object_or_404(SimulationResultsCompiled, pk=request.GET['results_id'])
 	return render(request, 'ciclovia/simulationResultsValidation.html',
@@ -462,7 +462,7 @@ def simulationResultsValidationOld(request, ciclovia_id):
 @login_required(login_url='CicloviaProgram:login')
 def detailTrackValidation(request, ciclovia_id, track_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	# print("La llave es " + track_id)
 	track = get_object_or_404(SimulationResultsCompiledPerTrack, pk=track_id)
@@ -477,7 +477,7 @@ def detailTrackValidation(request, ciclovia_id, track_id):
 @login_required(login_url='CicloviaProgram:login')
 def detailValidationSingleRun(request, ciclovia_id, run_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	# print("La llave es " + run_id)
 	result = get_object_or_404(SimulationResults, pk=run_id)
@@ -491,7 +491,7 @@ def detailValidationSingleRun(request, ciclovia_id, run_id):
 @login_required(login_url='CicloviaProgram:login')
 def detailTrackValidationSingleRun(request, ciclovia_id, run_id, track_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	# print("La llave es " + run_id)
 	result = get_object_or_404(SimulationResults, pk=run_id)
