@@ -230,7 +230,7 @@ def uploadFormCiclovia(request):
 		return render(request,'ciclovia/uploadFormCiclovia.html')
 
 @login_required(login_url='CicloviaProgram:login')
-def borrarCiclovia(request, ciclovia_id):
+def deleteCiclovia(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
 	if not ciclovia.user == request.user or request.user.is_superuser:
 		raise PermissionDenied

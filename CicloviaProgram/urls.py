@@ -17,7 +17,7 @@ urlpatterns = patterns('',
         views.editNeighboor, name='editNeighboor'),
     url(r'^upload/$', views.upload, name='upload'),
     url(r'^uploadFormCiclovia$', views.uploadFormCiclovia, name='uploadFormCiclovia'),
-    url(r'^borrarCiclovia/(?P<ciclovia_id>\d+)/$', views.borrarCiclovia, name='borrarCiclovia'),
+    url(r'^borrarCiclovia/(?P<ciclovia_id>\d+)/$', views.deleteCiclovia, name='borrarCiclovia'),
     url(r'^(?P<ciclovia_id>\d+)/uploadArrivalInfo/$',
         views.uploadArrivalInfo, name='uploadArrivalInfo'),
     url(r'^(?P<ciclovia_id>\d+)/detailArrival$',
@@ -53,10 +53,14 @@ urlpatterns = patterns('',
         {'template_name':'ciclovia/login.html'}, name='login'),
     url(r'^newUser$', views.newUser, name='newUser'),
     url(r'^user$', views.user, name='user'),
-    url(r'^cambiarContrasena$',auth_views.password_change,
+    url(r'^changePassword$',auth_views.password_change,
         {'template_name':'ciclovia/cambiarContrasena.html',
          'post_change_redirect':'CicloviaProgram:cambiarContrasenaExito'}, name="cambiarContrasena"),
-    url(r'^cambiarContrasenaExito$', auth_views.password_change_done,
+    url(r'^changePasswordSuccess$', auth_views.password_change_done,
         {'template_name':'ciclovia/cambiarContrasenaExito.html'}, name='cambiarContrasenaExito'),
+    url(r'^passwordReset$', auth_views.password_reset, {'template_name':'passwordReset.html'
+        ,'email_template_name':'passwordResetEmail.html','subject_template_name':'passwordResetSubject.txt'
+        ,'post_reset_redirect':'CicloviaProgram:passwordResetConfirmation'
+        ,}, name='passwordReset')
 )
 
