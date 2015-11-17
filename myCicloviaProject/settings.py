@@ -1,3 +1,4 @@
+# coding=utf-8
 """
 Django settings for myCicloviaProject project.
 
@@ -106,5 +107,12 @@ STATIC_URL = '/static/'
 #Revisar como poner relativa
 MEDIA_ROOT = os.path.join(BASE_DIR, 'CicloviaProgram/media/')
 
-# Dreccion para iniciar sesion.
+# Dirección para iniciar sesion.
 LOGIN_URL = 'CicloviaProgram:login'
+
+# Ajustes para enviar correos. Tiene que ser un servidor SMTP.
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_PASSWORD = 'simsicpass'
+EMAIL_HOST_USER='simsicsim@gmail.com'
+EMAIL_PORT='465'
+EMAIL_USE_SSL = True

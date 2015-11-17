@@ -1,27 +1,26 @@
 # coding=utf-8
+import json
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import RequestContext, loader
 from django.shortcuts import render, get_object_or_404
-from docutils.nodes import inline
-from .forms import *
-from CicloviaProgram.models import Ciclovia, Track, Document, SimulationParameters, SimulationResultsCompiled, \
-	SimulationResults, SimulationResultsPerTrack, SimulationResultsFlowPerTrack, SimulationResultsCompiledPerTrack
-import CicloviaScript
-import traceback
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
-from .authentication import *
 from django.contrib.auth import views as auth_views, login, authenticate
 from django.contrib.auth.decorators import *
 from django.views.decorators.csrf import ensure_csrf_cookie
-from myCicloviaProject import settings as settings
 from django.utils.translation import ugettext_lazy as _
-import json
 from django.forms.models import modelform_factory
 from django.forms.models import inlineformset_factory
+from django.core.exceptions import PermissionDenied
+
+from .forms import *
+from CicloviaProgram.models import Ciclovia, Track, Document, SimulationParameters, SimulationResultsCompiled, \
+	SimulationResults, SimulationResultsPerTrack, SimulationResultsCompiledPerTrack
+import CicloviaScript
+from .authentication import *
+from myCicloviaProject import settings as settings
 import charts
 import grafo
-from django.core.exceptions import PermissionDenied
 
 
 #El índice de la página.
@@ -591,7 +590,6 @@ def user(request):
 	else:
 		form = UserChangeFormUniqueEmail(instance=User.objects.get(pk=request.user.pk))
 		return render(request, 'ciclovia/user.html', {'form': form})
-
 
 
 

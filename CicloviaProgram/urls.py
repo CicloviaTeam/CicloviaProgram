@@ -1,6 +1,7 @@
 # coding=utf-8
 from django.conf.urls import patterns, url
 from django.contrib.auth import views as auth_views
+
 from CicloviaProgram import views
 
 urlpatterns = patterns('',
@@ -58,9 +59,15 @@ urlpatterns = patterns('',
          'post_change_redirect':'CicloviaProgram:cambiarContrasenaExito'}, name="cambiarContrasena"),
     url(r'^changePasswordSuccess$', auth_views.password_change_done,
         {'template_name':'ciclovia/cambiarContrasenaExito.html'}, name='cambiarContrasenaExito'),
-    url(r'^passwordReset$', auth_views.password_reset, {'template_name':'passwordReset.html'
-        ,'email_template_name':'passwordResetEmail.html','subject_template_name':'passwordResetSubject.txt'
-        ,'post_reset_redirect':'CicloviaProgram:passwordResetConfirmation'
-        ,}, name='passwordReset')
+    url(r'^passwordReset$', auth_views.password_reset, {'template_name':'ciclovia/passwordReset.html'
+        ,'email_template_name':'ciclovia/passwordResetEmail.html','subject_template_name':'ciclovia/passwordResetSubject.txt'
+        ,'post_reset_redirect':'CicloviaProgram:passwordResetDone',}, name='passwordReset'),
+    url(r'^passwordResetDone$',auth_views.password_reset_done, {'template_name':'ciclovia/passwordResetDone.html'},
+        name='passwordResetDone'),
+    url(r'^passwordResetConfirm/(?P<uidb64>.+)/(?P<token>.+)$',auth_views.password_reset_confirm,
+        {'template_name':'ciclovia/passwordResetConfirm.html', 'post_reset_redirect':'CicloviaProgram:passwordResetComplete'}
+        , name='passwordResetConfirm'),
+    url(r'^passwordResetComplete$',auth_views.password_reset_complete,
+        {'template_name':'ciclovia/passwordResetComplete.html'}, name='passwordResetComplete'),
 )
 
