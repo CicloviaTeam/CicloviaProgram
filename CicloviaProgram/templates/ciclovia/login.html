@@ -34,7 +34,16 @@
 				<label class="control-label" for="{{ form.password.id_for_label }}" >Contraseña:</label>
 				<input class="form-control" type="password" id="{{ form.password.id_for_label }}" name="{{ form.password.html_name }}" />
 			</div>
-			<input class="btn btn-primary" type="submit" value="Aceptar">
+			<div class="form-group">
+				<div class="row">
+					<div class="col-md-3">
+						<input class="btn btn-primary" type="submit" value="Aceptar">
+					</div>
+					<div class="col-md-offset-7 col-md-2">
+						<a href="{% url 'CicloviaProgram:passwordReset' %}">Reestablecer contraseña</a>
+					</div>
+				</div>
+			</div>
 			{% if next %}
 				<input type="hidden" name="next" value="{{ next }}">
 			{% else %}

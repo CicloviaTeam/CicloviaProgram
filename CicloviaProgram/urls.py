@@ -1,6 +1,7 @@
 # coding=utf-8
 from django.conf.urls import patterns, url
 from django.contrib.auth import views as auth_views
+
 from CicloviaProgram import views
 
 urlpatterns = patterns('',
@@ -17,7 +18,7 @@ urlpatterns = patterns('',
         views.editNeighboor, name='editNeighboor'),
     url(r'^upload/$', views.upload, name='upload'),
     url(r'^uploadFormCiclovia$', views.uploadFormCiclovia, name='uploadFormCiclovia'),
-    url(r'^borrarCiclovia/(?P<ciclovia_id>\d+)/$', views.borrarCiclovia, name='borrarCiclovia'),
+    url(r'^borrarCiclovia/(?P<ciclovia_id>\d+)/$', views.deleteCiclovia, name='borrarCiclovia'),
     url(r'^(?P<ciclovia_id>\d+)/uploadArrivalInfo/$',
         views.uploadArrivalInfo, name='uploadArrivalInfo'),
     url(r'^(?P<ciclovia_id>\d+)/detailArrival$',
@@ -53,10 +54,20 @@ urlpatterns = patterns('',
         {'template_name':'ciclovia/login.html'}, name='login'),
     url(r'^newUser$', views.newUser, name='newUser'),
     url(r'^user$', views.user, name='user'),
-    url(r'^cambiarContrasena$',auth_views.password_change,
+    url(r'^changePassword$',auth_views.password_change,
         {'template_name':'ciclovia/cambiarContrasena.html',
          'post_change_redirect':'CicloviaProgram:cambiarContrasenaExito'}, name="cambiarContrasena"),
-    url(r'^cambiarContrasenaExito$', auth_views.password_change_done,
+    url(r'^changePasswordSuccess$', auth_views.password_change_done,
         {'template_name':'ciclovia/cambiarContrasenaExito.html'}, name='cambiarContrasenaExito'),
+    url(r'^passwordReset$', auth_views.password_reset, {'template_name':'ciclovia/passwordReset.html'
+        ,'email_template_name':'ciclovia/passwordResetEmail.html','subject_template_name':'ciclovia/passwordResetSubject.txt'
+        ,'post_reset_redirect':'CicloviaProgram:passwordResetDone',}, name='passwordReset'),
+    url(r'^passwordResetDone$',auth_views.password_reset_done, {'template_name':'ciclovia/passwordResetDone.html'},
+        name='passwordResetDone'),
+    url(r'^passwordResetConfirm/(?P<uidb64>.+)/(?P<token>.+)$',auth_views.password_reset_confirm,
+        {'template_name':'ciclovia/passwordResetConfirm.html', 'post_reset_redirect':'CicloviaProgram:passwordResetComplete'}
+        , name='passwordResetConfirm'),
+    url(r'^passwordResetComplete$',auth_views.password_reset_complete,
+        {'template_name':'ciclovia/passwordResetComplete.html'}, name='passwordResetComplete'),
 )
 
