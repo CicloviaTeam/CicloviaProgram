@@ -25,28 +25,30 @@ urlpatterns = patterns('',
         views.detailArrival, name='detailArrival'),
     url(r'^(?P<ciclovia_id>\d+)/editArrivalInfo$',views.editArrivalInfo, name="editArrivalInfo"),
     url(r'^adminSimulation/$', views.adminSimulation, name='adminSimulation'),
+                       # Páginas de simulación
     url(r'^(?P<ciclovia_id>\d+)/simulationResults/$',
         views.simulationResults, name='simulationResults'),
     url(r'^simulationResultsOld/(?P<ciclovia_id>\d+)/$',
         views.simulationResultsOld, name='simulationResultsOld'),
-    url(r'^charts/pie/$',views.piechart, name='pieChart'),
-    url(r'^charts/verticalBarChart/$',views.verticalBarChart, name='vBarChart'),
-    url(r'^charts/graph/$',views.graphImg, name='graph'),
-                    # Páginas de validación
+                       # Páginas de validación
     url(r'^(?P<ciclovia_id>\d+)/simulationResultsValidation/$',
         views.simulationResultsValidation, name='simulationResultsValidation'),
     url(r'^(?P<ciclovia_id>\d+)/simulationResultsValidationOld/$',
         views.simulationResultsValidationOld, name='simulationResultsValidationOld'),
     url(r'^(?P<ciclovia_id>\d+)/simulationResultsValidationPerTrack'+
         '/(?P<track_id>\d+)/$', views.detailTrackValidation,
-        name='detailTrackValidation'),  
+        name='detailTrackValidation'),
     url(r'^(?P<ciclovia_id>\d+)/simulationResultsValidationOneRun'+
         '/(?P<run_id>\d+)/$', views.detailValidationSingleRun,
-        name='detailValidationSingleRun'),  
+        name='detailValidationSingleRun'),
     url(r'^(?P<ciclovia_id>\d+)/simulationResultsValidationOneRun'+
         '/(?P<run_id>\d+)/(?P<track_id>\d+)/$',
         views.detailTrackValidationSingleRun,
-        name='detailTrackValidationSingleRun'),  
+        name='detailTrackValidationSingleRun'),
+                       # Gráficas
+    url(r'^charts/pie/$',views.piechart, name='pieChart'),
+    url(r'^charts/verticalBarChart/$',views.verticalBarChart, name='vBarChart'),
+    url(r'^charts/graph/$',views.graphImg, name='graph'),
     url(r'^(?P<ciclovia_id>\d+)/simulationResultsImg/(?P<results_id>\d+)/$',
         views.simulationResultsImg, name='simulationResultsImg'),
                     # Páginas de usuario.
