@@ -263,6 +263,32 @@ def uploadArrivalInfo(request, ciclovia_id):
 	#return render_to_response('upload.html', {'form': form}, context_instance = RequestContext(request))
 	return render(request, 'ciclovia/upload.html', {'form': form})
 
+@login_required(login_url='CicloviaProgram:login')
+def uploadArrivalInfoForm(request, ciclovia_id):
+	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
+	if not ciclovia.user == request.user or request.user.is_superuser:
+		raise PermissionDenied
+	if request.method == 'POST':
+		#todo cambiar esto para que funcione con el archivo en tipo JSON
+		form = UploadForm(request.POST, request.FILES)
+		if form.is_valid():
+			newdoc = Document(filename = request.POST['filename']
+							  ,docfile = request.FILES['docfile'])
+			newdoc.save(form)
+			name = settings.MEDIA_ROOT + str(newdoc.docfile)
+			cicloviaToLoad = CicloviaScript.loadCiclovia(ciclovia_id)
+			CicloviaScript.assignArrivalInfo(cicloviaToLoad, ciclovia_id, name)
+			ciclovia_list = Ciclovia.objects
+			cicloviaLoad = get_object_or_404(Ciclovia, pk=ciclovia_id)
+			return render(request, 'ciclovia/detailArrival.html',
+							  {'ciclovia': cicloviaLoad})
+		else:
+			return render(request, 'ciclovia/uploadArrivalInfoForm.html', {'form': form})
+	else:
+		form = UploadForm()
+	#tambien se puede utilizar render_to_response
+	#return render_to_response('upload.html', {'form': form}, context_instance = RequestContext(request))
+	return render(request, 'ciclovia/uploadArrivalInfoForm.html', {'form': form})
 # @login_required(login_url='CicloviaProgram:login')
 # def simulationResults(request, ciclovia_id):
 # 	return HttpResponse("Estos son los resultados de la Ciclovia %s." %
