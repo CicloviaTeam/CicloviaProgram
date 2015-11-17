@@ -37,8 +37,8 @@
 								</tr>	
 								<tr>
 									<td align="center">Horario</td>
-									<td align="center">{{ ciclovia.start_hour }} - {{ ciclovia.end_hour }} </td>
-								</tr>	
+									<td align="center">{{ciclovia.start_hour| floatformat:0}}:00 - {{ciclovia.end_hour | floatformat:0}}:00</td>
+								</tr>
 								<tr>
 									<td align="center">Número de trayectos</td>
 									<td align="center">{{ ciclovia.num_tracks }}</td>

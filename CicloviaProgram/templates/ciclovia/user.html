@@ -7,7 +7,7 @@
 	</head>
 {% endcomment %}
 
-{% block title %}Pagina de {{ request.user.get_username }}{% endblock title %}
+{% block title %}Página de {{ request.user.get_username }}{% endblock title %}
 
 {% block content %}
 	<div class="container">
@@ -51,10 +51,14 @@
 			<div class="form-group">
 				<input class="btn btn-primary" type="submit" name="opcion" value="Actualizar datos">
 			</div>
-			<h2>Mas opciones:</h2>
+			<h2>Más opciones:</h2>
 			<div class="form-group">
-				<input class="btn btn-primary" type="submit" name="opcion" value="Cerrar sesión">
-				<input class="btn btn-primary" type="submit" name="opcion" value="Borrar usuario">
+				<div class="row">
+					<div class="col-md-3">
+						<input class="btn btn-primary" type="submit" name="opcion" value="Cerrar sesión">
+						<input class="btn btn-primary" type="submit" name="opcion" value="Borrar usuario">
+					</div>
+				</div>
 			</div>
 		</form>
 	</div>
