@@ -265,7 +265,7 @@ def uploadArrivalInfo(request, ciclovia_id):
 @login_required(login_url='CicloviaProgram:login')
 def uploadArrivalInfoForm(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	if not ciclovia.user == request.user or request.user.is_superuser:
+	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	if request.method == 'POST':
 		#todo cambiar esto para que funcione con el archivo en tipo JSON
