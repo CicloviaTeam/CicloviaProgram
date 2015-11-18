@@ -62,7 +62,7 @@
 					</div>
 				</div>
 			</div>			
-			<div class="col-md-7">
+			<div class="col-md-8">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h3 class="panel-title">Detalle Trayectos</h3>
@@ -79,6 +79,9 @@
 										<th align="center">Proporción de arribos</th>
 									{% endif %}
 									<th align="center">Vecinos</th>
+									<th align="center">Numero de paradas</th>
+									<th align="center">Tiene pendiente</th>
+									<th align="center">Numero de semaforos</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -92,9 +95,11 @@
 											<td align="center">{{track.arrival_proportion | floatformat:2}}</td>
 										{% endif %}
 										<td align="center"><a href="{% url 'CicloviaProgram:detailNeighboor' ciclovia.id track.id %}">Ver vecinos</a></td>
+										<td align="center">{{track.number_of_semaphores}}</td>
+										<td align="center">{{track.hasSlope}}</td>
+										<td align="center">{{track.quality_of_track}}</td>
 									</tr>
 								{% endfor %}
-							</tbody>
 						</table>
 					</div>
 				</div>
@@ -121,6 +126,17 @@
 						</div>
 						<div class="panel-body">
 							<p>En esta sección se puede ingresar la información que se va a utilizar para los arribos de la ciclovía (necesarios para la simulación).</p>
+							<p><a href="{% url 'CicloviaProgram:uploadArrivalInfoForm' ciclovia.id %}" class="btn btn-primary">Cargar &raquo;</a></p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="panel panel-primary">
+						<div class="panel-heading">
+							<h3 class="panel-title">Ingresar información de arribos (archivo XML)</h3>
+						</div>
+						<div class="panel-body">
+							<p>En esta sección se puede ingresar la información que se va a utilizar para los arribos de la ciclovía (necesarios para la simulación) por medio de un archivo XML.</p>
 							<p><a href="{% url 'CicloviaProgram:uploadArrivalInfo' ciclovia.id %}" class="btn btn-primary">Cargar &raquo;</a></p>
 						</div>
 					</div>

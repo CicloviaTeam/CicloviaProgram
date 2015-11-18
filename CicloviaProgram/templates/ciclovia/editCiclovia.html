@@ -65,12 +65,6 @@
                         {% for error in formsetform.distance.errors %}
                             <p class="text-danger"><strong>Ruta {{ formsetform.id_track.value }}, distancia! </strong>{{error}}</p>
                         {% endfor %}
-                        {% for error in formsetform.probabilityBegin.errors %}
-                            <p class="text-danger"><strong>Ruta {{ formsetform.id_track.value }}, probabilidad inicio! </strong>{{error}}</p>
-                        {% endfor %}
-                        {% for error in formsetform.probabilityEnd.errors %}
-                            <p class="text-danger"><strong>Ruta {{ formsetform.id_track.value }}, probabilidad fin! </strong>{{error}}</p>
-                        {% endfor %}
                         {% if ciclovia.arrivals_loaded %}
                             {% for error in formsetform.arrival_proportion.errors %}
                                 <p class="text-danger"><strong>Ruta {{ formsetform.id_track.value }}, porporción de arrivos! </strong>{{error}}</p>
@@ -163,8 +157,6 @@
                                     <tr>
                                         <th align="center">#</th>
                                         <th align="center">Distancia</th>
-                                        <th align="center">Probabilidad inicio</th>
-                                        <th align="center">Probabilidad fin</th>
                                         {% if ciclovia.arrivals_loaded %}
                                              <th align="center">Proporción de arribos</th>
                                         {% endif %}
@@ -181,8 +173,6 @@
                                                 <td align="center"><input class="form-control" type="number" name="{{ formsetform.id_track.html_name }}" value="{{ formsetform.id_track.value }}"></td>
                                             {% endif %}
                                             <td align="center"><input class="form-control" type="text" name="{{ formsetform.distance.html_name }}" value="{{ formsetform.distance.value }}"></td>
-                                            <td align="center"><input class="form-control" type="text" name="{{ formsetform.probabilityBegin.html_name }}" value="{{ formsetform.probabilityBegin.value }}"></td>
-                                            <td align="center"><input class="form-control" type="text" name="{{ formsetform.probabilityEnd.html_name }}" value="{{ formsetform.probabilityEnd.value }}"></td>
                                             {% if ciclovia.arrivals_loaded %}
                                                 <td align="center"><input class="form-control" type="text" name="{{ formsetform.arrival_proportion.html_name }}" value="{{ formsetform.arrival_proportion.value }}"></td>
                                             {% endif %}
@@ -216,8 +206,6 @@
                 var row =   "<tr>"+
                             "    <td align='center'><input class='form-control' type='number' name='{{ formset.empty_form.id_track.html_name }}' ></td>"+
                             "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.distance.html_name }}' ></td>"+
-                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityBegin.html_name }}' ></td>"+
-                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityEnd.html_name }}' ></td>"+
                             "    <td align='center'><input type='checkbox' name='{{ formset.empty_form.DELETE.html_name }}'></td>"+
                             "    <input type='hidden' name='{{ formset.empty_form.id.html_name }}' >"+
                             "    <input type='hidden' name='{{ formset.empty_form.ciclovia.html_name }}' value='{{ formset.empty_form.ciclovia.value }}'>"+
@@ -226,8 +214,6 @@
                 var row =   "<tr>"+
                             "    <td align='center'><input class='form-control' type='number' name='{{ formset.empty_form.id_track.html_name }}' ></td>"+
                             "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.distance.html_name }}' ></td>"+
-                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityBegin.html_name }}' ></td>"+
-                            "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.probabilityEnd.html_name }}' ></td>"+
                             "    <td align='center'><input class='form-control' type='text' name='{{ formset.empty_form.arrival_proportion.html_name }}' ></td>"+
                             "    <td align='center'><input type='checkbox' name='{{ formset.empty_form.DELETE.html_name }}'></td>"+
                             "    <input type='hidden' name='{{ formset.empty_form.id.html_name }}' >"+
