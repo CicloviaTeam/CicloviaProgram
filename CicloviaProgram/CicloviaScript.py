@@ -1,20 +1,19 @@
+# coding=utf-8
 import xml.etree.ElementTree as ET
 import decimal
-import simpy
-import collections
 import random
 import math
-import scipy
-import numpy
-from operator import attrgetter, itemgetter
-from PrintXML import printOrganizedXML
-from django.utils import timezone
+from operator import attrgetter
 import timeit
-import matplotlib.pyplot as plt
 import traceback
 
+import simpy
+import numpy
+from django.utils import timezone
+import matplotlib.pyplot as plt
 
-from CicloviaProgram.models import Ciclovia, Track, NeighboorInfo, ArrivalsProportionPerHour, TimeInSystemDistribution, SimulationResults, SimulationResultsCompiled, SimulationResultsPerTrack, SimulationResultsCompiledFlowTrack
+from PrintXML import printOrganizedXML
+from CicloviaProgram.models import Ciclovia, Track, SimulationResultsCompiled
 
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -741,6 +740,42 @@ def loadCiclovia(cicloviaId):
 
         return loadedCiclovia
 
+def copyCiclovia(ciclovia_id, pName):
+    """Crea una copia de la ciclovía dada por parámetro y la llama con el nombre
+    dado por parámetro. Retorna la copia creada."""
+    oldCiclovia = Ciclovia.objects.get(pk=ciclovia_id)
+    newCiclovia = Ciclovia(user=oldCiclovia.user,name=pName,place=oldCiclovia.place,
+        start_hour=oldCiclovia.start_hour,end_hor=oldCiclovia.end_hour,
+        num_tracks=oldCiclovia.num_tracks,reference_track=oldCiclovia.reference_track,
+        reference_hour=oldCiclovia.reference_hour,
+        reference_arrival_rate=oldCiclovia.reference_arrival_rate,
+        arrivals_loaded=oldCiclovia.arrivals_loaded)
+    newCiclovia.save()
+    for oldTrack in oldCiclovia.track_set.all():
+        newTrack= Track(ciclovia=newCiclovia, id_track=oldTrack.id_track,
+            distance=oldTrack.distance, probability=oldTrack.probability,
+            probabilityBegin=oldTrack.probabilityBegin,
+            probabilityEnd=oldTrack.probabilityEnd,
+            arrival_proportion=oldTrack.arrival_proportion,
+            number_of_semaphores=oldTrack.number_of_semaphores,
+            hasSlope=oldTrack.hasSlope,quality_of_track=oldTrack.quality_of_track)
+        newTrack.save()
+        for oldNeighboor in oldTrack.neighboorinfo_set.all():
+            newTrack.neighboorinfo_set.create(
+                neighboorId=oldNeighboor.neighboorId,
+                probability=oldNeighboor.probability,
+                direction=oldNeighboor.direction,
+                fromDirection=oldNeighboor.fromDirection)
+    for oldParticipantType in oldCiclovia.participanttype_set.all():
+        newCiclovia.participanttype_set.create(activity=oldParticipantType.activity,
+            velocity=oldParticipantType.velocity,percentage=oldParticipantType.percentage)
+    for oldTimeInSystemDistribution in oldCiclovia.timeinsystemdistribution_set.all():
+        newCiclovia.timeinsystemdistribution_set.create(time=oldTimeInSystemDistribution.time,
+            percentage=oldTimeInSystemDistribution.percentage)
+    for oldArrivalsProportionPerHour in oldCiclovia.arrivalsproportionperhour_set.all():
+        newCiclovia.arrivalsproportionperhour_set.create(hour=oldArrivalsProportionPerHour.hour,
+            proportion=oldArrivalsProportionPerHour.proportion)
+    return newCiclovia
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #   SIMULACION USANDO SIMPY
