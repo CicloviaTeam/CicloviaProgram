@@ -1,9 +1,9 @@
-//data = [];
-//original = "";
-//generar = 0;
-//$(document).ready(function (){
-//	 alert("hola");
-//});
+data = [];
+original = "";
+generar = 0;
+$(document).ready(function (){
+	// alert("hola");
+});
 
 var Ciclovia = React.createClass({
 	imprimir : function(){
@@ -33,20 +33,19 @@ var Ciclovia = React.createClass({
 				ruta["id"] = $(inputs[i]).val();
 			}else if ($(inputs[i]).attr("class") === "form-control imprimir rutaDistancia"){
 				ruta["distance"] = $(inputs[i]).val();
-			}else if ($(inputs[i]).attr("class") === "form-control imprimir rutaProbaInit"){
-				//ruta["probabilityBegin"] = $(inputs[i]).val();
-				ruta["probabilityBegin"] = 0.5
-			}else if ($(inputs[i]).attr("class") === "form-control imprimir rutaProbaFin"){
-				//ruta["probabilityEnd"] = $(inputs[i]).val();
-				ruta["probabilityEnd"] = 0.5
+			}else if ($(inputs[i]).attr("class") === "form-control imprimir rutaCalidad"){
+				ruta["calidad"] = $(inputs[i]).val();
+			}else if ($(inputs[i]).attr("class") === "form-control imprimir rutaSemaforos"){
+				ruta["semaforos"] = $(inputs[i]).val();
+			}else if ($(inputs[i]).attr("class") === "form-control imprimir rutaPendiente"){
+				ruta["pendiente"] = $(inputs[i]).val();
+				ruta["neighboor"] = [];
 			}
-			ruta["neighboor"] = [];
 
 			if ($(inputs[i]).attr("class") === "form-control imprimir vecinoId"){
 				vecino["id"] = $(inputs[i]).val();
 			}else if ($(inputs[i]).attr("class") === "form-control imprimir vecinoDistancia"){
-				//vecino["probability"] = $(inputs[i]).val();
-				vecino["probability"] = 0.5
+				vecino["probability"] = $(inputs[i]).val();
 			}else if ($(inputs[i]).attr("class") === "form-control imprimir vecinoDesde"){
 				vecino["direction"] = $(inputs[i]).val();
 			}else if ($(inputs[i]).attr("class") === "form-control imprimir vecinoHacia"){
@@ -66,8 +65,12 @@ var Ciclovia = React.createClass({
 
 		global["track"] = rutas;
 
-		mySendPost(global);
+		console.log(global);
+		alert(JSON.stringify(global));
+		// $.each(inputs, function(index,value){
+		// 	console.log($(value).val());
 
+		// });
 	},
 	componentDidMount: function() {
 		var arr = [];
@@ -75,9 +78,10 @@ var Ciclovia = React.createClass({
 		for (var i = 0; i < generar; i++) {
 			var ruta = {};
 			ruta["vecinos"] = [];
-			for (var i = 0; i < 6; i++) {
+			for (var j = 0; j < 6; j++) {
 				var vecino = {};
-				vecino["a"] = 1;
+				vecino["ruta"] = i + 1;
+				vecino["vec"] = j + 1;
 				ruta["vecinos"].push(vecino);
 			}
 			ruta["numero"] = i + 1;
@@ -96,36 +100,31 @@ var Ciclovia = React.createClass({
 	},
 	render: function(){
 		return(
-			<div>
-			<table className="InfoBasica">
-				Por favor llenar la siguiente informacion
-				<tbody id="principal">	
-					<form>
-						<div className="input-group">
-							<span className="input-group-addon">Nombre del form</span>
-							<input type="text" id="nombre-form" className="form-control" placeholder="" aria-describedby="basic-addon1"> </input>
-						</div>
-						<br/>
-					</form>
-					<form>
-						<div className="input-group">
-							<span className="input-group-addon">Nombre de la ciudad</span>
-							<input type="text" id="NombreCiudad" className="form-control" placeholder="" aria-describedby="basic-addon1"> </input>
-							<span className="input-group-addon">Hora Inicio</span>
-							<input type="number" id="HoraInicio" className="form-control" placeholder="" aria-describedby="basic-addon1"> </input>
-							<span className="input-group-addon" >Hora Fin</span>
-							<input type="number" id="HoraFin" className="form-control" placeholder="" aria-describedby="basic-addon1"> </input>
-						</div>
-					</form>			
-				</tbody>
-				<thread>
-				</thread>
-			</table>
+			<div className="row">
+				<div className="col-md-3">
+					<span className="input-group-addon">Nombre del form</span>
+					<input type="text" id="nombre-form" className="form-control" placeholder="" aria-describedby="basic-addon1"> </input>
+				</div>
+				<div className="col-md-3">
+					<span className="input-group-addon">Nombre de la ciudad</span>
+					<input type="text" id="NombreCiudad" className="form-control" placeholder="" aria-describedby="basic-addon1"> </input>
+				</div>
+				<div className="col-md-3">
+					<span className="input-group-addon">Hora Inicio</span>
+					<input type="number" id="HoraInicio" className="form-control" placeholder="" aria-describedby="basic-addon1"> </input>
+				</div>
+				<div className="col-md-3">
+					<span className="input-group-addon" >Hora Fin</span>
+					<input type="number" id="HoraFin" className="form-control" placeholder="" aria-describedby="basic-addon1"> </input>
+				</div>
 
 			<div>
-				<br/>
+				
+				<br/><br/><br/><br/>
+
+				<p>Introducir el n&uacute;mero de rutas:</p>
 				<div className="input-group">
-					<span className="input-group-addon">N&uacute;mero de tramos:</span>
+					<span className="input-group-addon">N&uacute;mero de rutas:</span>
 					<input type="number" id="generar" className="form-control" placeholder="Cuantas" aria-describedby="basic-addon1"> </input>
 				</div>
 				<br/>
@@ -155,7 +154,8 @@ var Ciclovia = React.createClass({
 			ruta["vecinos"] = [];
 			for (var j = 0; j < 6; j++) {
 				var vecino = {};
-				vecino["a"] = 1;
+				vecino["ruta"] = i + 1;
+				vecino["vec"] = j + 1;
 				ruta["vecinos"].push(vecino);
 			}
 			ruta["numero"] = i + 1;
@@ -175,15 +175,24 @@ var Ruta = React.createClass({
 		console.log(JSON.stringify(this.props.rutas));
 
 		var rutas = this.props.rutas.map(function (ruta) {
+			var valID = "ruta-" + ruta.numero + "-id";
+			var valDist = "ruta-" + ruta.numero + "-distancia";
+			var calidad = "ruta-" + ruta.numero + "-calidad";
+			var semaforo = "ruta-" + ruta.numero + "-semaforo";
+			var pendiente = "ruta-" + ruta.numero + "-pendiente";
+
 			return (
 				<div>
-					<h3>TRAMO {ruta.numero}</h3>
-					<input type="text" className="form-control imprimir rutaId" placeholder="ID tramo" aria-describedby="basic-addon1"> </input>
-					<input type="text" className="form-control imprimir rutaDistancia" placeholder="Distancia" aria-describedby="basic-addon1"> </input>
+					<h3>RUTA {ruta.numero}</h3>
+					<input type="text" className="form-control imprimir rutaId" placeholder={valID} aria-describedby="basic-addon1"> </input>
+					<input type="text" className="form-control imprimir rutaDistancia" placeholder={valDist} aria-describedby="basic-addon1"> </input>
+					<input type="text" className="form-control imprimir rutaCalidad" placeholder={calidad} aria-describedby="basic-addon1"> </input>
+					<input type="text" className="form-control imprimir rutaSemaforos" placeholder={semaforo} aria-describedby="basic-addon1"> </input>
+					<input type="text" className="form-control imprimir rutaPendiente" placeholder={pendiente} aria-describedby="basic-addon1"> </input>
 
 					<Vecino vecino={ruta.vecinos}> </Vecino>	
 
-					<h3>FIN TRAMO {ruta.numero} </h3>
+					<h3>FIN RUTA</h3>				
 				</div>	
 			);
 		});
@@ -200,17 +209,22 @@ var Vecino = React.createClass({
 	render: function(){
 		console.log(this.props);
 		var vecinos = this.props.vecino.map(function (vecino) {
+			var vecId = "vecino-" + vecino.ruta + "-" + vecino.vec + "-id";
+			var vecDist = "vecino-" + vecino.ruta + "-" + vecino.vec + "-distancia";
+			var vecDesde = "vecino-" + vecino.ruta + "-" + vecino.vec + "-desde";
+			var vecHacia = "vecino-" + vecino.ruta + "-" + vecino.vec + "-hacia";
+
 			return (
 				<div className="row">
 					<div className="col-md-1"></div> 
 					<div className="col-md-11"> 
-						<input type="text" className="form-control imprimir vecinoId" placeholder="ID tramo" aria-describedby="basic-addon1"> </input>
-						<input type="text" className="form-control imprimir vecinoDistancia" placeholder="Distancia" aria-describedby="basic-addon1"> </input>
-						<input type="text" className="form-control imprimir vecinoDesde" placeholder="desde" aria-describedby="basic-addon1"> </input>
-						<input type="text" className="form-control imprimir vecinoHacia" placeholder="hacia" aria-describedby="basic-addon1"> </input>
+						<input type="text" className="form-control imprimir vecinoId" placeholder={vecId} aria-describedby="basic-addon1"> </input>
+						<input type="text" className="form-control imprimir vecinoDistancia" placeholder={vecDist} aria-describedby="basic-addon1"> </input>
+						<input type="text" className="form-control imprimir vecinoDesde" placeholder={vecDesde} aria-describedby="basic-addon1"> </input>
+						<input type="text" className="form-control imprimir vecinoHacia" placeholder={vecHacia} aria-describedby="basic-addon1"> </input>
 					</div>
 					
-					<p>Fin vecino</p>
+					<p>Fin VECINO</p>
 				</div>	
 			);
 		});
@@ -224,5 +238,5 @@ var Vecino = React.createClass({
 });
 
 React.render(
-	<Ciclovia  />, document.getElementById('container')
+	<Ciclovia data={data} />, document.getElementById('container')
 	);
