@@ -740,12 +740,12 @@ def loadCiclovia(cicloviaId):
 
         return loadedCiclovia
 
-def copyCiclovia(ciclovia_id, pName):
+def copyCiclovia(ciclovia_id, pName, pUser):
     """Crea una copia de la ciclovía dada por parámetro y la llama con el nombre
     dado por parámetro. Retorna la copia creada."""
     oldCiclovia = Ciclovia.objects.get(pk=ciclovia_id)
-    newCiclovia = Ciclovia(user=oldCiclovia.user,name=pName,place=oldCiclovia.place,
-        start_hour=oldCiclovia.start_hour,end_hor=oldCiclovia.end_hour,
+    newCiclovia = Ciclovia(user=pUser,name=pName,place=oldCiclovia.place,
+        start_hour=oldCiclovia.start_hour,end_hour=oldCiclovia.end_hour,
         num_tracks=oldCiclovia.num_tracks,reference_track=oldCiclovia.reference_track,
         reference_hour=oldCiclovia.reference_hour,
         reference_arrival_rate=oldCiclovia.reference_arrival_rate,

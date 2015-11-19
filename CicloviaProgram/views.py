@@ -117,6 +117,10 @@ def editCiclovia(request, ciclovia_id):
 		formset = TrackFormSet(instance=ciclovia)
 		return render(request,'ciclovia/editCiclovia.html',{'form':form,'formset':formset, 'ciclovia':ciclovia})
 
+@login_required(login_url='CicloviaProgram:login')
+def copiarCiclovia(request, ciclovia_id):
+	CicloviaScript.copyCiclovia(ciclovia_id, request.POST['nombre'], request.user)
+	return HttpResponseRedirect(reverse('CicloviaProgram:userModels'))
 
 @login_required(login_url='CicloviaProgram:login')
 def detailArrival(request, ciclovia_id):
@@ -570,6 +574,28 @@ def adminSimulation(request):
 		'simulation_list': simulation_list,
 	})
 	return HttpResponse(template.render(context))
+
+def simulationList(request):
+	"""Retorna un select con las simulaciones de la ciclovía o un mensaje si no hay ninguna."""
+	simulation_list = Ciclovia.objects.get(pk=request.GET['ciclovia_id']).\
+		simulationresultscompiled_set.filter(is_validation=False).order_by('-date')
+	if (request.GET['simsel']=="ciclovia1sel"):
+		return render(request,'ciclovia/simulationList.html',{'simulation_list':simulation_list,
+			'simulationnum':'1'})
+	else:
+		return render(request,'ciclovia/simulationList.html',{'simulation_list':simulation_list,
+			'simulationnum':'2'})
+
+@login_required(login_url='CicloviaProgram:login')
+def compareSimulations(request):
+	"""Compara las simulaciones de dos ciclovías."""
+	ciclovias = Ciclovia.objects.all()
+	if request.method == 'GET':
+		return render(request,"ciclovia/compararCiclovias.html",{'ciclovias':ciclovias})
+	elif request.method == 'POST':
+		simulation1 = request.POST['simulation1']
+		simulation2 = request.POST['simulation2']
+		return HttpResponse('<h1>Hola ' + simulation1 +' ' + simulation2 + '</h1>')
 
 #Cretate user if none is loged in.
 @user_passes_test(notAutheticated,login_url='CicloviaProgram:index')
