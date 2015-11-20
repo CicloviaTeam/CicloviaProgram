@@ -7,6 +7,7 @@ from operator import attrgetter
 import timeit
 import traceback
 
+from scipy.stats import norm
 import simpy
 import numpy
 from django.utils import timezone
@@ -778,6 +779,64 @@ def copyCiclovia(ciclovia_id, pName, pUser):
     return newCiclovia
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
+#   DEFINICIONES PARA COMPARAR LAS SIMULACIONES
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+class simulationComp:
+    """Resultados de comparar las simulaciones"""
+    def __init__(self, simulation1, simulation2):
+        self.simulation1 = simulation1
+        self.simulation2 = simulation2
+        self.same_avg_total_arrivals = self.compareValues(simulation1.avg_total_arrivals,
+            simulation1.hw_total_arrivals, simulation2.avg_total_arrivals,
+            simulation2.hw_total_arrivals)
+        self.same_average_number_system = self.compareValues(simulation1.average_number_system,
+            simulation1.hw_number_system, simulation2.average_number_system,
+            simulation2.hw_number_system)
+        self.trackComparable = False
+        self.trackComparisons = []
+        self.compareTracks()
+
+    @staticmethod
+    def compareValues(val1, hw1, val2, hw2):
+        """Compara los intervalos de confianza para determinar si son iguales estadísticamente"""
+        if val1+hw1 <val2-hw2 or val2+hw2<val1-hw1:
+            return False
+        else:
+            return True
+
+    def compareTracks(self):
+        """Determina si los trayectos son comparables y los compara."""
+        track_set1 = self.simulation1.simulationresultscompiledpertrack_set.all()\
+            .order_by('track')
+        track_set2 = self.simulation2.simulationresultscompiledpertrack_set.all()\
+            .order_by('track')
+        self.trackComparable = True
+        for track1 in track_set1:
+            found = False
+            for track2 in track_set2:
+                if track1.track == track2.track:
+                    found = True
+                    self.trackComparisons.append(trackComparison(track1,track2))
+            if not found:
+                self.trackComparable = False
+
+class trackComparison:
+    """Guarda la información de la comparación de dos trayectos."""
+    def __init__(self, track1, track2):
+        self.track1 = track1
+        self.track2 = track2
+        self.comparisons = []
+        self.makeComparisons()
+
+    def makeComparisons(self):
+        self.comparisons.append(simulationComp.compareValues(self.track1.average_number_track,
+            self.track1.hw_number_track,self.track2.average_number_track,
+            self.track2.hw_number_track))
+        self.comparisons.append(simulationComp.compareValues(self.track1.average_total_arrivals,
+            self.track1.hw_total_arrivals,self.track2.average_total_arrivals,
+            self.track2.hw_total_arrivals))
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #   SIMULACION USANDO SIMPY
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1321,6 +1380,8 @@ def simulationExecution(cicloviaId, isValidation):
         seed+=i
         #simDES.printResults(cicloviaId)
 
+    normalval = norm.ppf(0.95,loc=0, scale=1)
+    sqrtvals = numpy.sqrt([simulationRuns])
     listTotalArrivals = []
     listNumberSystem = []
     listInfoTracks =  []
@@ -1356,7 +1417,8 @@ def simulationExecution(cicloviaId, isValidation):
 
     for index, listPerTrack in enumerate(listInfoTracks):
         avg_number_track = round(numpy.mean(listPerTrack),3)
-        std_number_track = 0
+        std_number_track = round(numpy.std(listPerTrack),3)
+        hw_number_track = round(normalval*std_number_track/sqrtvals[0],3)
         if(len(listInfoTracks)>1):
             std_number_track = round(numpy.std(listPerTrack),3)
         avg_total_flow = 0
@@ -1365,7 +1427,7 @@ def simulationExecution(cicloviaId, isValidation):
             avg_total_flow = round(numpy.mean(listFlowTracks[index]),3)
             if(len(listInfoTracks)>1):
                 std_total_flow = round(numpy.std(listFlowTracks[index]),3)
-        resultsPerTrackCompiledDB = resultsCompiledDB.simulationresultscompiledpertrack_set.create(track = index+1, average_number_track = avg_number_track, stdev_number_track = std_number_track, average_total_flow=avg_total_flow, stdev_total_flow=std_total_flow)
+        resultsPerTrackCompiledDB = resultsCompiledDB.simulationresultscompiledpertrack_set.create(track = index+1, average_number_track = avg_number_track, stdev_number_track = std_number_track, hw_number_track=hw_number_track,average_total_flow=avg_total_flow, stdev_total_flow=std_total_flow)
         resultsPerTrackCompiledDB.save()
 
         #Aca se debe compilar el flujo por trayecto
@@ -1386,7 +1448,12 @@ def simulationExecution(cicloviaId, isValidation):
     resultsCompiledDB.num_runs = simulationRuns
     if(simulationRuns>1):
         resultsCompiledDB.stdev_total_arrivals = round(numpy.std(listTotalArrivals),3)
+        resultsCompiledDB.hw_total_arrivals = round(normalval*\
+            resultsCompiledDB.stdev_total_arrivals/sqrtvals[0],3)
         resultsCompiledDB.stdev_number_system = round(numpy.std(listNumberSystem),3)
+        resultsCompiledDB.hw_number_system = round(normalval*\
+            resultsCompiledDB.stdev_number_system/sqrtvals[0],3)
+
 
     resultsCompiledDB.save()
 

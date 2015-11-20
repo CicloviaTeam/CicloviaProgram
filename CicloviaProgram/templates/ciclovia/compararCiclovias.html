@@ -11,7 +11,7 @@
 
 {% block content %}
     <div class="container">
-        <h1>Comparar ciclovias</h1>
+        <h1>Comparar simulaciones</h1>
         <form id="simulationform" action="{% url 'CicloviaProgram:compareSimulations' %}" method="POST">
             {% csrf_token %}
             <div class="row">
