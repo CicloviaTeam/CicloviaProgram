@@ -60,7 +60,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-7">
+			<div class="col-md-8">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h3 class="panel-title">Detalles de los trayectos</h3>
@@ -70,10 +70,13 @@
 							<thead>
 								<tr>
 									<th align="center">#</th>
-									<th align="center">Distancia</th>
+									<th align="center">Longitud</th>
 									<th align="center">Probabilidad inicio</th>
 									<th align="center">Probabilidad fin</th>
 									<th align="center">Proporción de arribos</th>
+									<th align="center">Número de paradas</th>
+									<th align="center">Tiene pendiente</th>
+									<th align="center">Número de semáforos</th>
 									<th align="center">Vecinos</th>
 								</tr>
 							</thead>
@@ -84,7 +87,16 @@
 										<td align="center">{{track.distance}}</td>
 										<td align="center">{{track.probabilityBegin}}</td>
 										<td align="center">{{track.probabilityEnd}}</td>
-										<td align="center">{{track.arrival_proportion}}</td>
+										<td align="center">{{track.arrival_proportion | floatformat:2}}</td>
+										<td align="center">{{track.number_of_semaphores}}</td>
+										{% if track.hasSlope == 0 %}
+											<td align="center">No</td>
+										{% elif track.hasSlope == 1 %}
+											<td align="center">Media</td>
+										{% else %}
+											<td align="center">Alta</td>
+										{% endif %}
+										<td align="center">{{track.quality_of_track}}</td>
 										<td align="center"><a href="{% url 'CicloviaProgram:detailNeighboor' ciclovia.id track.id %}">Ver vecinos</a></td>
 									</tr>
 								{% endfor %}
