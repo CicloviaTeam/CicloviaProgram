@@ -94,13 +94,17 @@ def editCiclovia(request, ciclovia_id):
 	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	if ciclovia.arrivals_loaded:
-		CicloviaForm = modelform_factory(Ciclovia, fields=('name', 'place', 'start_hour', 'end_hour'\
+		CicloviaForm = modelform_factory(Ciclovia, fields=('name', 'place', 'start_hour', 'end_hour'
 			,'reference_track','reference_hour','reference_arrival_rate',))
-		TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance'\
-			,'probabilityBegin', 'probabilityEnd','arrival_proportion'), extra=0)
+		TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance'
+			,'probabilityBegin', 'probabilityEnd','arrival_proportion', 'number_of_semaphores'
+			, 'hasSlope', 'quality_of_track'), extra=0)
 	else:
-		CicloviaForm = modelform_factory(Ciclovia, fields=('name', 'place', 'start_hour', 'end_hour',))
-		TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance','probabilityBegin', 'probabilityEnd',), extra=0)
+		CicloviaForm = modelform_factory(Ciclovia, fields=('name', 'place', 'start_hour',
+			'end_hour',))
+		TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance'
+			,'probabilityBegin', 'probabilityEnd','number_of_semaphores'
+			, 'hasSlope', 'quality_of_track'), extra=0)
 	if request.method=='POST':
 		form = CicloviaForm(request.POST, instance = ciclovia)
 		formset = TrackFormSet(request.POST, request.FILES, instance = ciclovia)
