@@ -3,7 +3,7 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8">
-		<title>{% block title %}Simulador de la Ciclovia{% endblock title %}</title>
+		<title>{% block title %}Simulador de la Ciclovía{% endblock title %}</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
 		<link href="{% static 'css/fancybox/jquery.fancybox.css' %}" rel="stylesheet">
@@ -38,12 +38,11 @@
 							{% endcomment %}
 						{% if user.is_authenticated %}
 							<li class="active"><a href="{% url 'CicloviaProgram:user' %}">Bienvenido, {{ user.get_username }}</a></li>
-						</ul>
 						{% else %}
 							<li class="active"><a href="{% url 'CicloviaProgram:newUser' %}">Registrarse</a></li>
 							<li class="active"><a href="{% url 'CicloviaProgram:login'%}">Iniciar sesion</a></li>
-						</ul>
 						{% endif %}
+						</ul>
 					</div>
 				</div>
 			</nav>

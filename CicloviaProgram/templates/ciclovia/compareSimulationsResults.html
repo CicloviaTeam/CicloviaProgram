@@ -1,0 +1,107 @@
+{% extends "ciclovia/base.html" %}
+
+{% comment %}
+	Para la codificación en PyCharm
+	<head>
+		<meta charset="UTF-8">
+	</head>
+{% endcomment %}
+
+{% block content %}
+
+    <div class="container">
+        <h1>Comparar simulaciones</h1>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Resultados</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-striped">
+                            <tr>
+                                <td></td>
+                                <td colspan="2">Simulación 1</td>
+                                <td colspan="2">Simulación 2</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>Estadística</td>
+                                <td>Valor</td>
+                                <td>Ancho medio</td>
+                                <td>Valor</td>
+                                <td>Ancho medio</td>
+                                <td>Iguales</td>
+                            </tr>
+                            <tr>
+                                <td>Total de arribos promedio</td>
+                                <td>{{ simulation1.avg_total_arrivals | floatformat:2 }}</td>
+                                <td>{{ simulation1.hw_total_arrivals | floatformat:2 }}</td>
+                                <td>{{ simulation2.avg_total_arrivals | floatformat:2 }}</td>
+                                <td>{{ simulation2.hw_total_arrivals | floatformat:2 }}</td>
+                                <td>{{ simulationComp.same_avg_total_arrivals | yesno:"Sí,No" }}</td>
+                            </tr>
+                            <tr>
+                                <td>Total de arribos promedio</td>
+                                <td>{{ simulation1.average_number_system | floatformat:2 }}</td>
+                                <td>{{ simulation1.hw_number_system | floatformat:2 }}</td>
+                                <td>{{ simulation2.average_number_system | floatformat:2 }}</td>
+                                <td>{{ simulation2.hw_number_system | floatformat:2 }}</td>
+                                <td>{{ simulationComp.same_average_number_system | yesno:"Sí,No" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if simulationComp.trackComparable %}
+            <h2>Comparación de trayectos</h2>
+            {% for trackComp in simulationComp.trackComparisons %}
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Trayecto {{ trackComp.track1.track }}</h3>
+                            </div>
+                            <div class="panel-body">
+                                <table class="table table-striped">
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="2">Simulación 1</td>
+                                        <td colspan="2">Simulación 2</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Estadística</td>
+                                        <td>Valor</td>
+                                        <td>Ancho medio</td>
+                                        <td>Valor</td>
+                                        <td>Ancho medio</td>
+                                        <td>Iguales</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Número promedio de personas en el trayecto</td>
+                                        <td>{{ trackComp.track1.average_number_track | floatformat:2 }}</td>
+                                        <td>{{ trackComp.track1.hw_number_track | floatformat:2 }}</td>
+                                        <td>{{ trackComp.track2.average_number_track | floatformat:2 }}</td>
+                                        <td>{{ trackComp.track2.hw_number_track | floatformat:2 }}</td>
+                                        <td>{{ trackComp.comparisons.0 | yesno:"Sí,No" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Número promedio del total de arribos</td>
+                                        <td>{{ trackComp.track1.average_total_arrivals | floatformat:2 }}</td>
+                                        <td>{{ trackComp.track1.hw_total_arrivals | floatformat:2 }}</td>
+                                        <td>{{ trackComp.track2.average_total_arrivals | floatformat:2 }}</td>
+                                        <td>{{ trackComp.track2.hw_total_arrivals | floatformat:2 }}</td>
+                                        <td>{{ trackComp.comparisons.1 | yesno:"Sí,No" }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+{% endblock content %}

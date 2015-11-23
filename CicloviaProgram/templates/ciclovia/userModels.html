@@ -10,24 +10,28 @@
 {% block content %}
 	<div class="container theme-showcase" role="main">
 		<div class="page-header">
-			<h1>Ciclovias registradas</h1>
+			<h1>Ciclovías registradas</h1>
 		</div>
 		<div class="col-md-6">
 			<table class="table table-striped">
 				<thead>
 					<tr>
-						<th align="center">Usuario</th>
+						{% if request.user.is_superuser %}
+							<th align="center">Usuario</th>
+						{% endif %}
 						<th align="center">Nombre</th>
 						<th align="center">Lugar</th>
-						<th align="center">Hora inicio</th>
-						<th align="center">Hora fin</th>
-						<th align="center">Num trayectos</th>
+						<th align="center">Hora de inicio</th>
+						<th align="center">Hora de finnalización</th>
+						<th align="center">Número de trayectos</th>
 					</tr>
 				</thead>
 				<tbody>
 						{% for ciclovia in ciclovia_list %}
 							<tr>
-								<td align="center">{{ciclovia.user}}</td>
+								{% if request.user.is_superuser %}
+									<td align="center">{{ciclovia.user}}</td>
+								{% endif %}
 								<td align="center"><a href="{%    url 'CicloviaProgram:detail' ciclovia.id %}">{{ ciclovia.name}}</a></td>
 								<td align="center">{{ciclovia.place}}</td>
 								<td align="center">{{ciclovia.start_hour}}</td>
@@ -43,20 +47,29 @@
 		<div class="col-md-offset-2 col-md-4">
 			<div class="panel panel-primary">
 				<div class="panel-heading">
-					<h3 class="panel-title">Estructurar Ciclovia</h3>
+					<h3 class="panel-title">Estructurar ciclovía</h3>
 				</div>
 				<div class="panel-body">
-					En esta seccion se puede cargar la informacion necesaria para estructura una nueva Ciclovia (cargando un XML).   
+					<p>En esta sección se puede cargar la información necesaria para estructura una nueva ciclovía (cargando un XML). </p>
 					<p><a href="{% url 'CicloviaProgram:upload' %}" class="btn btn-primary">Cargar &raquo;</a></p>
 				</div>
 			</div>
 			<div class="panel panel-primary">
 				<div class="panel-heading">
-					<h3 class="panel-title">Estructurar Ciclovia</h3>
+					<h3 class="panel-title">Estructurar ciclovía</h3>
 				</div>
 				<div class="panel-body">
-					En esta seccion se puede cargar la informacion necesaria para estructura una nueva Ciclovia (Con un formulario).
+					<p>En esta sección se puede cargar la información necesaria para estructura una nueva ciclovía (Con un formulario).</p>
 					<p><a href="{% url 'CicloviaProgram:uploadFormCiclovia' %}" class="btn btn-primary">Estructurar &raquo;</a></p>
+				</div>
+			</div>
+			<div class="panel panel-primary">
+				<div class="panel-heading">
+					<h3 class="panel-title">Comparar simulaciones</h3>
+				</div>
+				<div class="panel-body">
+					<p>En esta sección se pueden comparar dos simulaciones.</p>
+					<p><a href="{% url 'CicloviaProgram:compareSimulations' %}" class="btn btn-primary">Comparar &raquo;</a></p>
 				</div>
 			</div>
 		</div>	

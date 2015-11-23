@@ -1,7 +1,7 @@
 # coding=utf-8
 from django.db import models
 from django.contrib.auth.models import User
-from django.utils.translation import ugettext_lazy as _
+
 
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #This section contains the objects associated with the information of the structure of the Ciclovia
