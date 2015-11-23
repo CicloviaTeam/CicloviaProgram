@@ -1,0 +1,99 @@
+{% extends "ciclovia/base.html" %}
+
+{% comment %}
+	Para la codificación en PyCharm
+	<head>
+		<meta charset="UTF-8">
+	</head>
+{% endcomment %}
+
+{% block title %}Comparar ciclovías{% endblock title %}
+
+{% block content %}
+    <div class="container">
+        <h1>Comparar simulaciones</h1>
+        <form id="simulationform" action="{% url 'CicloviaProgram:compareSimulations' %}" method="POST">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Simulación 1</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>Seleccione la ciclovía de la primera simulación.</p>
+                            {% if not ciclovias.count == 0 %}
+                                <select id="ciclovia1sel" onchange="simulations(ciclovia1sel,simulations1div)">
+                                    <option selected disabled>---</option>
+                                    {% for ciclovia in ciclovias %}
+                                        <option value="{{ ciclovia.id }}">{{ ciclovia.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <p class="alert alert-info">No se ha creado ninguna ciclovía.</p>
+                            {% endif %}
+                            <div id="simulations1div"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-primary">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Simulación 2</h3>
+                        </div>
+                        <div class="panel-body">
+                            <p>Seleccione la ciclovía de la segunda simulación.</p>
+                            {% if not ciclovias.count == 0 %}
+                                <select id="ciclovia2sel" onchange="simulations(ciclovia2sel,simulations2div)">
+                                    <option selected disabled>---</option>
+                                    {% for ciclovia in ciclovias %}
+                                        <option value="{{ ciclovia.id }}">{{ ciclovia.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% else %}
+                                <p class="alert alert-info">No se ha creado ninguna ciclovía.</p>
+                            {% endif %}
+                            <div id="simulations2div"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
+
+{% block scripts %}
+    <script>
+        var sel1;
+        var sel2;
+        var btnset;
+        function simulations(sel, div) {
+            ciclovia = sel.value;
+            $.ajax({
+                url:"{% url 'CicloviaProgram:simulationList' %}",
+                type: "GET",
+                data: {ciclovia_id:ciclovia, simsel:sel.id},
+                success:function(response){
+                    $("#"+div.id).html("<p>Seleccione la simulación</p>");
+                    $("#"+div.id).append(response);
+                },
+                error:function (xhr, textStatus, thrownError){
+                    $("html").html(xhr.responseText);
+                }
+            });
+            if (sel.id == "ciclovia1sel") {
+                sel1 = true;
+            } else {
+                sel2 = true;
+            }
+            btn();
+        }
+        function btn() {
+            if (sel1 && sel2 && !btnset) {
+                btnset=true;
+                $("#simulationform").append("<div class='row'><div class='col-md-2'>"
+                    +"<input class='btn btn-primary' type='submit' value='Comparar &raquo;'></div></div>");
+            }
+        }
+    </script>
+{% endblock scripts %}

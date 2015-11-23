@@ -57,11 +57,7 @@
 					$("body").html(response);
 				},
 				error:function (xhr, textStatus, thrownError){
-					<!--var jqueryResp = jQuery(xhr.responseText);-->
-					<!--var htmlEle = $("html");-->
 					$("html").html(xhr.responseText);
-					<!--$("div").replaceWith(jqueryResp);-->
-					<!--alert(textStatus + " " + thrownError);-->
 				}
 			});
 		}

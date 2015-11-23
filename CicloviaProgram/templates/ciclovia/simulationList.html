@@ -1,0 +1,9 @@
+{% if simulation_list %}
+    <select name="simulation{{ simulationnum }}">
+    {% for simulation in simulation_list %}
+        <option value="{{ simulation.id }}">{{ simulation }}</option>
+    {% endfor %}
+    </select>
+{% else %}
+    <p class="text-info"><b>No hay simulaciones</b></p>
+{% endif %}

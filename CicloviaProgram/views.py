@@ -42,9 +42,9 @@ def userModels(request):
 		CicloviaScript.buildCiclovia(newdoc)
 	'''
 	if not request.user.is_superuser:
-		ciclovia_list = Ciclovia.objects.filter(user=request.user).order_by('-name')[:10]
+		ciclovia_list = Ciclovia.objects.filter(user=request.user).order_by('-name')
 	else:
-		ciclovia_list = Ciclovia.objects.order_by('-name')[:10]
+		ciclovia_list = Ciclovia.objects.order_by('-name')
 	template = loader.get_template('ciclovia/userModels.html')
 	context = RequestContext(request, {
 		'ciclovia_list': ciclovia_list,
@@ -121,6 +121,10 @@ def editCiclovia(request, ciclovia_id):
 		formset = TrackFormSet(instance=ciclovia)
 		return render(request,'ciclovia/editCiclovia.html',{'form':form,'formset':formset, 'ciclovia':ciclovia})
 
+@login_required(login_url='CicloviaProgram:login')
+def copiarCiclovia(request, ciclovia_id):
+	CicloviaScript.copyCiclovia(ciclovia_id, request.POST['nombre'], request.user)
+	return HttpResponseRedirect(reverse('CicloviaProgram:userModels'))
 
 @login_required(login_url='CicloviaProgram:login')
 def detailArrival(request, ciclovia_id):
@@ -574,6 +578,35 @@ def adminSimulation(request):
 		'simulation_list': simulation_list,
 	})
 	return HttpResponse(template.render(context))
+
+def simulationList(request):
+	"""Retorna un select con las simulaciones de la ciclovía o un mensaje si no hay ninguna."""
+	ciclovia = get_object_or_404(Ciclovia, pk=request.GET['ciclovia_id'])
+	if not (ciclovia.user == request.user or request.user.is_superuser):
+		raise PermissionDenied
+	simulation_list = ciclovia.simulationresultscompiled_set.filter(is_validation=False).order_by('-date')
+	if (request.GET['simsel']=="ciclovia1sel"):
+		return render(request,'ciclovia/simulationList.html',{'simulation_list':simulation_list,
+			'simulationnum':'1'})
+	else:
+		return render(request,'ciclovia/simulationList.html',{'simulation_list':simulation_list,
+			'simulationnum':'2'})
+
+@login_required(login_url='CicloviaProgram:login')
+def compareSimulations(request):
+	"""Compara las simulaciones de dos ciclovías."""
+	if not request.user.is_superuser:
+		ciclovias = Ciclovia.objects.filter(user=request.user).order_by('-name')
+	else:
+		ciclovias = Ciclovia.objects.order_by('-name')
+	if request.method == 'GET':
+		return render(request,"ciclovia/compararCiclovias.html",{'ciclovias':ciclovias})
+	elif request.method == 'POST':
+		simulation1 = get_object_or_404(SimulationResultsCompiled, pk=request.POST['simulation1'])
+		simulation2 = get_object_or_404(SimulationResultsCompiled, pk=request.POST['simulation2'])
+		simulationComp = CicloviaScript.simulationComp(simulation1,simulation2)
+		return render(request,"ciclovia/compareSimulationsResults.html",
+			{'simulation1':simulation1,'simulation2':simulation2, 'simulationComp':simulationComp})
 
 #Cretate user if none is loged in.
 @user_passes_test(notAutheticated,login_url='CicloviaProgram:index')
