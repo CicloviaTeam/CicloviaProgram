@@ -70,7 +70,7 @@
 								</tr>
 								<tr>
 									<td align="center">Horario</td>
-									<td align="center">{{ciclovia.start_hour}} :00 - {{ciclovia.end_hour}} :00</td>
+									<td align="center">{{ciclovia.start_hour| floatformat:0}}:00 - {{ciclovia.end_hour | floatformat:0}}:00</td>
 								</tr>
 								<tr>
 									<td align="center">Número de trayectos</td>
@@ -100,12 +100,36 @@
                                     <td align="center">{{track.distance}}</td>
                                 </tr>
                                 <tr>
-                                    <td align="center">Probabilidad del trayecto</td>
-                                    <td align="center">{{track.probability}}</td>
+                                    <td align="center">Probabilidad inicio</td>
+                                    <td align="center">{{track.probabilityBegin}}</td>
                                 </tr>
                                 <tr>
-                                    <td align="center">Proporción de arribos</td>
-                                    <td align="center">{{track.arrival_proportion}}</td>
+                                    <td align="center">Probabilidad fin</td>
+                                    <td align="center">{{track.probabilityEnd}}</td>
+                                </tr>
+                                {% if ciclovia.arrivals_loaded %}
+                                    <tr>
+                                        <td align="center">Proporción de arribos</td>
+                                        <td align="center">{{track.arrival_proportion}}</td>
+                                    </tr>
+                                {% endif %}
+                                <tr>
+                                    <td align="center">Número de semáforos</td>
+                                    <td align="center">{{track.number_of_semaphores}}</td>
+                                </tr>
+                                <tr>
+                                    <td align="center">Pendiente</td>
+                                    {% if track.hasSlope == 0 %}
+                                        <td align="center">No</td>
+                                    {% elif track.hasSlope == 1 %}
+                                        <td align="center">Media</td>
+                                    {% else %}
+                                        <td align="center">Alta</td>
+                                    {% endif %}
+                                </tr>
+                                <tr>
+                                    <td align="center">Calidad del trayecto</td>
+                                    <td align="center">{{track.quality_of_track}}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -181,9 +205,6 @@
 {% block scripts %}
 
     <script>
-        /*
-        {{ formset.empty_form }}
-        */
         var form_count = {{formset.total_form_count}};
         var emptyf = "{{ formset.empty_form|escapejs }}";
         var test = $(emptyf);
