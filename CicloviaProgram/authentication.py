@@ -9,16 +9,16 @@ from django.contrib.auth.models import User
 ##    User.objects.create_user(username, email, password)
 
 def CreateU(username, password):
-    "Create user."
+    """Create user."""
     User.objects.create_user(username, '', password)
 
 ##Delete user.
 ##@login_required at view
 def DeleteU(pUsername):
-    "Delete user."
+    """Delete user."""
     User.objects.get(username=pUsername).delete()
 
 ##Check if user is logged in.
-def notAutheticated(User):
-    return not User.is_authenticated()
+def notAutheticated(pUser):
+    return not pUser.is_authenticated()
 

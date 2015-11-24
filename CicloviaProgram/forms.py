@@ -1,9 +1,9 @@
 # coding=utf-8
 from django import forms
-from models import *
-from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
+
+from models import *
+
 
 class UploadForm(forms.Form):
     filename = forms.CharField(max_length=100, label='Nombre del archivo')
@@ -56,18 +56,11 @@ class NewUserForm(forms.ModelForm):
 
         return self.cleaned_data['email']
 
-# Change user values.
 class UserChangeFormUniqueEmail(forms.ModelForm):
-
+    """Change user values."""
     class Meta:
         model = User
         fields = ['first_name','last_name','email']
-
-# Form to modify a ciclovia.
-class cicloviaForm(forms.ModelForm):
-    class Meta:
-        model=Ciclovia
-        fields=['user','name','place','start_hour','end_hour','num_tracks']
 
 
 

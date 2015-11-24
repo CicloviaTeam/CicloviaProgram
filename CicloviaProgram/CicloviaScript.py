@@ -140,11 +140,11 @@ class TrackObj:
 
 
 
-        if(listProbabilities[0]==self.idNum):
+        if listProbabilities[0]==self.idNum:
             return [listProbabilities[0],direction]
         enterTo = "begin"
         for index, neighboor  in enumerate(self.tracksId):
-                if(listProbabilities[0] == neighboor):
+                if listProbabilities[0] == neighboor:
                     direction = self.tracksDirection[index]
                     enterTo =direction[0]
         #OJO ACA
@@ -820,6 +820,8 @@ class simulationComp:
                     self.trackComparisons.append(trackComparison(track1,track2))
             if not found:
                 self.trackComparable = False
+        if not len(track_set1)==len(track_set2):
+            self.trackComparable = False
 
 class trackComparison:
     """Guarda la información de la comparación de dos trayectos."""

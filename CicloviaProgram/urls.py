@@ -7,9 +7,7 @@ from CicloviaProgram import views
 urlpatterns = patterns('',
                     # Páginas principales.
     url(r'^$', views.index, name='index'),
-    # ex: /ciclovias/
     url(r'^models/$', views.userModels, name='userModels'),
-    # ex: /ciclovias/5/
     url(r'^(?P<ciclovia_id>\d+)/$', views.detail, name='detail'),
     url(r'^editCiclovia/(?P<ciclovia_id>\d+)/$', views.editCiclovia, name='editCiclovia'),
     url(r'^upload/$', views.upload, name='upload'),
@@ -27,7 +25,7 @@ urlpatterns = patterns('',
     url(r'^(?P<ciclovia_id>\d+)/detailArrival$',
         views.detailArrival, name='detailArrival'),
     url(r'^(?P<ciclovia_id>\d+)/editArrivalInfo$',views.editArrivalInfo, name="editArrivalInfo"),
-    url(r'^adminSimulation/$', views.adminSimulation, name='adminSimulation'),
+    # url(r'^adminSimulation/$', views.adminSimulation, name='adminSimulation'),
                        # Páginas de simulación
     url(r'^(?P<ciclovia_id>\d+)/simulationResults/$',
         views.simulationResults, name='simulationResults'),
@@ -54,8 +52,6 @@ urlpatterns = patterns('',
     url(r'^charts/pie/$',views.piechart, name='pieChart'),
     url(r'^charts/verticalBarChart/$',views.verticalBarChart, name='vBarChart'),
     url(r'^charts/graph/$',views.graphImg, name='graph'),
-    url(r'^(?P<ciclovia_id>\d+)/simulationResultsImg/(?P<results_id>\d+)/$',
-        views.simulationResultsImg, name='simulationResultsImg'),
                     # Páginas de usuario.
     url(r'^login$', auth_views.login,
         {'template_name':'ciclovia/login.html'}, name='login'),

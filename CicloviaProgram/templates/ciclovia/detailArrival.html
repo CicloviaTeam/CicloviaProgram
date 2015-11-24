@@ -60,7 +60,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-md-8">
+			<div class="col-md-7">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h3 class="panel-title">Detalles de los trayectos</h3>
@@ -71,8 +71,6 @@
 								<tr>
 									<th align="center">#</th>
 									<th align="center">Longitud</th>
-									<th align="center">Probabilidad inicio</th>
-									<th align="center">Probabilidad fin</th>
 									<th align="center">Proporción de arribos</th>
 									<th align="center">Número de paradas</th>
 									<th align="center">Tiene pendiente</th>
@@ -85,8 +83,6 @@
 									<tr>
 										<td align="center">{{track.id_track}}</td>
 										<td align="center">{{track.distance}}</td>
-										<td align="center">{{track.probabilityBegin}}</td>
-										<td align="center">{{track.probabilityEnd}}</td>
 										<td align="center">{{track.arrival_proportion | floatformat:2}}</td>
 										<td align="center">{{track.number_of_semaphores}}</td>
 										{% if track.hasSlope == 0 %}

@@ -62,7 +62,7 @@
 					</div>
 				</div>
 			</div>			
-			<div class="col-md-8">
+			<div class="col-md-7">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
 						<h3 class="panel-title">Detalle Trayectos</h3>
@@ -73,8 +73,6 @@
 								<tr>
 									<th align="center">#</th>
 									<th align="center">Longitud</th>
-									<th align="center">Probabilidad inicio</th>
-									<th align="center">Probabilidad fin</th>
 									{% if ciclovia.arrivals_loaded %}
 										<th align="center">Proporción de arribos</th>
 									{% endif %}
@@ -89,8 +87,6 @@
 									<tr>
 										<td align="center">{{track.id_track}}</td>
 										<td align="center">{{track.distance}}</td>
-										<td align="center">{{track.probabilityBegin}}</td>
-										<td align="center">{{track.probabilityEnd}}</td>
 										{% if ciclovia.arrivals_loaded %}
 											<td align="center">{{track.arrival_proportion | floatformat:2}}</td>
 										{% endif %}

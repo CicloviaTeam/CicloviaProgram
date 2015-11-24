@@ -14,7 +14,7 @@ from django.forms.models import inlineformset_factory
 from django.core.exceptions import PermissionDenied
 
 from .forms import *
-from CicloviaProgram.models import Ciclovia, Track, Document, SimulationParameters, SimulationResultsCompiled, \
+from CicloviaProgram.models import Ciclovia, Track, Document, SimulationResultsCompiled, \
 	SimulationResults, SimulationResultsPerTrack, SimulationResultsCompiledPerTrack
 import CicloviaScript
 from .authentication import *
@@ -29,18 +29,6 @@ def index(request):
 
 @login_required(login_url='CicloviaProgram:login')
 def userModels(request):
-	'''
-	if request.method == 'POST':
-	form = UploadForm(request.POST, request.FILES)
-	if form.is_valid():
-		#fileObj = request.FILES['file']
-		#name = fileObj['filename']
-		#CicloviaScript.buildCiclovia(fileObj)
-		#return render(request, 'ciclovia/main.html')
-		newdoc = Document(filename = request.POST['filename'],docfile = request.FILES['docfile'])
-		newdoc.save(form)
-		CicloviaScript.buildCiclovia(newdoc)
-	'''
 	if not request.user.is_superuser:
 		ciclovia_list = Ciclovia.objects.filter(user=request.user).order_by('-name')
 	else:
@@ -50,10 +38,6 @@ def userModels(request):
 		'ciclovia_list': ciclovia_list,
 	})
 	return HttpResponse(template.render(context))
-
-# @login_required(login_url='CicloviaProgram:login')
-# def detail(request, ciclovia_id):
-#     return HttpResponse("Esta es la Ciclovia %s." % ciclovia_id)
 
 @login_required(login_url='CicloviaProgram:login')
 def detail(request, ciclovia_id):
@@ -84,10 +68,6 @@ def graphImg(request):
 	outputimg = d.asString('gif')
 	return HttpResponse(outputimg, 'image/gif')
 
-# @login_required(login_url='CicloviaProgram:login')
-# def detailArrival(request, ciclovia_id):
-#     return HttpResponse("Esta es la Ciclovia %s." % ciclovia_id)
-
 @login_required(login_url='CicloviaProgram:login')
 def editCiclovia(request, ciclovia_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
@@ -96,15 +76,21 @@ def editCiclovia(request, ciclovia_id):
 	if ciclovia.arrivals_loaded:
 		CicloviaForm = modelform_factory(Ciclovia, fields=('name', 'place', 'start_hour', 'end_hour'
 			,'reference_track','reference_hour','reference_arrival_rate',))
+		# TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance'
+		# 	,'probabilityBegin', 'probabilityEnd','arrival_proportion', 'number_of_semaphores'
+		# 	, 'hasSlope', 'quality_of_track'), extra=0)
 		TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance'
-			,'probabilityBegin', 'probabilityEnd','arrival_proportion', 'number_of_semaphores'
+			,'arrival_proportion', 'number_of_semaphores'
 			, 'hasSlope', 'quality_of_track'), extra=0)
 	else:
 		CicloviaForm = modelform_factory(Ciclovia, fields=('name', 'place', 'start_hour',
 			'end_hour',))
+		# TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance'
+		# 	,'probabilityBegin', 'probabilityEnd','number_of_semaphores'
+		# 	, 'hasSlope', 'quality_of_track'), extra=0)
 		TrackFormSet= inlineformset_factory(Ciclovia,Track,fields=('id_track','distance'
-			,'probabilityBegin', 'probabilityEnd','number_of_semaphores'
-			, 'hasSlope', 'quality_of_track'), extra=0)
+				,'number_of_semaphores'
+				, 'hasSlope', 'quality_of_track'), extra=0)
 	if request.method=='POST':
 		form = CicloviaForm(request.POST, instance = ciclovia)
 		formset = TrackFormSet(request.POST, request.FILES, instance = ciclovia)
@@ -173,10 +159,6 @@ def editArrivalInfo(request,ciclovia_id):
 				 'arrivalsproportionformset':arrivalproportionperhourformset,
 				 'participantformset':participantformset})
 
-# @login_required(login_url='CicloviaProgram:login')
-# def detailNeighboor(request, ciclovia_id, track_id):
-#     return HttpResponse("Este es el Track %s." % track_id)
-
 @login_required(login_url='CicloviaProgram:login')
 def detailNeighboor(request, ciclovia_id, track_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
@@ -216,14 +198,12 @@ def upload(request):
 			newdoc = Document(filename = request.POST['filename'],
 							  docfile = request.FILES['docfile'])
 			newdoc.save(form)
-		name = settings.MEDIA_ROOT + str(newdoc.docfile)
-		CicloviaScript.buildCiclovia(name, request.user)
+			name = settings.MEDIA_ROOT + str(newdoc.docfile)
+			CicloviaScript.buildCiclovia(name, request.user)
 		return HttpResponseRedirect(reverse('CicloviaProgram:userModels'))
 
 	else:
 		form = UploadForm()
-	#tambien se puede utilizar render_to_response
-	#return render_to_response('upload.html', {'form': form}, context_instance = RequestContext(request))
 	return render(request, 'ciclovia/upload.html', {'form': form})
 
 @ensure_csrf_cookie
@@ -258,7 +238,6 @@ def uploadArrivalInfo(request, ciclovia_id):
 			name = settings.MEDIA_ROOT + str(newdoc.docfile)
 			cicloviaToLoad = CicloviaScript.loadCiclovia(ciclovia_id)
 			CicloviaScript.assignArrivalInfo(cicloviaToLoad, ciclovia_id, name)
-			ciclovia_list = Ciclovia.objects
 			cicloviaLoad = get_object_or_404(Ciclovia, pk=ciclovia_id)
 			return render(request, 'ciclovia/detailArrival.html',
 							  {'ciclovia': cicloviaLoad})
@@ -266,8 +245,6 @@ def uploadArrivalInfo(request, ciclovia_id):
 			return render(request, 'ciclovia/upload.html', {'form': form})
 	else:
 		form = UploadForm()
-	#tambien se puede utilizar render_to_response
-	#return render_to_response('upload.html', {'form': form}, context_instance = RequestContext(request))
 	return render(request, 'ciclovia/upload.html', {'form': form})
 
 @login_required(login_url='CicloviaProgram:login')
@@ -285,7 +262,6 @@ def uploadArrivalInfoForm(request, ciclovia_id):
 			name = settings.MEDIA_ROOT + str(newdoc.docfile)
 			cicloviaToLoad = CicloviaScript.loadCiclovia(ciclovia_id)
 			CicloviaScript.assignArrivalInfo(cicloviaToLoad, ciclovia_id, name)
-			ciclovia_list = Ciclovia.objects
 			cicloviaLoad = get_object_or_404(Ciclovia, pk=ciclovia_id)
 			return render(request, 'ciclovia/detailArrival.html',
 							  {'ciclovia': cicloviaLoad})
@@ -293,13 +269,7 @@ def uploadArrivalInfoForm(request, ciclovia_id):
 			return render(request, 'ciclovia/uploadArrivalInfoForm.html', {'form': form})
 	else:
 		form = UploadForm()
-	#tambien se puede utilizar render_to_response
-	#return render_to_response('upload.html', {'form': form}, context_instance = RequestContext(request))
 	return render(request, 'ciclovia/uploadArrivalInfoForm.html', {'form': form})
-# @login_required(login_url='CicloviaProgram:login')
-# def simulationResults(request, ciclovia_id):
-# 	return HttpResponse("Estos son los resultados de la Ciclovia %s." %
-# 						ciclovia_id)
 
 @login_required(login_url='CicloviaProgram:login')
 def simulationResults(request, ciclovia_id):
@@ -318,12 +288,6 @@ def simulationResultsOld(request, ciclovia_id):
 	results = get_object_or_404(SimulationResultsCompiled, pk=request.GET['results_id'])
 	return render(request, 'ciclovia/simulationResults.html',
 				  {'ciclovia': ciclovia, 'results': results})
-
-# @login_required(login_url='CicloviaProgram:login')
-# def simulationResultsValidation(request, ciclovia_id):
-# 	return HttpResponse("Estos son los resultados de la Ciclovia %s." %
-# 						ciclovia_id)
-
 
 def piechart(request):
 	d = charts.myPieChart()
@@ -356,8 +320,8 @@ def piechart(request):
 		srcpt = get_object_or_404(SimulationResultsCompiledPerTrack, pk=request.GET['srcpt_id'])
 		for flowresult in srcpt.simulationresultscompiledflowtrack_set.all():
 			data.append(flowresult.avg_flow_hour)
-			categories.append("Hora " + str(flowresult.hour))
-		d.defineData(data,categories, "Flujo promedio por hora")
+			categories.append("Intervalo " + str(flowresult.hour))
+		d.defineData(data,categories, "Flujo promedio por intervalo")
 	elif request.GET['data']=='totalfluxtrackonerun':
 		results = get_object_or_404(SimulationResults, pk=request.GET['results_id'])
 		for track in results.simulationresultspertrack_set.all():
@@ -374,24 +338,17 @@ def piechart(request):
 		results = get_object_or_404(SimulationResultsPerTrack, pk=request.GET['results_id'])
 		for result in results.simulationresultsflowpertrack_set.all():
 			data.append(result.flow_hour)
-			categories.append("Hora " + str(result.hour))
+			categories.append("Intervalo " + str(result.hour))
 		d.defineData(data,categories,'Flujo')
-	elif request.GET['data']=='gender':
-		data.append(50)
-		categories.append("Femenino")
-		data.append(50)
-		categories.append("Masculino")
-		d.defineData(data,categories,"Proporción por género")
+	# elif request.GET['data']=='gender':
+	# 	data.append(50)
+	# 	categories.append("Femenino")
+	# 	data.append(50)
+	# 	categories.append("Masculino")
+	# 	d.defineData(data,categories,"Proporción por género")
 
-	# outputimg = d.asString('png')
-	# return HttpResponse(outputimg, 'png')
 	outputimg = d.asString('gif')
 	return HttpResponse(outputimg, 'image/gif')
-
-# def piechart3d(request):
-# 	pie = charts.myPie3d()
-# 	outputimg = pie.asString('gif')
-# 	return HttpResponse(outputimg, 'image/gif')
 
 def verticalBarChart(request):
 	barChart = charts.myVerticalBarChart()
@@ -408,6 +365,7 @@ def verticalBarChart(request):
 		results = get_object_or_404(SimulationResultsCompiled, pk=request.GET['results_id'])
 		trackresults = results.simulationresultscompiledpertrack_set.all()
 		for trackresult in trackresults:
+			# Los datos del promedio del total de arribos no se han calculado.
 			# data.append([trackresult.average_total_arrivals])
 			data.append([10])
 			categories.append("Trayecto " + str(trackresult.track))
@@ -424,8 +382,8 @@ def verticalBarChart(request):
 		srcpt = get_object_or_404(SimulationResultsCompiledPerTrack, pk=request.GET['srcpt_id'])
 		for flowresult in srcpt.simulationresultscompiledflowtrack_set.all():
 			data.append([flowresult.avg_flow_hour])
-			categories.append("Hora " + str(flowresult.hour))
-			barChart.defineData(data,categories, "Flujo promedio por hora")
+			categories.append("Intervalo " + str(flowresult.hour))
+			barChart.defineData(data,categories, "Flujo promedio por intervalo")
 	elif request.GET['data']=='totalfluxtrackonerun':
 		results = get_object_or_404(SimulationResults, pk=request.GET['results_id'])
 		for track in results.simulationresultspertrack_set.all():
@@ -442,7 +400,7 @@ def verticalBarChart(request):
 		results = get_object_or_404(SimulationResultsPerTrack, pk=request.GET['results_id'])
 		for result in results.simulationresultsflowpertrack_set.all():
 			data.append([result.flow_hour])
-			categories.append("Hora " + str(result.hour))
+			categories.append("Intervalo " + str(result.hour))
 		barChart.defineData(data,categories,'Flujo')
 	elif request.GET['data']=='gender':
 		data.append([50])
@@ -452,23 +410,6 @@ def verticalBarChart(request):
 		barChart.defineData(data,categories,"Proporción por género")
 	outputimg = barChart.asString('gif')
 	return HttpResponse(outputimg, 'image/gif')
-
-# def linechart(request):
-# 	#instantiate a drawing object
-# 	d = charts.MyLineChartDrawing()
-# 	#extract the request params of interest.
-# 	#I suggest having a default for everything.
-# 	d.chart.data = [((1,1), (2,2), (2.5,1), (3,3), (4,5)),((1,2), (2,3), (2.5,2), (3.5,5), (4,6))]
-# 	labels =  ["Label One","Label Two"]
-# 	if labels:
-# 		# set colors in the legend
-# 		d.Legend.colorNamePairs = []
-# 		for cnt,label in enumerate(labels):
-# 				d.Legend.colorNamePairs.append((d.chart.lines[cnt].strokeColor,label))
-# 	#get a GIF (or PNG, JPG, or whatever)
-# 	binaryStuff = d.asString('gif')
-# 	return HttpResponse(binaryStuff, 'image/gif')
-
 
 @login_required(login_url='CicloviaProgram:login')
 def simulationResultsValidation(request, ciclovia_id):
@@ -488,96 +429,44 @@ def simulationResultsValidationOld(request, ciclovia_id):
 	return render(request, 'ciclovia/simulationResultsValidation.html',
 				  {'ciclovia': ciclovia, 'results': results})
 
-# @login_required(login_url='CicloviaProgram:login')
-# def detailTrackValidation(request, ciclovia_id, track_id):
-# 	return HttpResponse("Esta es la Ciclovia %s." % ciclovia_id)
-
 @login_required(login_url='CicloviaProgram:login')
 def detailTrackValidation(request, ciclovia_id, track_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
 	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
-	# print("La llave es " + track_id)
 	track = get_object_or_404(SimulationResultsCompiledPerTrack, pk=track_id)
-	#return render(request, 'ciclovia/detailTrackValidation.html', {'ciclovia': ciclovia, 'track': track})
 	return render(request, 'ciclovia/detailTrackValidation.html',
 				  {'ciclovia': ciclovia, 'track': track})
-
-# @login_required(login_url='CicloviaProgram:login')
-# def detailValidationSingleRun(request, ciclovia_id, run_id):
-# 	return HttpResponse("Esta es la Ciclovia %s." % ciclovia_id)
 
 @login_required(login_url='CicloviaProgram:login')
 def detailValidationSingleRun(request, ciclovia_id, run_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
 	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
-	# print("La llave es " + run_id)
 	result = get_object_or_404(SimulationResults, pk=run_id)
 	return render(request, 'ciclovia/detailValidationSingleRun.html',
 				  {'ciclovia': ciclovia, 'run': result})
-
-# @login_required(login_url='CicloviaProgram:login')
-# def detailtrackValidationSingleRun(request, ciclovia_id, run_id, track_id):
-# 	return HttpResponse("Esta es la Ciclovia %s." % ciclovia_id)
 
 @login_required(login_url='CicloviaProgram:login')
 def detailTrackValidationSingleRun(request, ciclovia_id, run_id, track_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
 	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
-	# print("La llave es " + run_id)
 	result = get_object_or_404(SimulationResults, pk=run_id)
 	track = get_object_or_404(SimulationResultsPerTrack, pk=track_id)
 	return render(request, 'ciclovia/detailTrackValidationSingleRun.html',
 				  {'ciclovia': ciclovia, 'run': result, 'track': track})
 
-@login_required(login_url='CicloviaProgram:login')
-def simulationResultsImg(request, ciclovia_id, results_id):
-	cicloviaN = get_object_or_404(Ciclovia, pk=ciclovia_id)
-	results = get_object_or_404(SimulationResultsCompiled, pk=results_id)
-	# print(request)
-	#Crea el objeto que representa el grafico de barras
-	d = charts.BarChart()
-	#Esta lista representa los datos que van a ser graficados
-	data = []
-	#Busca cual es la informacion que desea el usuario y la pone en la
-	#variable data
-	queryFromDB = results.simulationresults_set.all()
-	if request.GET.get('data','') == 'total_arrivals':
-		for i in queryFromDB:
-			data.append(i.total_arrivals)
-			# print("Estoy en la iteracion " + str(i) + "de total arrivals")
-			# print(i.total_arrivals)
-			d.changeTitle('Numero total de arribos')
-	elif request.GET.get('data','') == 'average_number_system':
-		for i in queryFromDB:
-			data.append(i.average_number_system)
-			# print("Estoy en la iteracion " + str(i) + "de num promedio")
-			# print(i.average_number_system)
-			d.changeTitle('Numero promedio de personas')
-	else:
-		data = [0,0,0,0]
-
-	d.chart.data = [data]
-	d.chart.valueAxis.valueMin = 2000
-	# print(d.chart.data)
-	draw = d.asString('gif')
-	# print("String generado")
-	print(request)
-	return HttpResponse(draw,'image/gif')
-
-
-@login_required(login_url='CicloviaProgram:login')
-def adminSimulation(request):
-	# if not request.user.is_superuser:
-	# 	raise PermissionDenied
-	simulation_list = SimulationParameters.objects.order_by('-replications')[:1]
-	template = loader.get_template('ciclovia/adminSimulation.html')
-	context = RequestContext(request, {
-		'simulation_list': simulation_list,
-	})
-	return HttpResponse(template.render(context))
+# @login_required(login_url='CicloviaProgram:login')
+# def adminSimulation(request):
+# 	if not request.user.is_superuser:
+# 		raise PermissionDenied
+# 	simulation_list = SimulationParameters.objects.order_by('-replications')[:1]
+# 	template = loader.get_template('ciclovia/adminSimulation.html')
+# 	context = RequestContext(request, {
+# 		'simulation_list': simulation_list,
+# 	})
+# 	return HttpResponse(template.render(context))
 
 def simulationList(request):
 	"""Retorna un select con las simulaciones de la ciclovía o un mensaje si no hay ninguna."""
@@ -585,7 +474,7 @@ def simulationList(request):
 	if not (ciclovia.user == request.user or request.user.is_superuser):
 		raise PermissionDenied
 	simulation_list = ciclovia.simulationresultscompiled_set.filter(is_validation=False).order_by('-date')
-	if (request.GET['simsel']=="ciclovia1sel"):
+	if request.GET['simsel']=="ciclovia1sel":
 		return render(request,'ciclovia/simulationList.html',{'simulation_list':simulation_list,
 			'simulationnum':'1'})
 	else:
@@ -608,9 +497,9 @@ def compareSimulations(request):
 		return render(request,"ciclovia/compareSimulationsResults.html",
 			{'simulation1':simulation1,'simulation2':simulation2, 'simulationComp':simulationComp})
 
-#Cretate user if none is loged in.
 @user_passes_test(notAutheticated,login_url='CicloviaProgram:index')
 def newUser(request):
+	"""Cretate user if none is loged in."""
 	if request.method == 'POST':
 		form = NewUserForm(request.POST)
 		if form.is_valid():
@@ -627,8 +516,8 @@ def newUser(request):
 		form = NewUserForm()
 		return render(request, 'ciclovia/new_user.html',{'form':form})
 
-#User page.
 def user(request):
+	"""User page."""
 	if request.method == 'POST':
 		if request.POST['opcion']=='Cerrar sesión'.decode('utf-8'):
 			return auth_views.logout(request,next_page='CicloviaProgram:index')
