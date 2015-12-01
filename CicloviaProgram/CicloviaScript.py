@@ -1382,7 +1382,7 @@ def simulationExecution(cicloviaId, isValidation):
         seed+=i
         #simDES.printResults(cicloviaId)
 
-    normalval = norm.ppf(0.95,loc=0, scale=1)
+    normalval = norm.ppf(0.975,loc=0, scale=1)
     sqrtvals = numpy.sqrt([simulationRuns])
     listTotalArrivals = []
     listNumberSystem = []

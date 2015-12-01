@@ -12,6 +12,7 @@
 {% block content %}
 
     <div class="container">
+		<h1>Cambiar contraseña</h1>
         <form action="{% url 'CicloviaProgram:cambiarContrasena' %}" method="POST">
             {% csrf_token %}
             {% for error in form.non_field_errors %}

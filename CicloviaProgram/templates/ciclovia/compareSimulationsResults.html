@@ -42,7 +42,7 @@
                                 <td>{{ simulationComp.same_avg_total_arrivals | yesno:"Sí,No" }}</td>
                             </tr>
                             <tr>
-                                <td>Número promedio de personas en la ciclovía</td>
+                                <td>Número promedio del promedio de personas en la ciclovía</td>
                                 <td>{{ simulation1.average_number_system | floatformat:2 }}</td>
                                 <td>{{ simulation1.hw_number_system | floatformat:2 }}</td>
                                 <td>{{ simulation2.average_number_system | floatformat:2 }}</td>
@@ -88,7 +88,7 @@
                                         <td>{{ trackComp.comparisons.1 | yesno:"Sí,No" }}</td>
                                     </tr>
                                     <tr>
-                                        <td>Número promedio de personas en el trayecto</td>
+                                        <td>Número promedio del promedio de personas en el trayecto</td>
                                         <td>{{ trackComp.track1.average_number_track | floatformat:2 }}</td>
                                         <td>{{ trackComp.track1.hw_number_track | floatformat:2 }}</td>
                                         <td>{{ trackComp.track2.average_number_track | floatformat:2 }}</td>
