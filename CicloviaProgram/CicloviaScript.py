@@ -83,20 +83,25 @@ class TrackObj:
 
     #This is the constructor of the class Track
     def __init__(self, idNum, distance, probability, probabilityBegin, probabilityEnd, tracksId, tracksProb, tracksDirection):
-            self.idNum = idNum
-            self.distance = distance
-            self.probability = probability
-            self.probabilityBegin = probabilityBegin
-            self.probabilityEnd = probabilityEnd
-            self.tracksId = tracksId
-            self.tracksProb = tracksProb
-            self.tracksDirection = tracksDirection
-            self.arrivalProportion = 0
-            self.arrivalsPerHour = []
-            self.numberInTrack = 0
-            self.numParticipantsInTrack = []
-            self.flowInTrack = []
-            self.totalArrivals = 0
+        self.idNum = idNum
+        self.distance = distance
+        self.probability = probability
+        self.probabilityBegin = probabilityBegin
+        self.probabilityEnd = probabilityEnd
+        self.tracksId = tracksId
+        self.tracksProb = tracksProb
+        self.tracksDirection = tracksDirection
+        self.arrivalProportion = 0
+        self.arrivalsPerHour = []
+        self.numberInTrack = 0
+        self.numParticipantsInTrack = []
+        self.flowInTrack = []
+        self.totalArrivals = 0
+        #todo Aqui se ponen los nuevos parametros del track
+        self.number_of_semaphores = 0
+        self.hasSlope = 0
+        self.quality_of_track = 0
+
 
     #This gives the probability of a neighboor track, given its ID
     def getProb(self, trackId):
@@ -144,9 +149,9 @@ class TrackObj:
             return [listProbabilities[0],direction]
         enterTo = "begin"
         for index, neighboor  in enumerate(self.tracksId):
-                if listProbabilities[0] == neighboor:
-                    direction = self.tracksDirection[index]
-                    enterTo =direction[0]
+            if listProbabilities[0] == neighboor:
+                direction = self.tracksDirection[index]
+                enterTo =direction[0]
         #OJO ACA
         neighboorIdDir = [listProbabilities[0],enterTo]
 
@@ -838,15 +843,13 @@ class trackComparison:
         self.comparisons.append(simulationComp.compareValues(self.track1.average_total_arrivals,
             self.track1.hw_total_arrivals,self.track2.average_total_arrivals,
             self.track2.hw_total_arrivals))
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #   SIMULACION USANDO SIMPY
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-#This class represents the Discrete Event Simulation
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# This class represents the Discrete Event Simulation
 class SimulationDES:
-
-    #This is the constructor of the class SimulationDES
-    #It takes the parameters provided as arguments and stores them in the object
+    # This is the constructor of the class SimulationDES
+    # It takes the parameters provided as arguments and stores them in the object
     def __init__(self, random_seed, cicloviaId, resultsCompiledId, isValidation):
         self.random_seed = random_seed
         self.ciclovia = loadCiclovia(cicloviaId)
@@ -861,19 +864,21 @@ class SimulationDES:
         self.results = []
         self.ciclovia.printInfo()
 
-    #This class allows the execution of the simulation
+    # This class allows the execution of the simulation
     def execute(self, cicloviaId, resultsCompiledId):
         random.seed(self.random_seed)
+        originalTime = timeit.default_timer()
         self.env.run(until=self.simTime)
+        timeOfEnvRun = timeit.default_timer() - originalTime
+        #todo se debe optimizar esta funcion!!!!!!
         self.printResults(cicloviaId, resultsCompiledId)
+        timeOfPrinting = timeit.default_timer() - timeOfEnvRun
+        print("Tiempo de correr Env.Run: " + str(timeOfEnvRun))
+        print("Tiempo de imprimir: " + str(timeOfPrinting))
 
-
-
-    #This method represents the participant as an object and handles the events of the participant
-    #This method includes routing
-    #ACAAAAAAAA SE PODRIAN QUITAR PARAMETROS
-
-
+    # This method represents the participant as an object and handles the events of the participant
+    # This method includes routing
+    # ACAAAAAAAA SE PODRIAN QUITAR PARAMETROS
     def participant(self, partArriving, track, idNum, participantType, arrivalTime, timeInSystem):
 
         for event in partArriving.eventsList:
@@ -1003,17 +1008,9 @@ class SimulationDES:
                         enterParticipants+=1
 
                         if(self.isValidation == True):
-                            print("Va a asignar ruta")
+                            #print("Va a asignar ruta")
                             part.assignRoute()
                         #Imprimo la primera entidad que entra
-                        if(i == 100):
-                            print("El trayecto por el que entra es: " + str(track.idNum))
-                            #print("Entro a imprimir lista de eventos")
-                            #print("Evento 1" +" tracks " + str(part.arrivalTrack.idNum))
-                            #for event in part.eventsList:
-                                #print("Evento " + str(event[0]) +" tracks " + str(event[1].idNum) + ":" + str(event[2].idNum))
-                            #print("Entro a imprimir lista de eventos")
-
                         participantList.append(part)
                         self.timeInSystemStatistic(timeParticipantSystem)
 
@@ -1205,6 +1202,8 @@ class SimulationDES:
 
 
     def printResults(self, cicloviaId, resultsCompiledId):
+        # todo quitar este contador
+        counterTest = 0;
         cicloviaFromDB = Ciclovia.objects.get(id=cicloviaId)
         simTime = self.simTime
         totalArrivals = self.totalArrivals
@@ -1224,29 +1223,28 @@ class SimulationDES:
         resultsDB.save()
 
         for track in self.ciclovia.tracks:
+            counterTest += 1
+            print("Track numero: " + str(counterTest))
+
             listNumberInTrack = []
             listTimeNumberInTrack = []
             for value in track.numParticipantsInTrack:
                 listNumberInTrack.append(float(value[0]))
                 listTimeNumberInTrack.append(float(value[1]))
-            #Revisar
-            print("Sim time " + str(simTime))
-            if(len(listNumberInTrack)>0):
+            # Revisar
+            # print("Sim time " + str(simTime))
+            if len(listNumberInTrack) > 0:
                 listNumberInTrack.append(listNumberInTrack[len(listNumberInTrack)-1])
                 listTimeNumberInTrack.append(simTime - listTimeNumberInTrack[len(listTimeNumberInTrack)-1])
 
             avgNumberInTrack = 0
-            if(len(listNumberInTrack)==0):
+            if len(listNumberInTrack) == 0:
                 resultsPerTrackDB = resultsDB.simulationresultspertrack_set.create(track = track.idNum, total_arrivals=0,  average_number_track=0)
-                resultsPerTrackDB.save()
-
             else:
                 avgNumberInTrack = round(numpy.average(listNumberInTrack, weights=listTimeNumberInTrack),3)
-
                 resultsPerTrackDB = resultsDB.simulationresultspertrack_set.create(track = track.idNum, total_arrivals=0,  total_flow=0, average_number_track=avgNumberInTrack)
-                resultsPerTrackDB.save()
 
-            if(self.isValidation == True):
+            if self.isValidation:
 
                 hourInterval = 1
                 totalFlow = 0
@@ -1257,23 +1255,21 @@ class SimulationDES:
                 title = "Flujo del trayecto " + str(track.idNum)
                 #self.showBarChart(len(values), xLabel, values, yLabel, title)
                 for timeInterval in track.flowInTrack:
-                    print("   El flujo en la hora " + str(hourInterval) + " es de " + str(timeInterval))
+                    #print("   El flujo en la hora " + str(hourInterval) + " es de " + str(timeInterval))
                     totalFlow += timeInterval
-
-                    #Completar cargando los resultados a la base de datos
-                    resultsFlowValidationDB = resultsPerTrackDB.simulationresultsflowpertrack_set.create(hour = hourInterval, flow_hour = timeInterval)
-                    resultsFlowValidationDB.save()
-                    hourInterval+=1
-
+                    # Completar cargando los resultados a la base de datos
+                    resultsFlowValidationDB = resultsPerTrackDB.simulationresultsflowpertrack_set.create(hour=hourInterval, flow_hour=timeInterval)
+                    hourInterval += 1
+                resultsFlowValidationDB.save()
                 resultsPerTrackDB.total_flow = totalFlow
-                resultsPerTrackDB.save()
+            resultsPerTrackDB.save()
 
 
-#This class represents an entity
+# This class represents an entity
 class ParticipantObjSim:
 
-    #This is the constructor of the class ParticipantObjSim
-    #It takes the parameters provided as arguments and stores them in the object
+    # This is the constructor of the class ParticipantObjSim
+    # It takes the parameters provided as arguments and stores them in the object
     def __init__(self, ciclovia, track, direction, idNum, participantType, arrivalTime, timeInSystem):
         self.ciclovia = ciclovia
         self.arrivalTrack = track
@@ -1289,7 +1285,7 @@ class ParticipantObjSim:
         self.eventsList = []
 
 
-    #This method assigns the route
+    # This method assigns the route
     def assignRoute(self):
         #Arrival
         event = [1, self.track, self.track, self.arrivalTime]
@@ -1355,34 +1351,50 @@ class ParticipantObjSim:
                 self.assignRoute()
 
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #   EJECUCION DE LA APLICACION
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-#This method executes the simulation
+# This method executes the simulation
 def simulationExecution(cicloviaId, isValidation):
 
     start = timeit.default_timer()
     simulationRuns = 10
-    if(isValidation==True):
-        simulationRuns = 2
+    if isValidation:
+        simulationRuns = 10
     seed = 9243881
 
     cicloviaFromDB = Ciclovia.objects.get(id=cicloviaId)
-    resultsCompiledDB = cicloviaFromDB.simulationresultscompiled_set.create(num_runs = 0, date=timezone.now(), avg_total_arrivals = -1, stdev_total_arrivals = -1, hw_total_arrivals = -1, average_number_system = -1, stdev_number_system = -1, hw_number_system = -1, is_validation = isValidation )
+    resultsCompiledDB = cicloviaFromDB.simulationresultscompiled_set.create(num_runs=0, date=timezone.now(), avg_total_arrivals=-1, stdev_total_arrivals = -1, hw_total_arrivals = -1, average_number_system = -1, stdev_number_system = -1, hw_number_system = -1, is_validation = isValidation )
     resultsCompiledDB.save()
     resultsCompiledId = resultsCompiledDB.id
+    reps_exec_times = []
 
     for i in range(simulationRuns):
-        simDES = SimulationDES(seed, cicloviaId, resultsCompiledId, isValidation)
-        simDES.env.process(simDES.participantArrivals())
-        simDES.execute(cicloviaId, resultsCompiledId)
-        seed*=2
-        seed+=i
-        #simDES.printResults(cicloviaId)
+        timeRep = timeit.default_timer()
 
-    normalval = norm.ppf(0.975,loc=0, scale=1)
+        simDES = SimulationDES(seed, cicloviaId, resultsCompiledId, isValidation)
+        timeRepContructor = timeit.default_timer() - timeRep
+
+        simDES.env.process(simDES.participantArrivals())
+        timeRepEntityRouting = timeit.default_timer() - timeRep
+
+        simDES.execute(cicloviaId, resultsCompiledId)
+        timeRepExecution = timeit.default_timer() - timeRep
+
+        seed *= 2
+        seed += i
+        timeRep = timeit.default_timer() - timeRep
+        reps_exec_times.append(timeRep)
+        #simDES.printResults(cicloviaId)
+    print("Tiempos de replicas: ")
+    print(reps_exec_times)
+    print("Tiempo del constructor: " +str(timeRepContructor))
+    print("Tiempo del ruteo: " +str(timeRepEntityRouting))
+    print("Tiempo de la ejecucion: " +str(timeRepExecution))
+
+    normalval = norm.ppf(0.975, loc=0, scale=1)
     sqrtvals = numpy.sqrt([simulationRuns])
     listTotalArrivals = []
     listNumberSystem = []
@@ -1418,11 +1430,11 @@ def simulationExecution(cicloviaId, isValidation):
                 listFlowPerHourTracks[track.track-1][flow.hour-1].append(flow.flow_hour)
 
     for index, listPerTrack in enumerate(listInfoTracks):
-        avg_number_track = round(numpy.mean(listPerTrack),3)
-        std_number_track = round(numpy.std(listPerTrack),3)
-        hw_number_track = round(normalval*std_number_track/sqrtvals[0],3)
+        avg_number_track = round(numpy.mean(listPerTrack), 3)
+        std_number_track = round(numpy.std(listPerTrack),  3)
+        hw_number_track = round(normalval*std_number_track/sqrtvals[0], 3)
         if(len(listInfoTracks)>1):
-            std_number_track = round(numpy.std(listPerTrack),3)
+            std_number_track = round(numpy.std(listPerTrack), 3)
         avg_total_flow = 0
         std_total_flow = 0
         if(isValidation == True):
@@ -1455,15 +1467,10 @@ def simulationExecution(cicloviaId, isValidation):
         resultsCompiledDB.stdev_number_system = round(numpy.std(listNumberSystem),3)
         resultsCompiledDB.hw_number_system = round(normalval*\
             resultsCompiledDB.stdev_number_system/sqrtvals[0],3)
-
-
     resultsCompiledDB.save()
-
-
-
     stop = timeit.default_timer()
     time = stop - start
-    print("El tiempo de ejecucion es " + str(time))
+    print("El tiempo de ejecucion total es " + str(time))
 
     return resultsCompiledDB.id
 
