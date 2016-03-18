@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 
 # This object represents a Ciclovia
 class Ciclovia(models.Model):
-    user = models.ForeignKey(User, default=User.objects.get(pk=1).id)
+    user = models.ForeignKey(User)
     name = models.CharField(max_length=30)
     place = models.CharField(max_length=20)
     start_hour = models.FloatField(default=0)
@@ -69,7 +69,7 @@ class NeighboorInfo(models.Model):
 
 # This object represents a Type of participant
 class ParticipantType(models.Model):
-    ciclovia = models.ForeignKey(Ciclovia)    
+    ciclovia = models.ForeignKey(Ciclovia)
     activity = models.CharField(max_length=30)
     velocity = models.FloatField(default=1)
     percentage = models.FloatField(default=1)
@@ -80,7 +80,7 @@ class ParticipantType(models.Model):
 
 # This object represents one of the values of the time in system distribution
 class TimeInSystemDistribution(models.Model):
-    ciclovia = models.ForeignKey(Ciclovia) 
+    ciclovia = models.ForeignKey(Ciclovia)
     time = models.FloatField(default=1)
     percentage = models.FloatField(default=1)
        
@@ -90,7 +90,7 @@ class TimeInSystemDistribution(models.Model):
 
 # This object represents one of the values of the time in system distribution
 class ArrivalsProportionPerHour(models.Model):
-    ciclovia = models.ForeignKey(Ciclovia) 
+    ciclovia = models.ForeignKey(Ciclovia)
     hour= models.FloatField(default=1)
     proportion = models.FloatField(default=1)
        
@@ -123,8 +123,8 @@ class SimulationParameters(models.Model):
         
 # This object represents the statistics for a serie of runs
 class SimulationResultsCompiled(models.Model):
-    ciclovia = models.ForeignKey(Ciclovia) 
-    date = models.DateTimeField('date executed')  
+    ciclovia = models.ForeignKey(Ciclovia)
+    date = models.DateTimeField('date executed')
     num_runs = models.FloatField(default=0)
     avg_total_arrivals = models.IntegerField(default=0)
     stdev_total_arrivals = models.IntegerField(default=0)
@@ -139,7 +139,7 @@ class SimulationResultsCompiled(models.Model):
     
 # This obhect represents the results of a single run
 class SimulationResults(models.Model):
-    ciclovia = models.ForeignKey(SimulationResultsCompiled) 
+    ciclovia = models.ForeignKey(SimulationResultsCompiled)
     date = models.DateTimeField('date executed')
     sim_time = models.FloatField(default=0)
     total_arrivals = models.IntegerField(default=0)
@@ -147,14 +147,14 @@ class SimulationResults(models.Model):
     standard_deviation_time = models.FloatField(default=0)
     average_number_system = models.FloatField(default=0)
     is_validation = models.BooleanField(default=False)
-    
-    def __unicode__(self):  
+
+    def __unicode__(self):
         return str(self.sim_time)+ "," + str(self.total_arrivals)
-    
+
 # This object represents the statistics per track for a serie of runs
 class SimulationResultsCompiledPerTrack(models.Model):
-    simulation_compiled = models.ForeignKey(SimulationResultsCompiled) 
-    track = models.IntegerField(default=0)    
+    simulation_compiled = models.ForeignKey(SimulationResultsCompiled)
+    track = models.IntegerField(default=0)
     average_number_track = models.IntegerField(default=0)
     stdev_number_track = models.IntegerField(default=0)
     hw_number_track = models.IntegerField(default=0)
@@ -166,12 +166,12 @@ class SimulationResultsCompiledPerTrack(models.Model):
     hw_total_flow = models.IntegerField(default=0)
     
     def __unicode__(self):  
-        return str(self.simulation_compiled)+ "," + str(self.track)+ "," + str(self.average_number_track)+ "," \
+        return str(self.simulation_compiled) + "," + str(self.track)+ "," + str(self.average_number_track) + "," \
         + str(self.stdev_number_track) + "," + str(self.average_total_flow)+ "," + str(self.stdev_total_flow)
        
 # This object represents the information associated with the flow that occurs in a single track
 class SimulationResultsPerTrack(models.Model):
-    simulation = models.ForeignKey(SimulationResults) 
+    simulation = models.ForeignKey(SimulationResults)
     track = models.IntegerField(default=0)
     total_arrivals = models.IntegerField(default=0)
     total_flow = models.FloatField(default=0)
@@ -182,7 +182,7 @@ class SimulationResultsPerTrack(models.Model):
     
 # This object represents the information associated with the flow of the track in a signle run
 class SimulationResultsCompiledFlowTrack(models.Model):
-    track_simulation = models.ForeignKey(SimulationResultsCompiledPerTrack) 
+    track_simulation = models.ForeignKey(SimulationResultsCompiledPerTrack)
     hour = models.IntegerField(default=0)
     avg_flow_hour = models.FloatField(default=0)
     stdev_flow_hour = models.FloatField(default=0)
@@ -193,7 +193,7 @@ class SimulationResultsCompiledFlowTrack(models.Model):
         
 # This object represents the information associated with the flow of the track in a signle run
 class SimulationResultsFlowPerTrack(models.Model):
-    track_simulation = models.ForeignKey(SimulationResultsPerTrack) 
+    track_simulation = models.ForeignKey(SimulationResultsPerTrack)
     hour = models.IntegerField(default=0)
     flow_hour = models.IntegerField(default=0)
             

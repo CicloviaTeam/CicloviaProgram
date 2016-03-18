@@ -12,6 +12,8 @@ import simpy
 import numpy
 from django.utils import timezone
 import matplotlib.pyplot as plt
+import threading
+import time as timeLib
 
 from PrintXML import printOrganizedXML
 from CicloviaProgram.models import Ciclovia, Track, SimulationResultsCompiled
@@ -735,8 +737,8 @@ def loadCiclovia(cicloviaId):
             arrivalSet = []
             for arrivalAtHour in loadedCiclovia.arrivalProportionPerHour:
                 arrivalRate = decimal.Decimal(arrivalAtHour[1])*decimal.Decimal(track.arrivalProportion)*decimal.Decimal(loadedCiclovia.referenceArrivalRate)*decimal.Decimal(track.distance)/900
-                print("Para el trayecto " + str(track.idNum) + " en la hora " + str(arrivalAtHour) + " la tasa es " + str(arrivalRate))
-                print("Se esta multiplicando " + str(arrivalAtHour[1]) + "*" + str(track.arrivalProportion) + "*" + str(loadedCiclovia.referenceArrivalRate))
+                # print("Para el trayecto " + str(track.idNum) + " en la hora " + str(arrivalAtHour) + " la tasa es " + str(arrivalRate))
+                # print("Se esta multiplicando " + str(arrivalAtHour[1]) + "*" + str(track.arrivalProportion) + "*" + str(loadedCiclovia.referenceArrivalRate))
                 arrivalSet.append(arrivalRate)
                 loadedCiclovia.maxArrivals+=arrivalRate
                 track.arrivalsPerHour = arrivalSet
@@ -1062,7 +1064,7 @@ class SimulationDES:
         print(bins)
         return values[numpy.digitize(x, bins)]
 
-    #This definition generates a stream of values from a discrete probability distribution
+    # This definition generates a stream of values from a discrete probability distribution
     def weightedValuesSoft(self, valuesP, probabilitiesP, sizeP):
         minFrequency = 0.05
         values = valuesP
@@ -1144,7 +1146,6 @@ class SimulationDES:
             probAdj = probability/totalWeight
             weightedProbabilities[index] = probAdj
 
-
         size = sizeP
         bins = numpy.cumsum(weightedProbabilities)
         x = numpy.random.random_sample(size)
@@ -1170,7 +1171,7 @@ class SimulationDES:
 
         return randomsList
 
-    #This definition accumulates the current number in system
+    # This definition accumulates the current number in system
     def numberInSystemStatistic(self):
         size = len(self.listNumberInSystem)
         if(size == 0):
@@ -1200,10 +1201,9 @@ class SimulationDES:
         plt.yticks(numpy.arange(0,81,10))
         plt.show()
 
-
     def printResults(self, cicloviaId, resultsCompiledId):
         # todo quitar este contador
-        counterTest = 0;
+        counterTest = 0
         cicloviaFromDB = Ciclovia.objects.get(id=cicloviaId)
         simTime = self.simTime
         totalArrivals = self.totalArrivals
@@ -1219,7 +1219,7 @@ class SimulationDES:
         results = [simTime, totalArrivals, averageTime, standardDevTime, listNumberInCiclovia]
         self.results = results
         resultsCompiled = SimulationResultsCompiled.objects.get(id=resultsCompiledId)
-        resultsDB = resultsCompiled.simulationresults_set.create(sim_time = self.simTime, date=timezone.now(), total_arrivals=self.totalArrivals, average_time=round(averageTime, 3), standard_deviation_time=round(standardDevTime, 3), average_number_system= round(avgNumberSystem,3))
+        resultsDB = resultsCompiled.simulationresults_set.create(sim_time=self.simTime, date=timezone.now(), total_arrivals=self.totalArrivals, average_time=round(averageTime, 3), standard_deviation_time=round(standardDevTime, 3), average_number_system= round(avgNumberSystem,3))
         resultsDB.save()
 
         for track in self.ciclovia.tracks:
@@ -1253,15 +1253,15 @@ class SimulationDES:
                 xLabel = ('8:00','8:30','9:00','9:30','10:00','10:30','11:00','11:30')
                 values = track.flowInTrack
                 title = "Flujo del trayecto " + str(track.idNum)
-                #self.showBarChart(len(values), xLabel, values, yLabel, title)
+                # self.showBarChart(len(values), xLabel, values, yLabel, title)
                 for timeInterval in track.flowInTrack:
-                    #print("   El flujo en la hora " + str(hourInterval) + " es de " + str(timeInterval))
+                    # print("   El flujo en la hora " + str(hourInterval) + " es de " + str(timeInterval))
                     totalFlow += timeInterval
                     # Completar cargando los resultados a la base de datos
                     resultsFlowValidationDB = resultsPerTrackDB.simulationresultsflowpertrack_set.create(hour=hourInterval, flow_hour=timeInterval)
                     hourInterval += 1
-                resultsFlowValidationDB.save()
-                resultsPerTrackDB.total_flow = totalFlow
+                    resultsFlowValidationDB.save()
+            resultsPerTrackDB.total_flow = totalFlow
             resultsPerTrackDB.save()
 
 
@@ -1284,10 +1284,9 @@ class ParticipantObjSim:
         self.currentTimeForFlow = arrivalTime
         self.eventsList = []
 
-
     # This method assigns the route
     def assignRoute(self):
-        #Arrival
+        # Arrival
         event = [1, self.track, self.track, self.arrivalTime]
         self.eventsList.append(event)
         sim_time = (self.ciclovia.endHour - self.ciclovia.startHour+1)*30
@@ -1370,35 +1369,55 @@ def simulationExecution(cicloviaId, isValidation):
     resultsCompiledDB.save()
     resultsCompiledId = resultsCompiledDB.id
     reps_exec_times = []
-
+    totalTimeContruction = 0
+    totalTimeEntityRouting = 0
+    totalTimeExecution = 0
+    threads = []
     for i in range(simulationRuns):
         timeRep = timeit.default_timer()
 
         simDES = SimulationDES(seed, cicloviaId, resultsCompiledId, isValidation)
         timeRepContructor = timeit.default_timer() - timeRep
+        totalTimeContruction += timeRepContructor
 
         simDES.env.process(simDES.participantArrivals())
         timeRepEntityRouting = timeit.default_timer() - timeRep
-
+        totalTimeEntityRouting += timeRepEntityRouting
+        #t = threading.Thread(name="Rep-"+str(i), target=simDES.execute, args=(cicloviaId, resultsCompiledId,))
         simDES.execute(cicloviaId, resultsCompiledId)
+        #threads.append(t)
+        #t.start()
         timeRepExecution = timeit.default_timer() - timeRep
+        totalTimeExecution += timeRepExecution
 
         seed *= 2
         seed += i
         timeRep = timeit.default_timer() - timeRep
         reps_exec_times.append(timeRep)
-        #simDES.printResults(cicloviaId)
+        # simDES.printResults(cicloviaId)
+    # Espera 10 segundos y mira si ya todos los threads han terminado
+    waitTime = 10
+    #threadsToFinish = numpy.ones(simulationRuns)
+    #while numpy.sum(threadsToFinish):
+    #    print("Espera " + str(waitTime) + " segundos")
+    #    print("Faltan " + str(numpy.sum(threadsToFinish)) + " por terminar")
+    #    timeLib.sleep(waitTime)
+    #    for i in range(len(threads)):
+    #        if threads[i].isAlive() == 0:
+    #            threadsToFinish[i] = 0
+
     print("Tiempos de replicas: ")
     print(reps_exec_times)
-    print("Tiempo del constructor: " +str(timeRepContructor))
-    print("Tiempo del ruteo: " +str(timeRepEntityRouting))
-    print("Tiempo de la ejecucion: " +str(timeRepExecution))
+    print("Numero de replicas: " + str(simulationRuns))
+    print("Tiempo del constructor: " + str(totalTimeContruction))
+    print("Tiempo del ruteo: " + str(totalTimeEntityRouting))
+    print("Tiempo de la ejecucion: " + str(totalTimeExecution))
 
     normalval = norm.ppf(0.975, loc=0, scale=1)
     sqrtvals = numpy.sqrt([simulationRuns])
     listTotalArrivals = []
     listNumberSystem = []
-    listInfoTracks =  []
+    listInfoTracks = []
     listFlowTracks = []
     listFlowPerHourTracks = []
     for track in range(cicloviaFromDB.num_tracks):
@@ -1444,7 +1463,7 @@ def simulationExecution(cicloviaId, isValidation):
         resultsPerTrackCompiledDB = resultsCompiledDB.simulationresultscompiledpertrack_set.create(track = index+1, average_number_track = avg_number_track, stdev_number_track = std_number_track, hw_number_track=hw_number_track,average_total_flow=avg_total_flow, stdev_total_flow=std_total_flow)
         resultsPerTrackCompiledDB.save()
 
-        #Aca se debe compilar el flujo por trayecto
+        # Aca se debe compilar el flujo por trayecto
         if(isValidation==True):
             for index2, hourInt in enumerate(listFlowPerHourTracks[index]):
                 avg_flow_hourInt = round(numpy.mean(hourInt),3)
