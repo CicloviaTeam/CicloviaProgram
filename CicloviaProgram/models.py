@@ -3,12 +3,12 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-#This section contains the objects associated with the information of the structure of the Ciclovia
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# This section contains the objects associated with the information of the structure of the Ciclovia
 # - 1 - Ciclovia: contains the general information of the Ciclovia
 # - 2 - Track: contains the main information of a track that belongs to a Ciclovia
 # - 3 - NeighboorInfo: contains the relations between the tracks 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # This object represents a Ciclovia
 class Ciclovia(models.Model):

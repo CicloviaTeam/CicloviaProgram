@@ -1,0 +1,31 @@
+{% extends "ciclovia/base.html" %}
+
+{% comment %}
+	Para la codificación en PyCharm
+	<head>
+		<meta charset="UTF-8">
+	</head>
+{% endcomment %}
+
+{% block content %}
+	<div class="container theme-showcase" role="main">
+		<div class="page-header">
+			<h1>Simulación inversa</h1>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<p>Usted esta por correr una simulación inversa de la ciclovia, este es un proceso que puede tomar
+				entre 2 a 3 días (depende del tamaño de la ciclovia)
+				</p>
+				<p>
+					Cuando se tenga los resultados completos se enviará una notificación al correo electronico que se especifique en el siguiente campo
+				</p>
+                <form action="{% url 'CicloviaProgram:inverseSimulationExecution' ciclovia.id %}" method="post">
+				<input type="email" placeholder="correo@ejemplo.com" class="form-control" name="email">
+                    <p>Este es un proceso muy largo, por tal motivo solo se permite a un usuario tener una simulacion ejecutandose al mismo tiempo, haciendo click en ejecutar confirma la ejecución del proceso</p>
+                <input type="submit" value="Ejecutar" class="btn btn-primary" >
+                </form>
+			</div>
+		</div>
+	</div>
+{% endblock content %}          

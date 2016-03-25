@@ -430,6 +430,22 @@ def simulationResultsValidationOld(request, ciclovia_id):
 				  {'ciclovia': ciclovia, 'results': results})
 
 @login_required(login_url='CicloviaProgram:login')
+def inverseSimulationWarning(request, ciclovia_id):
+	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
+	if not (ciclovia.user == request.user or request.user.is_superuser):
+		raise PermissionDenied
+	#results_id = CicloviaScript.simulationExecution(ciclovia_id,True)
+	return render(request, 'ciclovia/inverseSimulationWarning.html', {'ciclovia':ciclovia})
+
+@login_required(login_url='CicloviaProgram:login')
+def inverseSimulationExecution(request, ciclovia_id):
+	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
+	if not (ciclovia.user == request.user or request.user.is_superuser):
+		raise PermissionDenied
+	#results_id = CicloviaScript.simulationExecution(ciclovia_id,True)
+	return render(request, 'ciclovia/inverseSimulationWarning.html', {'ciclovia':ciclovia_id})
+
+@login_required(login_url='CicloviaProgram:login')
 def detailTrackValidation(request, ciclovia_id, track_id):
 	ciclovia = get_object_or_404(Ciclovia, pk=ciclovia_id)
 	if not (ciclovia.user == request.user or request.user.is_superuser):

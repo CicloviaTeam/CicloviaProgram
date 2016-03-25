@@ -872,7 +872,6 @@ class SimulationDES:
         originalTime = timeit.default_timer()
         self.env.run(until=self.simTime)
         timeOfEnvRun = timeit.default_timer() - originalTime
-        #todo se debe optimizar esta funcion!!!!!!
         self.printResults(cicloviaId, resultsCompiledId)
         timeOfPrinting = timeit.default_timer() - timeOfEnvRun
         print("Tiempo de correr Env.Run: " + str(timeOfEnvRun))
@@ -1361,7 +1360,7 @@ def simulationExecution(cicloviaId, isValidation):
     start = timeit.default_timer()
     simulationRuns = 10
     if isValidation:
-        simulationRuns = 10
+        simulationRuns = 200
     seed = 9243881
 
     cicloviaFromDB = Ciclovia.objects.get(id=cicloviaId)
@@ -1494,4 +1493,28 @@ def simulationExecution(cicloviaId, isValidation):
     return resultsCompiledDB.id
 
 
+def inverseSimulation(cicloviaId, usesSIR):
+    # First it must generate arrival information
+    randomArrivals = []
+    nVariates = 1400
+    if usesSIR:
+        randomArrivals = generateSIRArrivals(cicloviaId, nVariates)
+    else:
+        # If montecarl is implemented
+        randomArrivals = []
+    nthreads = 10   # Define el numero de threads que se ejecutan al mismo tiempo
+    threads = []
+    cVariate = 0 #Current Variate
+    for i in len(nthreads):
+        t = threading.Thread(name="Thread "+str(i), target=inverseSimulationSingleExecution, args=(cicloviaId, randomArrivals[cVariate]))
+        #simDES.execute(cicloviaId, resultsCompiledId)
+    threads.append(t)
+    t.start()
+    timeLib.sleep(10)
 
+def inverseSimulationSingleExecution(cicloviaId, arrivals):
+    return 0
+# todo Complete this method
+# Generate a matrix of arrivals accoring to SIR method (t multivariate)
+def generateSIRArrivals(cicloviaId, nVariates):
+    return [[5, 4, 3], [5, 4, 3]]
