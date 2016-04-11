@@ -26,6 +26,7 @@ class Ciclovia(models.Model):
     def __unicode__(self):  
         return self.name + " " + self.user.username
 
+
 # This object represents a Track
 class Track(models.Model):
     ciclovia = models.ForeignKey(Ciclovia)
@@ -46,7 +47,8 @@ class Track(models.Model):
     def __unicode__(self):  
         return str(self.id_track)   
 
-#This object represents the relation between two tracks
+
+# This object represents the relation between two tracks
 class NeighboorInfo(models.Model):
     track = models.ForeignKey(Track)
     neighboorId = models.IntegerField(default=1)
@@ -56,8 +58,7 @@ class NeighboorInfo(models.Model):
     
     def __unicode__(self):  
         return str(self.neighboorId) + "," + str(self.probability)   
-    
-    
+
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # This section contains the objects associated with the information of the arrivals' behavior
 # - 1 - ParticipantType: contains the information related to the types of activities that people do in a Ciclovia
@@ -91,12 +92,13 @@ class TimeInSystemDistribution(models.Model):
 # This object represents one of the values of the time in system distribution
 class ArrivalsProportionPerHour(models.Model):
     ciclovia = models.ForeignKey(Ciclovia)
-    hour= models.FloatField(default=1)
+    hour = models.FloatField(default=1)
     proportion = models.FloatField(default=1)
        
     def __unicode__(self):  
         return str(self.hour)
-    
+
+
 # This object represents the XML document which contains the information of a Ciclovia
 class Document(models.Model):
     filename = models.CharField(max_length=100)
@@ -113,6 +115,7 @@ class Document(models.Model):
 # - 7 - SimulationResultsFlowPerTrack: contains the statistics associated to the flow of a single run in a specific track
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
 # This object represents default information of the simulation
 class SimulationParameters(models.Model):
     replications = models.FloatField(default=1)
@@ -120,7 +123,8 @@ class SimulationParameters(models.Model):
                
     def __unicode__(self):  
         return str(self.replications)+ "," + str(self.arrivals_probability_distribution)
-        
+
+
 # This object represents the statistics for a serie of runs
 class SimulationResultsCompiled(models.Model):
     ciclovia = models.ForeignKey(Ciclovia)
@@ -136,7 +140,8 @@ class SimulationResultsCompiled(models.Model):
     
     def __unicode__(self):  
         return 'Fecha: ' + self.date.strftime('%Y-%m-%d %H:%M %Z') + ', Replicas: ' + str(self.num_runs)
-    
+
+
 # This obhect represents the results of a single run
 class SimulationResults(models.Model):
     ciclovia = models.ForeignKey(SimulationResultsCompiled)
@@ -199,3 +204,15 @@ class SimulationResultsFlowPerTrack(models.Model):
             
     def __unicode__(self):  
         return str(self.track_simulation)+ "," + str(self.hour)+ "," + str(self.flow_hour)        
+
+# This object represents the information involved in a inverse simulation
+class InverseSimulation(models.Model):
+    ciclovia = models.ForeignKey(Ciclovia)
+    lastModified = models.DateTimeField(auto_now=True)
+    finished = models.BooleanField(default=False)
+    creationTime = models.DateTimeField(auto_now_add=True)
+    # This number is between 0 and 100 (completion percentage)
+    progress = models.IntegerField(default=0)
+
+    def __unicode__(self):
+        return str(self.ciclovia)+","+str(self.creationTime)

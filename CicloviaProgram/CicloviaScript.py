@@ -16,18 +16,18 @@ import threading
 import time as timeLib
 
 from PrintXML import printOrganizedXML
-from CicloviaProgram.models import Ciclovia, Track, SimulationResultsCompiled
+from CicloviaProgram.models import Ciclovia, Track, SimulationResultsCompiled, InverseSimulation
 
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #   OBJETOS - CLASES
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-#This class represents a Ciclovia model
+# This class represents a Ciclovia model
 class CicloviaObj:
 
-    #This is the constructor of the class Ciclovia
-    #It takes the parameters provided as arguments and stores them in the object
+    # This is the constructor of the class Ciclovia
+    # It takes the parameters provided as arguments and stores them in the object
     def __init__(self, name, place, startHour, endHour, numTracks, tracks):
         self.name = name
         self.place = place
@@ -62,13 +62,13 @@ class CicloviaObj:
         for typeParticipant in self.typeParticipants:
             print (typeParticipant.activity, typeParticipant.velocity, typeParticipant.percentage)
 
-    #This gives a track, given its ID
+    # This gives a track, given its ID
     def getTrack(self, trackId):
         for track in self.tracks:
             if(track.idNum==trackId):
                 return track
 
-    #This assigns the arrival, according to the hour and the track density
+    # This assigns the arrival, according to the hour and the track density
     def assignArrivalsToTrack(self):
         for track in self.tracks:
             arrivalSet = []
@@ -268,22 +268,22 @@ def buildCiclovia(filename, pUser):
         name = root.find('name').text
         place = root.find('place').text
         startHour = decimal.Decimal(root.find('startHour').text)
-        if startHour > 24 :
+        if startHour > 24:
             print("Error: se ha excedido el maximo de horas en un dia (24)")
         endHour = decimal.Decimal(root.find('endHour').text)
-        if endHour > 24 :
+        if endHour > 24:
                 print("Error: se ha excedido el maximo de horas en un dia (24)")
         numTracks = int(root.find('numTracks').text)
-        if numTracks > 30 :
+        if numTracks > 30:
                 print("Error: se ha excedido el maximo numero de trayectos (30)")
         ciclovia = CicloviaObj(name, place, startHour, endHour, numTracks, trackSet)
 
 
-        #Only loads info in database if it is a model (no an experiment)
-        #OJO: CAMBIAR A MODEL en lugar de MODELC
+        # Only loads info in database if it is a model (no an experiment)
+        # OJO: CAMBIAR A MODEL en lugar de MODELC
         if(typeCiclovia=="model"):
             #print("Como es un modelo, voy a guardar la info en la base de datos")
-            cicloviaDB = Ciclovia(user=pUser, name=ciclovia.name, place=ciclovia.place, start_hour = ciclovia.startHour, end_hour = ciclovia.endHour, num_tracks = ciclovia.numTracks)
+            cicloviaDB = Ciclovia(user=pUser, name=ciclovia.name, place=ciclovia.place, start_hour=ciclovia.startHour, end_hour=ciclovia.endHour, num_tracks=ciclovia.numTracks)
             cicloviaDB.save()
             #print("ID de la Ciclovia en la base de datos")
             #print(cicloviaDB.id)
@@ -641,11 +641,12 @@ def printExperiment(ciclovia):
     tree = ET.ElementTree(rootCiclovia)
     tree.write("CicloviaExperiment.xml")
 
-#This definitions builds a Ciclovia from the database, given its name and place
+
+# This definitions builds a Ciclovia from the database, given its name and place
 def loadCiclovia(cicloviaId):
 
-    #query_cicloviaFromDB = Ciclovia.objects.filter(place=placeC)
-    #for ciclovia in query_cicloviaFromDB:
+    # query_cicloviaFromDB = Ciclovia.objects.filter(place=placeC)
+    # for ciclovia in query_cicloviaFromDB:
     ciclovia = Ciclovia.objects.get(id=cicloviaId)
     name = str(ciclovia.name.encode('utf-8'))
     place = str(ciclovia.place)
@@ -654,7 +655,6 @@ def loadCiclovia(cicloviaId):
     numTracks = ciclovia.num_tracks
     tracks = []
     loadedCiclovia = CicloviaObj(name, place, startHour, endHour, numTracks, tracks)
-    print(loadedCiclovia.printInfo())
     query_tracksFromDB = ciclovia.track_set.all()
     for track in query_tracksFromDB:
         idTrack = track.id_track
@@ -668,11 +668,9 @@ def loadCiclovia(cicloviaId):
         tracksDir = []
         loadedTrack = TrackObj(idTrack, distance, probability, probabilityBegin, probabilityEnd, tracksId, tracksProb, tracksDir)
         loadedCiclovia.tracks.append(loadedTrack)
-    print(loadedCiclovia.printInfo())
 
     #If arrivals are already loaded, I have to load all the information to the Ciclovia
     if(ciclovia.arrivals_loaded==True):
-        print("Tengo que cargar toda la info del a Ciclovia")
         loadedCiclovia.referenceTrack = ciclovia.reference_track
         loadedCiclovia.referenceHour = ciclovia.reference_hour
         loadedCiclovia.referenceArrivalRate = ciclovia.reference_arrival_rate
@@ -724,8 +722,6 @@ def loadCiclovia(cicloviaId):
                 tracksProb.append(neighboor.probability)
                 tracksDir.append([neighboor.fromDirection,neighboor.direction])
             loadedTrack = TrackObj(idTrack, distance, probability, probabilityBegin, probabilityEnd, tracksId, tracksProb, tracksDir)
-            print("REVISOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO LOADTRACK")
-            print(str(loadedTrack))
             loadedTrack.arrivalProportion = arrivalProportion
             tracksUpdated.append(loadedTrack)
         loadedCiclovia.tracks = tracksUpdated
@@ -743,24 +739,25 @@ def loadCiclovia(cicloviaId):
                 loadedCiclovia.maxArrivals+=arrivalRate
                 track.arrivalsPerHour = arrivalSet
 
-        print(loadedCiclovia.printInfo())
-
+        #print(loadedCiclovia.printInfo())
 
         return loadedCiclovia
 
-def copyCiclovia(ciclovia_id, pName, pUser):
+
+def copyCiclovia(ciclovia_id, pName, pUser, referenceArrivalRate):
     """Crea una copia de la ciclovía dada por parámetro y la llama con el nombre
     dado por parámetro. Retorna la copia creada."""
+    from django.contrib.auth.models import User
     oldCiclovia = Ciclovia.objects.get(pk=ciclovia_id)
-    newCiclovia = Ciclovia(user=pUser,name=pName,place=oldCiclovia.place,
-        start_hour=oldCiclovia.start_hour,end_hour=oldCiclovia.end_hour,
-        num_tracks=oldCiclovia.num_tracks,reference_track=oldCiclovia.reference_track,
+    newCiclovia = Ciclovia(user=User.objects.get(username=pUser), name=pName, place=oldCiclovia.place,
+        start_hour=oldCiclovia.start_hour, end_hour=oldCiclovia.end_hour,
+        num_tracks=oldCiclovia.num_tracks, reference_track=oldCiclovia.reference_track,
         reference_hour=oldCiclovia.reference_hour,
-        reference_arrival_rate=oldCiclovia.reference_arrival_rate,
+        reference_arrival_rate=referenceArrivalRate,
         arrivals_loaded=oldCiclovia.arrivals_loaded)
     newCiclovia.save()
     for oldTrack in oldCiclovia.track_set.all():
-        newTrack= Track(ciclovia=newCiclovia, id_track=oldTrack.id_track,
+        newTrack = Track(ciclovia=newCiclovia, id_track=oldTrack.id_track,
             distance=oldTrack.distance, probability=oldTrack.probability,
             probabilityBegin=oldTrack.probabilityBegin,
             probabilityEnd=oldTrack.probabilityEnd,
@@ -776,18 +773,20 @@ def copyCiclovia(ciclovia_id, pName, pUser):
                 fromDirection=oldNeighboor.fromDirection)
     for oldParticipantType in oldCiclovia.participanttype_set.all():
         newCiclovia.participanttype_set.create(activity=oldParticipantType.activity,
-            velocity=oldParticipantType.velocity,percentage=oldParticipantType.percentage)
+                                               velocity=oldParticipantType.velocity,
+                                               percentage=oldParticipantType.percentage)
     for oldTimeInSystemDistribution in oldCiclovia.timeinsystemdistribution_set.all():
         newCiclovia.timeinsystemdistribution_set.create(time=oldTimeInSystemDistribution.time,
-            percentage=oldTimeInSystemDistribution.percentage)
+                                                        percentage=oldTimeInSystemDistribution.percentage)
     for oldArrivalsProportionPerHour in oldCiclovia.arrivalsproportionperhour_set.all():
         newCiclovia.arrivalsproportionperhour_set.create(hour=oldArrivalsProportionPerHour.hour,
-            proportion=oldArrivalsProportionPerHour.proportion)
+                                                         proportion=oldArrivalsProportionPerHour.proportion)
     return newCiclovia
 
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #   DEFINICIONES PARA COMPARAR LAS SIMULACIONES
-#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 
 class simulationComp:
     """Resultados de comparar las simulaciones"""
@@ -864,7 +863,7 @@ class SimulationDES:
         self.listNumberInSystem = []
         self.listTimeInSystem = []
         self.results = []
-        self.ciclovia.printInfo()
+        #self.ciclovia.printInfo()
 
     # This class allows the execution of the simulation
     def execute(self, cicloviaId, resultsCompiledId):
@@ -874,8 +873,6 @@ class SimulationDES:
         timeOfEnvRun = timeit.default_timer() - originalTime
         self.printResults(cicloviaId, resultsCompiledId)
         timeOfPrinting = timeit.default_timer() - timeOfEnvRun
-        print("Tiempo de correr Env.Run: " + str(timeOfEnvRun))
-        print("Tiempo de imprimir: " + str(timeOfPrinting))
 
     # This method represents the participant as an object and handles the events of the participant
     # This method includes routing
@@ -922,18 +919,15 @@ class SimulationDES:
         #print('%s leaving the Ciclovia at %s' % (idNum, self.env.now))
 
 
-    #This method defines the arrival behavior and creates the participants until the sim time reaches simTime
+    # This method defines the arrival behavior and creates the participants until the sim time reaches simTime
     def participantArrivals(self):
-        #print("Va a crear participantes")
+        # print("Va a crear participantes")
 
         participantList = []
 
-        #This section creates the values to the time in system
+        # This section creates the values to the time in system
         durationValues = []
         durationProbabilities = []
-
-        print("Tam : ")
-        print(len(self.ciclovia.timeInSystemDistribution))
 
         for timeSystem in self.ciclovia.timeInSystemDistribution:
             durationValues.append(float(timeSystem[0]))
@@ -941,19 +935,15 @@ class SimulationDES:
         durationValuesArray = numpy.array(durationValues, dtype=numpy.dtype(numpy.float64))
         durationProbabilitiesArray = numpy.array(durationProbabilities, dtype=numpy.dtype(numpy.float64))
         timeParticipantsSystem = self.weightedValuesSoft(durationValues, durationProbabilities, (self.ciclovia.maxArrivals*55))
-        print("llegoooo")
 
-
-
-        #This section creates the values associated with the participant type
-
+        # This section creates the values associated with the participant type
         typeValues = []
         typeProbabilities = []
         index = 0
         for typePart in self.ciclovia.typeParticipants:
             typeValues.append(index)
             typeProbabilities.append(float(typePart.percentage))
-            index+=1
+            index += 1
         typeValuesArray = numpy.array(typeValues, dtype=numpy.dtype(numpy.float64))
         typeProbabilitiesArray = numpy.array(typeProbabilities, dtype=numpy.dtype(numpy.float64))
         typeParticipantsSystem = self.weightedValues(typeValuesArray, typeProbabilitiesArray, (self.ciclovia.maxArrivals*55))
@@ -1049,12 +1039,12 @@ class SimulationDES:
             self.numberInSystemStatistic()
             self.env.process(part)
 
-    #This definition generates a stream of values from a discrete probability distribution
+    # This definition generates a stream of values from a discrete probability distribution
     def weightedValues(self, values, probabilities, size):
-        print("size es" + str(size))
+        # print("size es" + str(size))
         bins = numpy.cumsum(probabilities)
         bins[len(bins)-1] = 1.0
-        print("Parametros")
+        # print("Parametros")
         x = numpy.random.random_sample(size)
         for value in x:
             if(value > bins[len(bins)-1]):
@@ -1260,7 +1250,7 @@ class SimulationDES:
                     resultsFlowValidationDB = resultsPerTrackDB.simulationresultsflowpertrack_set.create(hour=hourInterval, flow_hour=timeInterval)
                     hourInterval += 1
                     resultsFlowValidationDB.save()
-            resultsPerTrackDB.total_flow = totalFlow
+                resultsPerTrackDB.total_flow = totalFlow
             resultsPerTrackDB.save()
 
 
@@ -1360,7 +1350,7 @@ def simulationExecution(cicloviaId, isValidation):
     start = timeit.default_timer()
     simulationRuns = 10
     if isValidation:
-        simulationRuns = 200
+        simulationRuns = 10
     seed = 9243881
 
     cicloviaFromDB = Ciclovia.objects.get(id=cicloviaId)
@@ -1492,29 +1482,73 @@ def simulationExecution(cicloviaId, isValidation):
 
     return resultsCompiledDB.id
 
+# --------------------------------------------------------------------------------
+# INVERSE SIMULATION
+# --------------------------------------------------------------------------------
 
-def inverseSimulation(cicloviaId, usesSIR):
-    # First it must generate arrival information
-    randomArrivals = []
-    nVariates = 1400
-    if usesSIR:
-        randomArrivals = generateSIRArrivals(cicloviaId, nVariates)
-    else:
-        # If montecarl is implemented
-        randomArrivals = []
-    nthreads = 10   # Define el numero de threads que se ejecutan al mismo tiempo
-    threads = []
-    cVariate = 0 #Current Variate
-    for i in len(nthreads):
-        t = threading.Thread(name="Thread "+str(i), target=inverseSimulationSingleExecution, args=(cicloviaId, randomArrivals[cVariate]))
-        #simDES.execute(cicloviaId, resultsCompiledId)
-    threads.append(t)
-    t.start()
-    timeLib.sleep(10)
 
-def inverseSimulationSingleExecution(cicloviaId, arrivals):
-    return 0
+def inverseSimulation(cicloviaId):
+    cicloviaFromDB = Ciclovia.objects.get(id=cicloviaId)
+    inv = InverseSimulation.objects.create(ciclovia=cicloviaFromDB)
+    ciclovia = loadCiclovia(cicloviaId)
+    referenceArrivalRate = generateArrivals(ciclovia, 10)
+    for i in range(1, 5):
+        newCiclovia = copyCiclovia(cicloviaId, "SimInv - "+cicloviaFromDB.name+" iteration "+str(i), "admin",
+                                   referenceArrivalRate)
+        resultsId = simulationExecution(newCiclovia.id, True)
+    #cicloviaFromDB.delete()
+    print "Termino siminv"
+
 # todo Complete this method
-# Generate a matrix of arrivals accoring to SIR method (t multivariate)
-def generateSIRArrivals(cicloviaId, nVariates):
-    return [[5, 4, 3], [5, 4, 3]]
+# Generate a matrix of arrivals accoring to Multivariate log normal distribution
+def generateArrivals(cicloviaObj, nVariates):
+    refTrack = cicloviaObj.referenceTrack
+    refRate = cicloviaObj.referenceArrivalRate
+    refHour = cicloviaObj.referenceHour
+    numberOfRates = cicloviaObj.numTracks*(cicloviaObj.endHour - cicloviaObj.startHour)
+
+    # Vector de medias
+    mu = []
+    for track in cicloviaObj.tracks:
+        for arrivalHour in track.arrivalsPerHour:
+            mu.append(math.exp(arrivalHour))
+    print "vector de medias:"
+    print str(mu)
+
+    # Vector de varianza
+    var = []
+    # todo encontrar varianza de los arribos de un trayecto para cada hora
+    for track in cicloviaObj.tracks:
+        var = [x * 16 for x in mu]
+    cov = numpy.diag(var)
+    normVariates = numpy.random.multivariate_normal(mu, cov, size=nVariates)
+    print "Arribos normales"
+    print (normVariates)
+    logNormVariates = numpy.log(normVariates)
+    print (logNormVariates)
+    return cicloviaObj.referenceArrivalRate*random.random()
+
+
+def duplicateCiclovia(cicloviaObj, index):
+    # index: name to put in the ciclovia database as ciclovia name
+    # cicloviaObj: instatiation of CicloviaObj class
+    from django.contrib.auth.models import User
+    # Duplicate ciclovia in ciclovia databases
+    cicloviaDB = Ciclovia.objects.create(user=User.objects.get(username="admin"), name="SimInv - "+cicloviaObj.name+" iteration "+str(index),
+                                         place=cicloviaObj.place, start_hour=cicloviaObj.startHour,
+                                         end_hour=cicloviaObj.endHour, num_tracks=cicloviaObj.numTracks,
+                                         reference_track=cicloviaObj.referenceTrack,
+                                         reference_hour=cicloviaObj.referenceHour,
+                                         reference_arrival_rate=cicloviaObj.referenceArrivalRate, arrivals_loaded=True)
+    print "Ciclovia DB: " + str(cicloviaDB.id)
+    # Duplicate tracks
+    for track in cicloviaObj.tracks:
+        trackDB = Track.objects.create(ciclovia=cicloviaDB, id_track=track.idNum, distance=track.distance,
+                                       probability=track.probability, probabilityBegin=track.probabilityBegin,
+                                       probabilityEnd=track.probabilityEnd, arrival_proportion=track.arrivalProportion,
+                                       number_of_semaphores=track.number_of_semaphores, hasSlope=track.hasSlope,
+                                       quality_of_track=track.quality_of_track)
+    hour = 1
+    for arrival in cicloviaObj.arrivalProportionPerHour:
+        cicloviaDB.arrivalsproportionperhour_set.create(hour=hour, proportion=arrival)
+        hour += 1

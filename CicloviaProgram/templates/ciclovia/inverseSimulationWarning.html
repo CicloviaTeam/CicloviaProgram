@@ -20,7 +20,7 @@
 				<p>
 					Cuando se tenga los resultados completos se enviará una notificación al correo electronico que se especifique en el siguiente campo
 				</p>
-                <form action="{% url 'CicloviaProgram:inverseSimulationExecution' ciclovia.id %}" method="post">
+                <form action="{% url 'CicloviaProgram:inverseSimulationExecution' ciclovia.id %}" method="get">
 				<input type="email" placeholder="correo@ejemplo.com" class="form-control" name="email">
                     <p>Este es un proceso muy largo, por tal motivo solo se permite a un usuario tener una simulacion ejecutandose al mismo tiempo, haciendo click en ejecutar confirma la ejecución del proceso</p>
                 <input type="submit" value="Ejecutar" class="btn btn-primary" >

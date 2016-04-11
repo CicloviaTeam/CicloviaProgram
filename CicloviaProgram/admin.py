@@ -14,6 +14,8 @@ from CicloviaProgram.models import SimulationResultsCompiledPerTrack
 from CicloviaProgram.models import SimulationResultsPerTrack
 from CicloviaProgram.models import SimulationResultsCompiledFlowTrack
 from CicloviaProgram.models import SimulationResultsFlowPerTrack
+from CicloviaProgram.models import InverseSimulation
+
 
 class CicloviaAdmin(admin.ModelAdmin):
 ##     list_display = ('user', 'name', 'place', 'start_hour', 'end_hour', 'num_tracks')
@@ -56,8 +58,12 @@ class SimulationResultsCompiledFlowPerTrackAdmin(admin.ModelAdmin):
      list_display = ('track_simulation','hour',  'avg_flow_hour', 'stdev_flow_hour')	
      
 class SimulationResultsFlowPerTrackAdmin(admin.ModelAdmin):
-     list_display = ('track_simulation','hour',  'flow_hour')	 
-	 
+     list_display = ('track_simulation','hour',  'flow_hour')
+
+class InverseSimulationAdmin(admin.ModelAdmin):
+    list_display = ('ciclovia', 'lastModified', 'finished', 'creationTime', 'progress')
+
+
 admin.site.register(Ciclovia, CicloviaAdmin)
 
 admin.site.register(Track, TrackAdmin)
@@ -85,3 +91,5 @@ admin.site.register(SimulationResultsPerTrack, SimulationResultsPerTrackAdmin)
 admin.site.register(SimulationResultsCompiledFlowTrack, SimulationResultsCompiledFlowPerTrackAdmin)
 
 admin.site.register(SimulationResultsFlowPerTrack, SimulationResultsFlowPerTrackAdmin)
+
+admin.site.register(InverseSimulation, InverseSimulationAdmin)
