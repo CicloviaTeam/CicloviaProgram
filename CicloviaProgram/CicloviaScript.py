@@ -7,6 +7,7 @@ from operator import attrgetter
 import timeit
 import traceback
 
+import scipy.stats
 from scipy.stats import norm
 import simpy
 import numpy
@@ -1491,13 +1492,29 @@ def inverseSimulation(cicloviaId):
     cicloviaFromDB = Ciclovia.objects.get(id=cicloviaId)
     inv = InverseSimulation.objects.create(ciclovia=cicloviaFromDB)
     ciclovia = loadCiclovia(cicloviaId)
-    referenceArrivalRate = generateArrivals(ciclovia, 10)
-    for i in range(1, 5):
+    referenceArrivalRate = ciclovia.referenceArrivalRate
+    newCiclovia = copyCiclovia(cicloviaId, "SimInv - " + cicloviaFromDB.name + " iteration " + str(1), "admin",
+                               referenceArrivalRate)
+    resultsId = simulationExecution(newCiclovia.id, True)
+    posteriorCurrent = likelihood(resultsId, cicloviaId) * priori(referenceArrivalRate, ciclovia)
+    for i in range(2, 2):
+        # referenceArrivalRateNew = generateArrivals(ciclovia, 10)
+        referenceArrivalRateNew = genNextArrival(referenceArrivalRate, 2)
         newCiclovia = copyCiclovia(cicloviaId, "SimInv - "+cicloviaFromDB.name+" iteration "+str(i), "admin",
-                                   referenceArrivalRate)
+                                   referenceArrivalRateNew)
         resultsId = simulationExecution(newCiclovia.id, True)
+        posteriorToEvaluate = likelihood(resultsId, cicloviaId) * priori(referenceArrivalRateNew, ciclovia)
+        acceptanceProbability = min(1, posteriorToEvaluate/posteriorCurrent)
+        if random.random() < acceptanceProbability:
+                referenceArrivalRate = referenceArrivalRateNew
+                posteriorCurrent = posteriorToEvaluate
     #cicloviaFromDB.delete()
     print "Termino siminv"
+
+
+# Generates next arrival, according to a symmetric t distribution with df freedom degrees
+def genNextArrival(currentArrival, df):
+    return currentArrival + numpy.random.standard_t(df)
 
 # todo Complete this method
 # Generate a matrix of arrivals accoring to Multivariate log normal distribution
@@ -1529,26 +1546,27 @@ def generateArrivals(cicloviaObj, nVariates):
     return cicloviaObj.referenceArrivalRate*random.random()
 
 
-def duplicateCiclovia(cicloviaObj, index):
-    # index: name to put in the ciclovia database as ciclovia name
-    # cicloviaObj: instatiation of CicloviaObj class
-    from django.contrib.auth.models import User
-    # Duplicate ciclovia in ciclovia databases
-    cicloviaDB = Ciclovia.objects.create(user=User.objects.get(username="admin"), name="SimInv - "+cicloviaObj.name+" iteration "+str(index),
-                                         place=cicloviaObj.place, start_hour=cicloviaObj.startHour,
-                                         end_hour=cicloviaObj.endHour, num_tracks=cicloviaObj.numTracks,
-                                         reference_track=cicloviaObj.referenceTrack,
-                                         reference_hour=cicloviaObj.referenceHour,
-                                         reference_arrival_rate=cicloviaObj.referenceArrivalRate, arrivals_loaded=True)
-    print "Ciclovia DB: " + str(cicloviaDB.id)
-    # Duplicate tracks
-    for track in cicloviaObj.tracks:
-        trackDB = Track.objects.create(ciclovia=cicloviaDB, id_track=track.idNum, distance=track.distance,
-                                       probability=track.probability, probabilityBegin=track.probabilityBegin,
-                                       probabilityEnd=track.probabilityEnd, arrival_proportion=track.arrivalProportion,
-                                       number_of_semaphores=track.number_of_semaphores, hasSlope=track.hasSlope,
-                                       quality_of_track=track.quality_of_track)
-    hour = 1
-    for arrival in cicloviaObj.arrivalProportionPerHour:
-        cicloviaDB.arrivalsproportionperhour_set.create(hour=hour, proportion=arrival)
-        hour += 1
+def likelihood(resultsCompiledId, cicloviaId):
+    measuredFlow = {}   # information of the simulated flow, dictionary with tuple key (track, hour)
+    simulatedFlow = {}  # Information of the measured flow, it may not have a flow in all the tracks
+    resultsCompiledDB = SimulationResultsCompiled.objects.get(id=resultsCompiledId)
+    for compiledPerTrackDB in resultsCompiledDB.simulationresultscompiledpertrack_set.all():
+        trackNum = compiledPerTrackDB.track
+        for compiledFlowHourDB in compiledPerTrackDB.simulationresultscompiledflowtrack_set.all():
+            measuredFlow[(trackNum, compiledFlowHourDB.hour)] = compiledFlowHourDB.avg_flow_hour
+    cicloviaDB = Ciclovia.objects.get(id=cicloviaId)
+    for trackDB in cicloviaDB.track_set.all():
+        if trackDB.hasCountPoint:
+            trackNum = trackDB.id_track
+            for measuredFlowTrackHourDB in trackDB.measuredflowhour_set.all():
+                simulatedFlow[(trackNum, measuredFlowTrackHourDB.hour)] = measuredFlowTrackHourDB.flow
+    # Residual of measured flow with simulated flow
+    residuals = 0
+    for tupleKey in simulatedFlow.keys():
+        residuals += (simulatedFlow[tupleKey] - simulatedFlow[tupleKey]) ^ 2
+    return math.exp(-residuals/(2*211.88))
+
+
+def priori(arrival, cicloviaObj):
+    """" Returns the probability density function of t distribution given the value arrival """
+    return random.norm.pdf(arrival, loc=cicloviaObj.referenceArrivalRate, scale=5)

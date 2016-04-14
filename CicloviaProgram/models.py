@@ -33,6 +33,7 @@ class Track(models.Model):
     id_track = models.IntegerField(default=100)
     distance = models.FloatField(default=1)
     probability = models.FloatField(default=1)
+    hasCountPoint = models.BooleanField(default=False)
     # Modified probabilities
     probabilityBegin = models.FloatField(default=1)
     probabilityEnd = models.FloatField(default=1)
@@ -216,3 +217,10 @@ class InverseSimulation(models.Model):
 
     def __unicode__(self):
         return str(self.ciclovia)+","+str(self.creationTime)
+
+
+# This objects represents the measured taken in the ciclovia
+class MeasuredFlowHour(models.Model):
+    track = models.ForeignKey(Track)
+    hour = models.IntegerField(default=0)
+    flow = models.FloatField(default=0)
