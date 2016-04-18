@@ -17,7 +17,7 @@ import threading
 import time as timeLib
 
 from PrintXML import printOrganizedXML
-from CicloviaProgram.models import Ciclovia, Track, SimulationResultsCompiled, InverseSimulation
+from CicloviaProgram.models import Ciclovia, Track, SimulationResultsCompiled, InverseSimulation, PosteriorDistribution
 
 
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -843,8 +843,10 @@ class trackComparison:
             self.track1.hw_number_track,self.track2.average_number_track,
             self.track2.hw_number_track))
         self.comparisons.append(simulationComp.compareValues(self.track1.average_total_arrivals,
-            self.track1.hw_total_arrivals,self.track2.average_total_arrivals,
+            self.track1.hw_total_arrivals, self.track2.average_total_arrivals,
             self.track2.hw_total_arrivals))
+
+
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 #   SIMULACION USANDO SIMPY
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -856,7 +858,7 @@ class SimulationDES:
         self.random_seed = random_seed
         self.ciclovia = loadCiclovia(cicloviaId)
         self.isValidation = isValidation
-        #Change 60 to 30
+        # Change 60 to 30
         self.simTime = (self.ciclovia.endHour - self.ciclovia.startHour+1)*30
         self.env = simpy.Environment()
         self.numberInCiclovia = 0
@@ -864,7 +866,7 @@ class SimulationDES:
         self.listNumberInSystem = []
         self.listTimeInSystem = []
         self.results = []
-        #self.ciclovia.printInfo()
+        # self.ciclovia.printInfo()
 
     # This class allows the execution of the simulation
     def execute(self, cicloviaId, resultsCompiledId):
@@ -1490,31 +1492,58 @@ def simulationExecution(cicloviaId, isValidation):
 
 def inverseSimulation(cicloviaId):
     cicloviaFromDB = Ciclovia.objects.get(id=cicloviaId)
-    inv = InverseSimulation.objects.create(ciclovia=cicloviaFromDB)
+    existentInverse = True
+    inverseDB = cicloviaFromDB.inversesimulation_set.all()
     ciclovia = loadCiclovia(cicloviaId)
-    referenceArrivalRate = ciclovia.referenceArrivalRate
-    newCiclovia = copyCiclovia(cicloviaId, "SimInv - " + cicloviaFromDB.name + " iteration " + str(1), "admin",
-                               referenceArrivalRate)
-    resultsId = simulationExecution(newCiclovia.id, True)
-    posteriorCurrent = likelihood(resultsId, cicloviaId) * priori(referenceArrivalRate, ciclovia)
-    for i in range(2, 2):
+    if not inverseDB:
+        existentInverse = False
+    if not existentInverse:
+        inverseDB = InverseSimulation.objects.create(ciclovia=cicloviaFromDB)
+        referenceArrivalRate = ciclovia.referenceArrivalRate
+        newCiclovia = copyCiclovia(cicloviaId, "SimInv - " + cicloviaFromDB.name + " iteration " + str(1), "admin",
+                                   referenceArrivalRate)
+        resultsId = simulationExecution(newCiclovia.id, True)
+        posteriorCurrent = likelihood(resultsId, cicloviaId) * priori(referenceArrivalRate, ciclovia)
+        inverseDB.currentArrivalTuple = "("+str(referenceArrivalRate)+",)"
+        inverseDB.posteriordistribution_set.create(arrivalParameters="(" + str(referenceArrivalRate) + ",)",
+                                                   pdf=posteriorCurrent)
+        inverseDB.progress += 1
+        newCiclovia.delete()
+    else:
+        inverseDB = inverseDB[0]
+        referenceArrivalRate = float(inverseDB.currentArrivalTuple.split(",")[0].split("(")[1])
+        posteriorCurrent = PosteriorDistribution.objects.get(arrivalParameters=inverseDB.currentArrivalTuple).pdf
+    for i in range(inverseDB.progress, 5000):
         # referenceArrivalRateNew = generateArrivals(ciclovia, 10)
-        referenceArrivalRateNew = genNextArrival(referenceArrivalRate, 2)
+        referenceArrivalRateNew = genNextArrival(referenceArrivalRate, 10)
+        inverseDB.evaluatingArrivalTuple = referenceArrivalRateNew
         newCiclovia = copyCiclovia(cicloviaId, "SimInv - "+cicloviaFromDB.name+" iteration "+str(i), "admin",
                                    referenceArrivalRateNew)
         resultsId = simulationExecution(newCiclovia.id, True)
         posteriorToEvaluate = likelihood(resultsId, cicloviaId) * priori(referenceArrivalRateNew, ciclovia)
+        inverseDB.posteriordistribution_set.create(arrivalParameters="(" + str(referenceArrivalRateNew) + ",)",
+                                                   pdf=posteriorToEvaluate)
         acceptanceProbability = min(1, posteriorToEvaluate/posteriorCurrent)
         if random.random() < acceptanceProbability:
                 referenceArrivalRate = referenceArrivalRateNew
                 posteriorCurrent = posteriorToEvaluate
+                inverseDB.currentArrivalTuple = referenceArrivalRateNew
+        newCiclovia.delete()
+        inverseDB.progress += 1
+        inverseDB.save()
+    inverseDB.finished = True
+    inverseDB.save()
     #cicloviaFromDB.delete()
     print "Termino siminv"
 
 
 # Generates next arrival, according to a symmetric t distribution with df freedom degrees
 def genNextArrival(currentArrival, df):
-    return currentArrival + numpy.random.standard_t(df)
+    nextArrival = currentArrival + numpy.random.standard_t(df)
+    while nextArrival < 0:
+        nextArrival = currentArrival + numpy.random.standard_t(df)
+    return nextArrival
+
 
 # todo Complete this method
 # Generate a matrix of arrivals accoring to Multivariate log normal distribution
@@ -1569,4 +1598,4 @@ def likelihood(resultsCompiledId, cicloviaId):
 
 def priori(arrival, cicloviaObj):
     """" Returns the probability density function of t distribution given the value arrival """
-    return random.norm.pdf(arrival, loc=cicloviaObj.referenceArrivalRate, scale=5)
+    return scipy.stats.norm.pdf(arrival, loc=cicloviaObj.referenceArrivalRate, scale=5)

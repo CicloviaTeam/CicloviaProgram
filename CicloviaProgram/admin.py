@@ -15,54 +15,80 @@ from CicloviaProgram.models import SimulationResultsPerTrack
 from CicloviaProgram.models import SimulationResultsCompiledFlowTrack
 from CicloviaProgram.models import SimulationResultsFlowPerTrack
 from CicloviaProgram.models import InverseSimulation
+from CicloviaProgram.models import MeasuredFlowHour
+from CicloviaProgram.models import PosteriorDistribution
 
 
 class CicloviaAdmin(admin.ModelAdmin):
-##     list_display = ('user', 'name', 'place', 'start_hour', 'end_hour', 'num_tracks')
-     list_display = ('name', 'place', 'start_hour', 'end_hour', 'num_tracks')
+    # list_display = ('user', 'name', 'place', 'start_hour', 'end_hour', 'num_tracks')
+    list_display = ('name', 'place', 'start_hour', 'end_hour', 'num_tracks')
+
 
 class TrackAdmin(admin.ModelAdmin):
-     list_display = ('id_track', 'distance', 'probability', 'arrival_proportion')
+    list_display = ('id_track', 'distance', 'probability', 'arrival_proportion')
+
 
 class NeighboorAdmin(admin.ModelAdmin):
-     list_display = ('neighboorId',  'probability')
+    list_display = ('neighboorId',  'probability')
+
 
 class DocumentAdmin(admin.ModelAdmin):
-     list_display = ('filename',  'docfile')
+    list_display = ('filename',  'docfile')
+
 
 class ParticipantTypeAdmin(admin.ModelAdmin):
-     list_display = ('activity',  'velocity', 'percentage')
+    list_display = ('activity',  'velocity', 'percentage')
+
 
 class SimulationParametersAdmin(admin.ModelAdmin):
-     list_display = ('replications',  'arrivals_probability_distribution')
+    list_display = ('replications',  'arrivals_probability_distribution')
+
 
 class TimeInSystemDistributionAdmin(admin.ModelAdmin):
-     list_display = ('time',  'percentage', 'ciclovia')
+    list_display = ('time',  'percentage', 'ciclovia')
+
 
 class ArrivalsProportionPerHourAdmin(admin.ModelAdmin):
-     list_display = ('hour',  'proportion')
-     
+    list_display = ('hour',  'proportion')
+
+
 class SimulationResultsCompiledAdmin(admin.ModelAdmin):
-     list_display = ('date',  'num_runs', 'avg_total_arrivals', 'stdev_total_arrivals', 'average_number_system', 'stdev_number_system', 'is_validation','ciclovia')
+    list_display = ('date',  'num_runs', 'avg_total_arrivals', 'stdev_total_arrivals', 'average_number_system',
+                    'stdev_number_system', 'is_validation', 'ciclovia')
+
 
 class SimulationResultsAdmin(admin.ModelAdmin):
-     list_display = ('date',  'sim_time', 'total_arrivals', 'average_time', 'standard_deviation_time', 'average_number_system')
+    list_display = ('date',  'sim_time', 'total_arrivals', 'average_time', 'standard_deviation_time',
+                    'average_number_system')
+
 
 class SimulationResultsCompiledPerTrackAdmin(admin.ModelAdmin):
-     list_display = ('track',  'average_number_track', 'stdev_number_track', 'average_total_flow', 'stdev_total_flow')
-     
+    list_display = ('track',  'average_number_track', 'stdev_number_track', 'average_total_flow',
+                    'stdev_total_flow')
+
+
 class SimulationResultsPerTrackAdmin(admin.ModelAdmin):
-     list_display = ('track',  'total_arrivals', 'total_flow', 'average_number_track')
+    list_display = ('track',  'total_arrivals', 'total_flow', 'average_number_track')
+
 
 class SimulationResultsCompiledFlowPerTrackAdmin(admin.ModelAdmin):
-     list_display = ('track_simulation','hour',  'avg_flow_hour', 'stdev_flow_hour')	
-     
+    list_display = ('track_simulation', 'hour',  'avg_flow_hour', 'stdev_flow_hour')
+
+
 class SimulationResultsFlowPerTrackAdmin(admin.ModelAdmin):
-     list_display = ('track_simulation','hour',  'flow_hour')
+    list_display = ('track_simulation', 'hour',  'flow_hour')
+
 
 class InverseSimulationAdmin(admin.ModelAdmin):
     list_display = ('ciclovia', 'lastModified', 'finished', 'creationTime', 'progress')
 
+
+class MeasuredFlowHourAdmin(admin.ModelAdmin):
+    list_display = ('track', 'hour', 'flow')
+
+
+class PosteriorDistributionAdmin(admin.ModelAdmin):
+    list_display = ('inverseSimulation', 'arrivalParameters', 'pdf')
 
 admin.site.register(Ciclovia, CicloviaAdmin)
 
@@ -93,3 +119,7 @@ admin.site.register(SimulationResultsCompiledFlowTrack, SimulationResultsCompile
 admin.site.register(SimulationResultsFlowPerTrack, SimulationResultsFlowPerTrackAdmin)
 
 admin.site.register(InverseSimulation, InverseSimulationAdmin)
+
+admin.site.register(MeasuredFlowHour, MeasuredFlowHourAdmin)
+
+admin.site.register(PosteriorDistribution, PosteriorDistributionAdmin)

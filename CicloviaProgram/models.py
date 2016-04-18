@@ -65,7 +65,8 @@ class NeighboorInfo(models.Model):
 # - 1 - ParticipantType: contains the information related to the types of activities that people do in a Ciclovia
 # - 2 - TimeInSystemDistribution: contains the information of the distribution of the time in system
 # - 3 - ArrivalsProportionPerHour: contains the relative proportion of arrivals that occur in an hour
-# - 4 - Document: contains the location of the XML files with the documents of the structure and the arrivals of the Ciclovia
+# - 4 - Document: contains the location of the XML files with the documents of the structure and the arrivals
+#       of the Ciclovia
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -112,8 +113,10 @@ class Document(models.Model):
 # - 3 - SimulationResults: contains the statistics of a single run
 # - 4 - SimulationResultsCompiledPerTrack: contains the statistics of a serie of runs for a single track 
 # - 5 - SimulationResultsPerTrack: contains the statistics of a single run in a specific track
-# - 6 - SimulationResultsCompiledFlowPerTrack: contains the statistics associated to the flow of a serie of runs for a single track 
-# - 7 - SimulationResultsFlowPerTrack: contains the statistics associated to the flow of a single run in a specific track
+# - 6 - SimulationResultsCompiledFlowPerTrack: contains the statistics associated to the flow of a serie of runs
+#       for a single track
+# - 7 - SimulationResultsFlowPerTrack: contains the statistics associated to the flow of a single run in a
+#       specific track
 # ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -123,7 +126,7 @@ class SimulationParameters(models.Model):
     arrivals_probability_distribution = models.CharField(max_length=30)
                
     def __unicode__(self):  
-        return str(self.replications)+ "," + str(self.arrivals_probability_distribution)
+        return str(self.replications) + "," + str(self.arrivals_probability_distribution)
 
 
 # This object represents the statistics for a serie of runs
@@ -155,7 +158,8 @@ class SimulationResults(models.Model):
     is_validation = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return str(self.sim_time)+ "," + str(self.total_arrivals)
+        return str(self.sim_time) + "," + str(self.total_arrivals)
+
 
 # This object represents the statistics per track for a serie of runs
 class SimulationResultsCompiledPerTrack(models.Model):
@@ -172,9 +176,10 @@ class SimulationResultsCompiledPerTrack(models.Model):
     hw_total_flow = models.IntegerField(default=0)
     
     def __unicode__(self):  
-        return str(self.simulation_compiled) + "," + str(self.track)+ "," + str(self.average_number_track) + "," \
-        + str(self.stdev_number_track) + "," + str(self.average_total_flow)+ "," + str(self.stdev_total_flow)
-       
+        return str(self.simulation_compiled) + "," + str(self.track) + "," + str(self.average_number_track) + "," \
+         + str(self.stdev_number_track) + "," + str(self.average_total_flow) + "," + str(self.stdev_total_flow)
+
+
 # This object represents the information associated with the flow that occurs in a single track
 class SimulationResultsPerTrack(models.Model):
     simulation = models.ForeignKey(SimulationResults)
@@ -184,8 +189,9 @@ class SimulationResultsPerTrack(models.Model):
     average_number_track = models.IntegerField(default=0)
     
     def __unicode__(self):  
-        return str(self.simulation)+ "," + str(self.track)+ "," + str(self.total_arrivals)
-    
+        return str(self.simulation) + "," + str(self.track) + "," + str(self.total_arrivals)
+
+
 # This object represents the information associated with the flow of the track in a signle run
 class SimulationResultsCompiledFlowTrack(models.Model):
     track_simulation = models.ForeignKey(SimulationResultsCompiledPerTrack)
@@ -195,8 +201,9 @@ class SimulationResultsCompiledFlowTrack(models.Model):
     hw_flow_hour = models.FloatField(default=0)
             
     def __unicode__(self):  
-        return str(self.track_simulation)+ "," + str(self.hour)+ "," + str(self.avg_flow_hour)        
-        
+        return str(self.track_simulation) + "," + str(self.hour) + "," + str(self.avg_flow_hour)
+
+
 # This object represents the information associated with the flow of the track in a signle run
 class SimulationResultsFlowPerTrack(models.Model):
     track_simulation = models.ForeignKey(SimulationResultsPerTrack)
@@ -204,7 +211,8 @@ class SimulationResultsFlowPerTrack(models.Model):
     flow_hour = models.IntegerField(default=0)
             
     def __unicode__(self):  
-        return str(self.track_simulation)+ "," + str(self.hour)+ "," + str(self.flow_hour)        
+        return str(self.track_simulation) + "," + str(self.hour) + "," + str(self.flow_hour)
+
 
 # This object represents the information involved in a inverse simulation
 class InverseSimulation(models.Model):
@@ -212,11 +220,21 @@ class InverseSimulation(models.Model):
     lastModified = models.DateTimeField(auto_now=True)
     finished = models.BooleanField(default=False)
     creationTime = models.DateTimeField(auto_now_add=True)
-    # This number is between 0 and 100 (completion percentage)
     progress = models.IntegerField(default=0)
+    currentArrivalTuple = models.TextField(default=0)
+    evaluatingArrivalTuple = models.TextField(default=0)
 
     def __unicode__(self):
-        return str(self.ciclovia)+","+str(self.creationTime)
+        return str(self.ciclovia)+", " + 'Creation: ' + self.creationTime.strftime('%Y-%m-%d %H:%M %Z')
+
+
+class PosteriorDistribution(models.Model):
+    inverseSimulation = models.ForeignKey(InverseSimulation)
+    arrivalParameters = models.TextField()
+    pdf = models.FloatField(default=0)
+
+    def __unicode__(self):
+        return str(self.inverseSimulation) + " , " + str(self.arrivalParameters) + " , " + str(self.pdf)
 
 
 # This objects represents the measured taken in the ciclovia
@@ -224,3 +242,5 @@ class MeasuredFlowHour(models.Model):
     track = models.ForeignKey(Track)
     hour = models.IntegerField(default=0)
     flow = models.FloatField(default=0)
+
+
