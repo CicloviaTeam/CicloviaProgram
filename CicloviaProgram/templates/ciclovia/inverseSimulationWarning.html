@@ -2,7 +2,7 @@
 
 {% comment %}
 	Para la codificación en PyCharm
-	<head>
+<head xmlns="http://www.w3.org/1999/html">
 		<meta charset="UTF-8">
 	</head>
 {% endcomment %}
@@ -14,18 +14,59 @@
 		</div>
 		<div class="row">
 			<div class="col-md-12">
-				<p>Usted esta por correr una simulación inversa de la ciclovia, este es un proceso que puede tomar
-				entre 2 a 3 días (depende del tamaño de la ciclovia)
-				</p>
 				<p>
+                    Esta por correr una simulación inversa de la ciclovia, este es un proceso que puede tomar
+				    entre 2 a 3 días (depende del tamaño de la ciclovia)
+				</p>
+                <p>
+                    La simulación inversa funciona con informacion sobre el flujo de la ciclovía, a continuación encontrara un formato para ubicar esta información.
+                    Cuando de click en ejecutar la informacion de flujo se va a guardar, si no desea guardar nueva informacion, no despliegue el formulario.
+                    Puede dejar una o mas filas sin llenar, pero las filas que decida llenar deben estar completas.
+				</p>
+                <p><button class="btn btn-primary" type="button" onclick='createflowfields()' >Agregar medidas de flujo &raquo;</button></p>
+                <form action="{% url 'CicloviaProgram:inverseSimulationExecution' ciclovia.id %}" method="get">
+                <div id="flowTable" hidden="true">
+                    <table class='table table-striped'>
+                        <thead>
+                            <tr>
+								<th align='center'>Trayecto</th>
+                                {% for arrivalPerHour in ciclovia.arrivalsproportionperhour_set.all %}
+                                <th align='center'>Flujo hora {{arrivalPerHour.hour}}</th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for i in ciclovia.track_set.all %}
+                            <tr>
+                                <td> {{i.id_track}} </td>
+                                {% for arrivalPerHour in ciclovia.arrivalsproportionperhour_set.all %}
+                                <td align='center'>
+                                    <input class='form-control' type='number' name='track{{i.id_track}}hour{{arrivalPerHour.hour}}' />
+                                </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <p>
 					Cuando se tenga los resultados completos se enviará una notificación al correo electronico que se especifique en el siguiente campo
 				</p>
-                <form action="{% url 'CicloviaProgram:inverseSimulationExecution' ciclovia.id %}" method="get">
-				<input type="email" placeholder="correo@ejemplo.com" class="form-control" name="email">
-                    <p>Este es un proceso muy largo, por tal motivo solo se permite a un usuario tener una simulacion ejecutandose al mismo tiempo, haciendo click en ejecutar confirma la ejecución del proceso</p>
-                <input type="submit" value="Ejecutar" class="btn btn-primary" >
+				    <input type="email" placeholder="correo@ejemplo.com" class="form-control" name="email">
+                        <p>Este es un proceso muy largo, por tal motivo solo se permite a un usuario tener una simulacion ejecutandose al mismo tiempo, haciendo click en ejecutar confirma la ejecución del proceso</p>
+                    <input type="submit" value="Ejecutar" class="btn btn-primary" >
                 </form>
 			</div>
 		</div>
 	</div>
-{% endblock content %}          
+{% endblock content %}
+
+{% block scripts %}
+    <script>
+        var loadMeasures = false
+        function createflowfields(){
+            $("#flowTable").attr("hidden", false);
+            loadMeasures = true;
+        }
+    </script>
+{% endblock scripts %}
