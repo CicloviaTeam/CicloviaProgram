@@ -1599,3 +1599,17 @@ def likelihood(resultsCompiledId, cicloviaId):
 def priori(arrival, cicloviaObj):
     """" Returns the probability density function of t distribution given the value arrival """
     return scipy.stats.norm.pdf(arrival, loc=cicloviaObj.referenceArrivalRate, scale=5)
+
+
+def addFlowMeasures(measures, ciclovia_id):
+    ciclovia = Ciclovia.objects.get(id=ciclovia_id)
+    for trackDB in ciclovia.track_set.all():
+        print "Key "+ str(trackDB.id_track)
+        print "val "+ str(measures[trackDB.id_track])
+        if measures[trackDB.id_track][0] is not None:
+            hour = ciclovia.start_hour
+            for i in measures[trackDB.id_track]:
+                print "imprime flujo: " + str(i)
+                if i is not None:
+                    trackDB.measuredflowhour_set.create(hour=hour, flow=i)
+                hour += 1
