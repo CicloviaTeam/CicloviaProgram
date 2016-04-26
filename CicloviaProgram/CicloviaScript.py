@@ -1353,7 +1353,7 @@ def simulationExecution(cicloviaId, isValidation):
     start = timeit.default_timer()
     simulationRuns = 10
     if isValidation:
-        simulationRuns = 10
+        simulationRuns = 5
     seed = 9243881
 
     cicloviaFromDB = Ciclovia.objects.get(id=cicloviaId)
@@ -1500,35 +1500,50 @@ def inverseSimulation(cicloviaId):
     if not existentInverse:
         inverseDB = InverseSimulation.objects.create(ciclovia=cicloviaFromDB)
         referenceArrivalRate = ciclovia.referenceArrivalRate
-        newCiclovia = copyCiclovia(cicloviaId, "SimInv - " + cicloviaFromDB.name + " iteration " + str(1), "admin",
+        newCicloviaDB = copyCiclovia(cicloviaId, "SimInv - " + cicloviaFromDB.name + " iteration " + str(1), "admin",
                                    referenceArrivalRate)
-        resultsId = simulationExecution(newCiclovia.id, True)
-        posteriorCurrent = likelihood(resultsId, cicloviaId) * priori(referenceArrivalRate, ciclovia)
-        inverseDB.currentArrivalTuple = "("+str(referenceArrivalRate)+",)"
-        inverseDB.posteriordistribution_set.create(arrivalParameters="(" + str(referenceArrivalRate) + ",)",
+        newCiclovia = loadCiclovia(newCicloviaDB.id)
+        for tracks in newCiclovia.tracks:
+            if tracks.idNum == newCiclovia.referenceTrack:
+                refTrack = tracks
+        resultsId = simulationExecution(newCicloviaDB.id, True)
+        posteriorCurrent = likelihood(resultsId, cicloviaId) * priori(refTrack.arrivalsPerHour, ciclovia)
+        inverseDB.currentArrivalTuple = str(tuple(refTrack.arrivalsPerHour))
+        inverseDB.posteriordistribution_set.create(arrivalParameters=str(tuple([float(i) for i in refTrack.arrivalsPerHour])),
                                                    pdf=posteriorCurrent)
+        referenceArrivalRate = refTrack.arrivalsPerHour
         inverseDB.progress += 1
-        newCiclovia.delete()
+        newCicloviaDB.delete()
     else:
         inverseDB = inverseDB[0]
-        referenceArrivalRate = float(inverseDB.currentArrivalTuple.split(",")[0].split("(")[1])
+        referenceArrivalRate = []
+        for i in inverseDB.currentArrivalTuple.split('(')[1].split(')')[0].split(','):
+            referenceArrivalRate.append(float(i))
         posteriorCurrent = PosteriorDistribution.objects.get(arrivalParameters=inverseDB.currentArrivalTuple).pdf
     for i in range(inverseDB.progress, 5000):
         # referenceArrivalRateNew = generateArrivals(ciclovia, 10)
-        referenceArrivalRateNew = genNextArrival(referenceArrivalRate, 10)
-        inverseDB.evaluatingArrivalTuple = referenceArrivalRateNew
-        newCiclovia = copyCiclovia(cicloviaId, "SimInv - "+cicloviaFromDB.name+" iteration "+str(i), "admin",
-                                   referenceArrivalRateNew)
-        resultsId = simulationExecution(newCiclovia.id, True)
+        referenceArrivalRateNew = genNextArrival(referenceArrivalRate, 2)
+        inverseDB.evaluatingArrivalTuple = str(tuple(
+            [float(i) for i in referenceArrivalRateNew]))
+        newCicloviaRep = copyCiclovia(cicloviaId, "SimInv - "+cicloviaFromDB.name+" iteration "+str(int(i)), "admin",
+                                      referenceArrivalRateNew[int(ciclovia.referenceTrack)])
+        for hourArrival in newCicloviaRep.arrivalsproportionperhour_set.all():
+            for hour in range(int(newCicloviaRep.start_hour), int(newCicloviaRep.end_hour)):
+                if hour == int(hourArrival.hour):
+                    hourArrival.proportion = referenceArrivalRateNew[int(hour - newCicloviaRep.start_hour)] / \
+                                             newCicloviaRep.reference_arrival_rate
+        newCicloviaRep.save()
+        resultsId = simulationExecution(newCicloviaRep.id, True)
         posteriorToEvaluate = likelihood(resultsId, cicloviaId) * priori(referenceArrivalRateNew, ciclovia)
-        inverseDB.posteriordistribution_set.create(arrivalParameters="(" + str(referenceArrivalRateNew) + ",)",
-                                                   pdf=posteriorToEvaluate)
+        inverseDB.posteriordistribution_set.create(arrivalParameters=str(tuple(
+            [float(i) for i in referenceArrivalRateNew])), pdf=posteriorToEvaluate)
         acceptanceProbability = min(1, posteriorToEvaluate/posteriorCurrent)
         if random.random() < acceptanceProbability:
                 referenceArrivalRate = referenceArrivalRateNew
                 posteriorCurrent = posteriorToEvaluate
-                inverseDB.currentArrivalTuple = referenceArrivalRateNew
-        newCiclovia.delete()
+                inverseDB.currentArrivalTuple = str(tuple(
+                    [float(i) for i in referenceArrivalRateNew]))
+        newCicloviaRep.delete()
         inverseDB.progress += 1
         inverseDB.save()
     inverseDB.finished = True
@@ -1539,40 +1554,14 @@ def inverseSimulation(cicloviaId):
 
 # Generates next arrival, according to a symmetric t distribution with df freedom degrees
 def genNextArrival(currentArrival, df):
-    nextArrival = currentArrival + numpy.random.standard_t(df)
-    while nextArrival < 0:
-        nextArrival = currentArrival + numpy.random.standard_t(df)
-    return nextArrival
-
-
-# todo Complete this method
-# Generate a matrix of arrivals accoring to Multivariate log normal distribution
-def generateArrivals(cicloviaObj, nVariates):
-    refTrack = cicloviaObj.referenceTrack
-    refRate = cicloviaObj.referenceArrivalRate
-    refHour = cicloviaObj.referenceHour
-    numberOfRates = cicloviaObj.numTracks*(cicloviaObj.endHour - cicloviaObj.startHour)
-
-    # Vector de medias
-    mu = []
-    for track in cicloviaObj.tracks:
-        for arrivalHour in track.arrivalsPerHour:
-            mu.append(math.exp(arrivalHour))
-    print "vector de medias:"
-    print str(mu)
-
-    # Vector de varianza
-    var = []
-    # todo encontrar varianza de los arribos de un trayecto para cada hora
-    for track in cicloviaObj.tracks:
-        var = [x * 16 for x in mu]
-    cov = numpy.diag(var)
-    normVariates = numpy.random.multivariate_normal(mu, cov, size=nVariates)
-    print "Arribos normales"
-    print (normVariates)
-    logNormVariates = numpy.log(normVariates)
-    print (logNormVariates)
-    return cicloviaObj.referenceArrivalRate*random.random()
+    arrivals = []
+    currentArrival = [float(decimal.Decimal(str(i))) for i in currentArrival]
+    for nextArrival in currentArrival:
+        nextArrival += numpy.random.standard_t(df)
+        while nextArrival < 0:
+            nextArrival += numpy.random.standard_t(df)
+        arrivals.append(nextArrival)
+    return arrivals
 
 
 def likelihood(resultsCompiledId, cicloviaId):
@@ -1596,9 +1585,24 @@ def likelihood(resultsCompiledId, cicloviaId):
     return math.exp(-residuals/(2*211.88))
 
 
-def priori(arrival, cicloviaObj):
-    """" Returns the probability density function of t distribution given the value arrival """
-    return scipy.stats.norm.pdf(arrival, loc=cicloviaObj.referenceArrivalRate, scale=5)
+def priori(arrivals, cicloviaObj):
+    hour = 0
+    variance = 50
+    muArray = []
+    covMatrix = []
+    xArrray = []
+    for arrival in arrivals:
+        mean = float(str(cicloviaObj.tracks[cicloviaObj.referenceTrack].arrivalsPerHour[hour]))
+        mu = math.log(mean*mean/(math.sqrt(variance+mean*mean)))
+        muArray.append(mu)
+        sigma = math.sqrt(math.log(variance/(mean*mean) + 1))
+        covMatrix.append(sigma)
+        xArrray.append(math.log(arrival))
+        hour += 1
+    covMatrix = numpy.diag(covMatrix)
+    normalPdf = scipy.stats.multivariate_normal.pdf(xArrray, mean=muArray, cov=covMatrix)
+    prioriPdf = normalPdf/float(str(numpy.prod(arrivals)))
+    return prioriPdf
 
 
 def addFlowMeasures(measures, ciclovia_id):

@@ -480,6 +480,7 @@ def inverseSimulationExecution(request, ciclovia_id):
         measures[track.id_track] = flowHours
     if newFlowMeasures:
         CicloviaScript.addFlowMeasures(measures, ciclovia_id)
+    CicloviaScript.inverseSimulation(ciclovia_id)
     return render(request, 'ciclovia/inverseSimulationWarning.html', {'ciclovia': ciclovia})
 
 
